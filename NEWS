@@ -1,0 +1,9 @@
+NEWS FOR 0.99.8
+---------------
+* I removed the timestampping from the swindow layer. I think it's
+  better this way. As a result, though, you'll probably want to remove
+  any set FORMAT_* lines from ~/.pork/porkrc.
+
+* Rewrote some screen i/o stuff to eliminate a lot of unnecessary
+  copying of data (hopefully speeding things up a bit and saving CPU
+  cycles).
