@@ -60,7 +60,10 @@ static int int_vasprintf(char **result, char *format, va_list args) {
 
 				while (strchr("hlL", *p))
 					++p;
-				/* Should be big enough for any format specifier except %s and floats.	*/
+				/*
+				** Should be big enough for any format
+				** specifier except %s and floats.
+				*/
 				total_width += 30;
 
 				switch (*p) {
@@ -81,8 +84,9 @@ static int int_vasprintf(char **result, char *format, va_list args) {
 					case 'G':
 						(void) va_arg(ap, double);
 						/*
-						** Since an ieee double can have an exponent of 307, we'll
-						** make the buffer wide enough to cover the gross case.
+						** Since an ieee double can have an exponent of 307,
+						** we'll make the buffer wide enough to cover
+						** the gross case.
 						*/
 						total_width += 307;
 						break;
