@@ -1023,6 +1023,7 @@ static int parse_im_chan2(	aim_session_t *session,
 	if (args->reqclass & AIM_CAPS_CHAT) {
 		char *chat_name;
 		char chat_fullname[512];
+		int ret;
 
 		/*
 		** They accepted our invitation.
@@ -1041,12 +1042,14 @@ static int parse_im_chan2(	aim_session_t *session,
 		if (chat_name == NULL)
 			chat_name = xstrdup(args->info.chat.roominfo.name);
 
-		snprintf(chat_fullname, sizeof(chat_fullname), "%s/%d",
-			chat_name, args->info.chat.roominfo.exchange);
+		ret = snprintf(chat_fullname, sizeof(chat_fullname), "%s/%d",
+				chat_name, args->info.chat.roominfo.exchange);
 		free(chat_name);
 
-		chat_got_invite(acct, chat_fullname,
-			userinfo->sn, NULL, (char *) args->msg);
+		if (ret > 0 && (size_t) ret < sizeof(chat_fullname)) {
+			chat_got_invite(acct, chat_fullname,
+				userinfo->sn, NULL, (char *) args->msg);
+		}
 
 		return (1);
 	} else if (args->reqclass & AIM_CAPS_SENDFILE) {
@@ -1199,6 +1202,7 @@ static FAIM_CB(aim_recv_missed) {
 	aim_userinfo_t *userinfo;
 	char buf[1024];
 	struct pork_acct *acct = session->aux_data;
+	int ret;
 
 	va_start(ap, fr);
 	chan = (u_int16_t) va_arg(ap, unsigned int);
@@ -1209,54 +1213,55 @@ static FAIM_CB(aim_recv_missed) {
 
 	switch(reason) {
 		case 0:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s because it was invalid" :
-					"%s missed %d messages from %s because they were invalid",
-				acct->username, num_missed, userinfo->sn);
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s because it was invalid" :
+						"%s missed %u messages from %s because they were invalid",
+					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 1:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s because it was too large" :
-					"%s missed %d messages from %s because they were too large",
-				acct->username, num_missed, userinfo->sn);
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s because it was too large" :
+						"%s missed %u messages from %s because they were too large",
+					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 2:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s because the rate limit has been exceeded" :
-					"%s missed %d messages from %s because the rate limit has been exceeded",
-				acct->username, num_missed, userinfo->sn);
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s because the rate limit has been exceeded" :
+						"%s missed %u messages from %s because the rate limit has been exceeded",
+					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 3:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s because the sender's warning level is too high" :
-					"%s missed %d messages from %s because the sender's warning level is too high",
-				acct->username, num_missed, userinfo->sn);
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s because the sender's warning level is too high" :
+						"%s missed %u messages from %s because the sender's warning level is too high",
+					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 4:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s because your warning level is too high" :
-					"%s missed %d messages from %s because your warning level is too high",
-				acct->username, num_missed, userinfo->sn);
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s because your warning level is too high" :
+						"%s missed %u messages from %s because your warning level is too high",
+					acct->username, num_missed, userinfo->sn);
 			break;
 
 		default:
-			snprintf(buf, sizeof(buf),
-				num_missed == 1 ?
-					"%s missed %d message from %s for unknown reasons" :
-					"%s missed %d messages from %s for unknown reasons",
-				acct->username, num_missed, userinfo->sn);
-			break;
+			ret = snprintf(buf, sizeof(buf),
+					num_missed == 1 ?
+						"%s missed %u message from %s for unknown reasons" :
+						"%s missed %u messages from %s for unknown reasons",
+					acct->username, num_missed, userinfo->sn);
+				break;
 	}
 
+	screen_err_msg("Error: %s", buf);
 	return (1);
 }
 

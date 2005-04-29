@@ -518,8 +518,11 @@ static int aim_file_accept(struct file_transfer *xfer) {
 
 	oft_info = xfer->data;
 
-	snprintf(buf, sizeof(buf), "%s:%d", oft_info->verifiedip,
-		oft_info->port);
+	ret = snprintf(buf, sizeof(buf), "%s:%d", oft_info->verifiedip,
+			oft_info->port);
+
+	if (ret < 0 || (size_t) ret >= sizeof(buf))
+		return (-1);
 
 	oft_info->conn = aim_newconn(&priv->aim_session,
 						AIM_CONN_TYPE_RENDEZVOUS, NULL);
