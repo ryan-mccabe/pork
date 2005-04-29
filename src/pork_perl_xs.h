@@ -132,5 +132,6 @@ XS(PORK_chat_topic);
 XS(PORK_chat_unignore);
 
 XS(PORK_input_send);
+XS(PORK_input_get_data);
 
 #endif

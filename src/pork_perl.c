@@ -174,6 +174,7 @@ void xs_init(init_args) {
 	newXS("PORK::chat_topic", PORK_chat_topic, file);
 	newXS("PORK::chat_unignore", PORK_chat_unignore, file);
 	newXS("PORK::input_send", PORK_input_send, file);
+	newXS("PORK::input_get_data", PORK_input_get_data, file);
 }
 
 int perl_load_file(char *filename) {

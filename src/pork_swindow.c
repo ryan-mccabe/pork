@@ -845,7 +845,7 @@ int swindow_set_log(struct swindow *swindow) {
 	u_int32_t len;
 
 	if (swindow->logfile == NULL) {
-		screen_err_msg("No logfile has been specified for this window. Specify one with /win set logfile");
+		screen_err_msg("No logfile has been specified for this window");
 		return (-1);
 	}
 

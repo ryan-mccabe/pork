@@ -120,6 +120,15 @@ XS(PORK_input_send) {
 	XSRETURN_IV(0);
 }
 
+XS(PORK_input_get_data) {
+	dXSARGS;
+
+	(void) cv;
+	(void) items;
+
+	XSRETURN_PV(input_get_buf_str(cur_window()->input));
+}
+
 XS(PORK_disconnect) {
 	struct pork_acct *acct;
 	char *reason = NULL;

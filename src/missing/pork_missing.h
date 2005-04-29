@@ -80,6 +80,10 @@ int getnameinfo(const struct sockaddr *sa, size_t salen, char *host,
 				size_t hostlen, char *serv, size_t servlen, int flags);
 #endif
 
+#ifndef HAVE_VASPRINTF
+int vasprintf(char **result, const char *format, va_list args);
+#endif
+
 #ifndef NI_MAXSERV
 #	define NI_MAXSERV 32
 #endif

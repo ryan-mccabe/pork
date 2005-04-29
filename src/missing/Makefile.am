@@ -8,7 +8,8 @@ libmissing_a_SOURCES =	\
 	ipv6_missing.c		\
 	getopt.c			\
 	snprintf.c			\
-	strsep.c
+	strsep.c			\
+	vasprintf.c
 
 noinst_HEADERS = 			\
 	getopt_missing.h		\
