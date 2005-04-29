@@ -92,6 +92,7 @@ int pork_io_del(void *key) {
 		return (-1);
 
 	io = node->data;
+	close(io->fd);
 	io->fd = -2;
 	io->callback = NULL;
 	return (0);
@@ -149,7 +150,7 @@ static int pork_io_find_dead_fds(dlist_t *io_list) {
 		struct io_source *io = cur->data;
 		dlist_t *next = cur->next;
 
-		if (sock_is_error(io->fd)) {
+		if (io->fd < 0 || sock_is_error(io->fd)) {
 			debug("fd %d is dead", io->fd);
 			if (io->callback != NULL)
 				io->callback(io->fd, IO_COND_DEAD, io->data);

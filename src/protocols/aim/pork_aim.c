@@ -551,9 +551,13 @@ static char *get_chatname(const char *orig) {
 		if (*p != '%')
 			*s = *p++;
 		else {
-			char buf[3];
+			char buf[4];
 
-			xstrncpy(buf, ++p, sizeof(buf));
+			if (xstrncpy(buf, ++p, sizeof(buf)) == -1) {
+				free(ret);
+				return (NULL);
+			}
+
 			p += 2;
 
 			*s = (char) strtol(buf, NULL, 16);
@@ -1727,17 +1731,29 @@ static FAIM_CB(aim_recv_redirect) {
 				aim_connected);
 		} else {
 			aim_conn_kill(session, &chat_conn);
-			screen_err_msg("Unable to connect to the chatnav server");
+			screen_err_msg("Unable to connect to the chat server");
 			return (0);
 		}
 
 		chat_title = get_chatname(redirect->chat.room);
+		if (chat_title == NULL)
+			chat_title = xstrdup(redirect->chat.room);
 
-		snprintf(buf, sizeof(buf), "%s/%d",
-			chat_title, redirect->chat.exchange);
+		ret = snprintf(buf, sizeof(buf), "%s/%d",
+				chat_title, redirect->chat.exchange);
+
+		if (ret < 0 || (size_t) ret >= sizeof(buf)) {
+			free(chat_title);
+			pork_io_del(chat_conn);
+			aim_conn_kill(session, &chat_conn);
+			return (-1);
+		}
 
 		win = imwindow_find_chat_target(acct, buf);
 		if (win == NULL) {
+			free(chat_title);
+			pork_io_del(chat_conn);
+			aim_conn_kill(session, &chat_conn);
 			debug("unable to find chat window for %s (acct: %s)",
 				buf, acct->username);
 			return (-1);
