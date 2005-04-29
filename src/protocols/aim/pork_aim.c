@@ -23,8 +23,8 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include <aim.h>
-#include <faimconfig.h>
+#include <libfaim/faimconfig.h>
+#include <libfaim/aim.h>
 
 #include <pork.h>
 #include <pork_missing.h>
@@ -50,27 +50,9 @@
 #include <pork_transfer.h>
 #include <pork_msg.h>
 #include <pork_opt.h>
+
 #include <pork_aim.h>
-
-static void aim_kill_pending_chats(struct pork_acct *acct);
-static int aim_join_chatroom(struct pork_acct *acct, char *name, char *args);
-static int aim_chat_print_users(struct pork_acct *acct, struct chatroom *chat);
-static dlist_t *aim_find_chat(	struct pork_acct *acct,
-								const char *name,
-								int exchange);
-
-static int aim_sock_connect(const char *ip,
-							struct sockaddr_storage *laddr,
-							int *sock);
-
-static int aim_report_idle(struct pork_acct *acct, int mode);
-static int aim_connect_abort(struct pork_acct *acct);
-static int aim_set_away(struct pork_acct *acct, char *away_msg);
-static int aim_login(struct pork_acct *acct);
-static int aim_send_msg_auto(struct pork_acct *acct, char *dest, char *msg);
-static int aim_update_buddy(struct pork_acct *acct,
-							struct buddy *buddy,
-							void *data);
+#include <pork_aim_proto.h>
 
 static u_int32_t pork_caps =	AIM_CAPS_CHAT | AIM_CAPS_INTEROPERATE |
 								AIM_CAPS_SENDFILE;
@@ -103,6 +85,11 @@ static char *msgerrreason[] = {
 	"Not while on AOL"
 };
 
+
+static FAIM_CB(aim_connerr);
+static FAIM_CB(aim_parse_login);
+static FAIM_CB(aim_parse_authresp);
+
 static void aim_debug(	aim_session_t *session __notused,
 						int level __notused,
 						const char *format __notused,
@@ -116,9 +103,9 @@ static void aim_debug(	aim_session_t *session __notused,
 #endif
 }
 
-static int aim_sock_connect(const char *ip,
-							struct sockaddr_storage *laddr,
-							int *sock)
+int aim_sock_connect(	const char *ip,
+						struct sockaddr_storage *laddr,
+						int *sock)
 {
 	struct sockaddr_storage ss;
 	char *addr;
@@ -231,76 +218,13 @@ static void aim_print_info(	char *user,
 	}
 }
 
-static int __aim_free_chat(struct pork_acct *acct, void *data) {
-	struct aim_chat *a_chat = data;
-
-	if (a_chat->conn != NULL) {
-		struct aim_priv *priv = acct->data;
-
-		pork_io_del(a_chat->conn);
-		aim_conn_kill(&priv->aim_session, &a_chat->conn);
-	}
-
-	free(a_chat->fullname);
-	free(a_chat->fullname_quoted);
-	free(a_chat->title);
-	free(a_chat);
-
-	return (0);
-}
-
-static void aim_free_chat(struct pork_acct *acct, dlist_t *node) {
-	struct chatroom *chat = node->data;
-
-	__aim_free_chat(acct, chat->data);
-}
-
-static char *get_chatname(const char *orig) {
-	char *p;
-	char *s;
-	char *ret;
-
-	if (orig == NULL)
-		return (xstrdup(orig));
-
-	p = strrchr(orig, '-');
-	if (p == NULL)
-		return (xstrdup(orig));
-
-	s = xstrdup(++p);
-	ret = s;
-
-	/*
-	** The length of s will always be less than or equal to the length of p.
-	*/
-
-	while (*p != '\0') {
-		if (*p != '%')
-			*s = *p++;
-		else {
-			char buf[3];
-
-			xstrncpy(buf, ++p, sizeof(buf));
-			p += 2;
-
-			*s = (char) strtol(buf, NULL, 16);
-		}
-
-		s++;
-	}
-
-	*s = '\0';
-	return (ret);
-}
-
 static inline void aim_disconnected_chat(	struct pork_acct *acct,
 											struct chatroom *chat)
 {
 	chat_forced_leave(acct, chat->title, "the server", "disconnected");
 }
 
-static void aim_listen_conn_event(int sock, u_int32_t cond, void *data)
-{
+void aim_listen_conn_event(int sock, u_int32_t cond, void *data) {
 	aim_conn_t *conn = (aim_conn_t *) data;
 	aim_session_t *session = conn->sessv;
 	struct pork_acct *acct = session->aux_data;
@@ -314,6 +238,23 @@ static void aim_listen_conn_event(int sock, u_int32_t cond, void *data)
 		pork_sock_err(acct, sock);
 		close(sock);
 		transfer_lost(xfer);
+	}
+}
+
+static void aim_kill_pending_chats(struct pork_acct *acct) {
+	struct aim_priv *priv = acct->data;
+	dlist_t *cur;
+
+	cur = priv->chat_create_list;
+	while (cur != NULL) {
+		struct chatroom_info *info = cur->data;
+		dlist_t *next = cur->next;
+
+		free(info->name);
+		free(info);
+		free(cur);
+
+		cur = next;
 	}
 }
 
@@ -391,7 +332,7 @@ static void aim_conn_event(int sock, u_int32_t cond, void *data) {
 		aim_tx_flushqueue(session);
 }
 
-static void aim_connected(int sock, u_int32_t cond __notused, void *data) {
+void aim_connected(int sock, u_int32_t cond __notused, void *data) {
 	aim_conn_t *conn = data;
 	aim_session_t *session = conn->sessv;
 	struct pork_acct *acct = session->aux_data;
@@ -518,11 +459,209 @@ static int aim_send_block_list(aim_session_t *session, struct pork_acct *acct) {
 	return (1);
 }
 
+int aim_login(struct pork_acct *acct) {
+	struct aim_priv *priv = acct->data;
+	int ret;
+	int sock;
+	aim_conn_t *auth_conn;
+	char *server;
+
+	server = getenv("AIM_SERVER");
+	if (server == NULL)
+		server = FAIM_LOGIN_SERVER;
+
+	acct->connected = 0;
+	screen_win_msg(cur_window(), 1, 1, 0,
+		MSG_TYPE_STATUS, "Logging in as %s...", acct->username);
+
+	auth_conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_AUTH, NULL);
+	if (auth_conn == NULL) {
+		screen_err_msg("Connection error while logging in as %s",
+			acct->username);
+
+		return (-1);
+	}
+
+	ret = aim_sock_connect(server, &acct->laddr, &sock);
+	if (ret == 0) {
+		aim_connected(sock, 0, auth_conn);
+	} else if (ret == -EINPROGRESS) {
+		auth_conn->status |= AIM_CONN_STATUS_INPROGRESS;
+		pork_io_add(sock, IO_COND_WRITE, auth_conn, auth_conn, aim_connected);
+	} else {
+		screen_err_msg("Error connecting to the authorizer server as %s",
+			acct->username);
+		aim_conn_kill(&priv->aim_session, &auth_conn);
+		return (-1);
+	}
+
+	aim_conn_addhandler(&priv->aim_session, auth_conn,
+		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
+
+	aim_conn_addhandler(&priv->aim_session, auth_conn,
+		AIM_CB_FAM_ATH, AIM_CB_ATH_AUTHRESPONSE, aim_parse_login, 0);
+
+	aim_conn_addhandler(&priv->aim_session, auth_conn,
+		AIM_CB_FAM_ATH, AIM_CB_ATH_LOGINRESPONSE, aim_parse_authresp, 0);
+
+	aim_request_login(&priv->aim_session, auth_conn, acct->username);
+	return (1);
+}
+
+static dlist_t *aim_find_chat(	struct pork_acct *acct,
+								const char *name,
+								int exchange)
+{
+	dlist_t *cur;
+
+	cur = acct->chat_list;
+	while (cur != NULL) {
+		struct chatroom *chat = cur->data;
+		struct aim_chat *a_chat = chat->data;
+
+		if (!strcasecmp(name, a_chat->title) && exchange == a_chat->exchange)
+			return (cur);
+
+		cur = cur->next;
+	}
+
+	return (NULL);
+}
+
+static char *get_chatname(const char *orig) {
+	char *p;
+	char *s;
+	char *ret;
+
+	if (orig == NULL)
+		return (xstrdup(orig));
+
+	p = strrchr(orig, '-');
+	if (p == NULL)
+		return (xstrdup(orig));
+
+	s = xstrdup(++p);
+	ret = s;
+
+	/*
+	** The length of s will always be less than or equal to the length of p.
+	*/
+
+	while (*p != '\0') {
+		if (*p != '%')
+			*s = *p++;
+		else {
+			char buf[3];
+
+			xstrncpy(buf, ++p, sizeof(buf));
+			p += 2;
+
+			*s = (char) strtol(buf, NULL, 16);
+		}
+
+		s++;
+	}
+
+	*s = '\0';
+	return (ret);
+}
+
+int aim_kill_all_conn(struct pork_acct *acct) {
+	struct aim_priv *priv = acct->data;
+	aim_conn_t *conn;
+	dlist_t *cur;
+
+	if (priv == NULL)
+		return (-1);
+
+	conn = priv->aim_session.connlist;
+
+	if (acct->connected) {
+		aim_rxdispatch(&priv->aim_session);
+		aim_tx_flushqueue(&priv->aim_session);
+	}
+
+	while (conn != NULL) {
+		pork_io_del(conn);
+		conn = conn->next;
+	}
+
+	aim_kill_pending_chats(acct);
+
+	cur = acct->chat_list;
+	while (cur != NULL) {
+		dlist_t *next = cur->next;
+		struct chatroom *chat = cur->data;
+
+		aim_chat_free(acct, chat->data);
+		cur = next;
+	}
+
+	aim_session_kill(&priv->aim_session);
+	return (0);
+}
+
+int aim_setup(struct pork_acct *acct) {
+	struct aim_priv *priv = acct->data;
+	aim_session_t *session = &priv->aim_session;
+
+	memset(session, 0, sizeof(*session));
+
+	aim_session_init(session, 0, 0);
+	aim_setdebuggingcb(session, aim_debug);
+
+	aim_tx_setenqueue(session, AIM_TX_IMMEDIATE, NULL);
+	session->aux_data = acct;
+
+	return (0);
+}
+
+int aim_chat_parse_name(const char *name, struct chatroom_info *info) {
+	int exchange;
+	char *p;
+
+	p = strchr(name, '/');
+	if (p != NULL) {
+		p++;
+
+		if (str_to_int(p, &exchange) != 0)
+			return (-1);
+
+		if (exchange < 4)
+			exchange = 4;
+		else if (exchange > 16)
+			exchange = 16;
+
+		info->name = xstrndup(name, p - name - 1);
+		info->exchange = exchange;
+	} else {
+		info->name = xstrdup(name);
+		info->exchange = AIM_DEFAULT_CHAT_EXCHANGE;
+	}
+
+	return (0);
+}
+
+dlist_t *aim_find_chat_name(struct pork_acct *acct, char *name) {
+	dlist_t *ret;
+	struct chatroom_info info;
+
+	if (aim_chat_parse_name(name, &info) != 0) {
+		debug("aim_chat_parse_name failed for %s", name);
+		return (NULL);
+	}
+
+	ret = aim_find_chat(acct, info.name, info.exchange);
+	free(info.name);
+	return (ret);
+}
+
+
 /*
 ** libfaim callback handlers.
 */
 
-FAIM_CB(aim_conn_dead) {
+static FAIM_CB(aim_conn_dead) {
 	aim_conn_t *conn;
 
 	va_list ap;
@@ -543,7 +682,7 @@ FAIM_CB(aim_conn_dead) {
 	return (1);
 }
 
-FAIM_CB(aim_connerr) {
+static FAIM_CB(aim_connerr) {
 	u_int16_t code;
 	char *msg;
 	va_list ap;
@@ -599,7 +738,7 @@ FAIM_CB(aim_file_transfer_dead) {
 	return (-1);
 }
 
-FAIM_CB(aim_recv_bos_rights) {
+static FAIM_CB(aim_recv_bos_rights) {
 	va_list ap;
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
@@ -617,7 +756,7 @@ FAIM_CB(aim_recv_bos_rights) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_buddy_rights) {
+static FAIM_CB(aim_recv_buddy_rights) {
 	va_list ap;
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
@@ -630,7 +769,7 @@ FAIM_CB(aim_recv_buddy_rights) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_conn_complete) {
+static FAIM_CB(aim_recv_conn_complete) {
 	pork_io_set_cond(fr->conn, IO_COND_READ);
 
 	aim_reqpersonalinfo(session, fr->conn);
@@ -642,7 +781,7 @@ FAIM_CB(aim_recv_conn_complete) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_typing) {
+static FAIM_CB(aim_recv_typing) {
 	va_list ap;
 	u_int16_t type1;
 	u_int16_t type2;
@@ -667,7 +806,7 @@ FAIM_CB(aim_recv_typing) {
 	return (0);
 }
 
-FAIM_CB(aim_recv_err_loc) {
+static FAIM_CB(aim_recv_err_loc) {
 	va_list ap;
 	char *dest;
 	char *err_str;
@@ -687,7 +826,7 @@ FAIM_CB(aim_recv_err_loc) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_err_msg) {
+static FAIM_CB(aim_recv_err_msg) {
 	va_list ap;
 	char *dest;
 	char *err_str;
@@ -722,7 +861,7 @@ FAIM_CB(aim_recv_err_msg) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_err_other) {
+static FAIM_CB(aim_recv_err_other) {
 	va_list ap;
 	u_int16_t code;
 	char *err_str;
@@ -740,7 +879,7 @@ FAIM_CB(aim_recv_err_other) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_evil) {
+static FAIM_CB(aim_recv_evil) {
 	va_list ap;
 	u_int16_t warn_level;
 	aim_userinfo_t *userinfo;
@@ -794,7 +933,7 @@ FAIM_CB(aim_recv_evil) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_icbm_param_info) {
+static FAIM_CB(aim_recv_icbm_param_info) {
 	va_list ap;
 	struct aim_icbmparameters *params;
 
@@ -974,7 +1113,7 @@ static int parse_im_chan2(	aim_session_t *session,
 	return (0);
 }
 
-FAIM_CB(aim_recv_msg) {
+static FAIM_CB(aim_recv_msg) {
 	va_list ap;
 	int channel;
 	aim_userinfo_t *userinfo;
@@ -1010,7 +1149,7 @@ FAIM_CB(aim_recv_msg) {
 	return (ret);
 }
 
-FAIM_CB(aim_recv_locrights) {
+static FAIM_CB(aim_recv_locrights) {
 	va_list ap;
 	u_int16_t max_len;
 	struct pork_acct *acct = session->aux_data;
@@ -1052,7 +1191,7 @@ FAIM_CB(aim_recv_locrights) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_missed) {
+static FAIM_CB(aim_recv_missed) {
 	va_list ap;
 	u_int16_t chan;
 	u_int16_t num_missed;
@@ -1121,7 +1260,7 @@ FAIM_CB(aim_recv_missed) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_selfinfo) {
+static FAIM_CB(aim_recv_selfinfo) {
 	va_list ap;
 	aim_userinfo_t *info;
 	struct pork_acct *acct = session->aux_data;
@@ -1136,7 +1275,7 @@ FAIM_CB(aim_recv_selfinfo) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_motd) {
+static FAIM_CB(aim_recv_motd) {
 	char *msg;
 	u_int16_t id;
 	va_list ap;
@@ -1154,7 +1293,7 @@ FAIM_CB(aim_recv_motd) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_offgoing) {
+static FAIM_CB(aim_recv_offgoing) {
 	va_list ap;
 	aim_userinfo_t *userinfo;
 	struct pork_acct *acct = session->aux_data;
@@ -1171,7 +1310,7 @@ FAIM_CB(aim_recv_offgoing) {
 	return (buddy_went_offline(acct, userinfo->sn));
 }
 
-FAIM_CB(aim_recv_oncoming) {
+static FAIM_CB(aim_recv_oncoming) {
 	va_list ap;
 	struct buddy *buddy;
 	aim_userinfo_t *userinfo;
@@ -1214,7 +1353,7 @@ FAIM_CB(aim_recv_oncoming) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_rate_change) {
+static FAIM_CB(aim_recv_rate_change) {
 	struct pork_acct *acct = session->aux_data;
 	va_list ap;
 	u_int16_t rate_code;
@@ -1268,7 +1407,7 @@ FAIM_CB(aim_recv_rate_change) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_chatnav_info) {
+static FAIM_CB(aim_recv_chatnav_info) {
 	va_list ap;
 	u_int16_t type;
 	struct pork_acct *acct = session->aux_data;
@@ -1346,7 +1485,7 @@ FAIM_CB(aim_recv_chatnav_info) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_chat_join) {
+static FAIM_CB(aim_recv_chat_join) {
 	struct pork_acct *acct = session->aux_data;
 	struct chatroom *chat = fr->conn->priv;
 	aim_userinfo_t *userinfo;
@@ -1381,7 +1520,7 @@ FAIM_CB(aim_recv_chat_join) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_chat_leave) {
+static FAIM_CB(aim_recv_chat_leave) {
 	struct pork_acct *acct = session->aux_data;
 	struct chatroom *chat = fr->conn->priv;
 	va_list ap;
@@ -1409,7 +1548,7 @@ FAIM_CB(aim_recv_chat_leave) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_chat_info_update) {
+static FAIM_CB(aim_recv_chat_info_update) {
 	va_list ap;
 	aim_userinfo_t *userinfo;
 	struct aim_chat_roominfo *roominfo;
@@ -1442,7 +1581,7 @@ FAIM_CB(aim_recv_chat_info_update) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_chat_msg) {
+static FAIM_CB(aim_recv_chat_msg) {
 	va_list ap;
 	aim_userinfo_t *info;
 	char *msg;
@@ -1479,27 +1618,34 @@ FAIM_CB(aim_recv_chat_msg) {
 	return (1);
 }
 
-FAIM_CB(recv_chat_conn) {
+static FAIM_CB(recv_chat_conn) {
 	pork_io_set_cond(fr->conn, IO_COND_READ);
 
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CHT, AIM_CB_CHT_ERROR, aim_recv_err_other, 0);
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CHT, AIM_CB_CHT_USERJOIN, aim_recv_chat_join, 0);
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CHT, AIM_CB_CHT_USERLEAVE, aim_recv_chat_leave, 0);
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CHT, AIM_CB_CHT_ROOMINFOUPDATE, aim_recv_chat_info_update, 0);
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CHT, AIM_CB_CHT_INCOMINGMSG, aim_recv_chat_msg, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CHT, AIM_CB_CHT_ERROR, aim_recv_err_other, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CHT, AIM_CB_CHT_USERJOIN, aim_recv_chat_join, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CHT, AIM_CB_CHT_USERLEAVE, aim_recv_chat_leave, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CHT, AIM_CB_CHT_ROOMINFOUPDATE, aim_recv_chat_info_update, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CHT, AIM_CB_CHT_INCOMINGMSG, aim_recv_chat_msg, 0);
 
 	aim_clientready(session, fr->conn);
 	return (1);
 }
 
-FAIM_CB(recv_chatnav_conn) {
+static FAIM_CB(recv_chatnav_conn) {
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
 
 	pork_io_set_cond(fr->conn, IO_COND_READ);
 
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CTN, AIM_CB_CTN_ERROR, aim_recv_err_other, 0);
-	aim_conn_addhandler(session, fr->conn, AIM_CB_FAM_CTN, AIM_CB_CTN_INFO, aim_recv_chatnav_info, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CTN, AIM_CB_CTN_ERROR, aim_recv_err_other, 0);
+	aim_conn_addhandler(session, fr->conn,
+		AIM_CB_FAM_CTN, AIM_CB_CTN_INFO, aim_recv_chatnav_info, 0);
 
 	aim_clientready(session, fr->conn);
 	aim_chatnav_reqrights(session, fr->conn);
@@ -1509,7 +1655,7 @@ FAIM_CB(recv_chatnav_conn) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_redirect) {
+static FAIM_CB(aim_recv_redirect) {
 	struct aim_redirect_data *redirect;
 	va_list ap;
 	struct pork_acct *acct = session->aux_data;
@@ -1543,9 +1689,12 @@ FAIM_CB(aim_recv_redirect) {
 			return (0);
 		}
 
-		aim_conn_addhandler(session, chatnav, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
-		aim_conn_addhandler(session, chatnav, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
-		aim_conn_addhandler(session, chatnav, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, recv_chatnav_conn, 0);
+		aim_conn_addhandler(session, chatnav,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
+		aim_conn_addhandler(session, chatnav,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
+		aim_conn_addhandler(session, chatnav,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, recv_chatnav_conn, 0);
 
 		aim_sendcookie(session, chatnav, redirect->cookielen, redirect->cookie);
 	} else if (redirect->group == AIM_CONN_TYPE_CHAT) {
@@ -1602,16 +1751,20 @@ FAIM_CB(aim_recv_redirect) {
 		chat->data = a_chat;
 		chat_conn->priv = chat;
 
-		aim_conn_addhandler(session, chat_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
-		aim_conn_addhandler(session, chat_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
-		aim_conn_addhandler(session, chat_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, recv_chat_conn, 0);
+		aim_conn_addhandler(session, chat_conn,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
+		aim_conn_addhandler(session, chat_conn,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
+		aim_conn_addhandler(session, chat_conn,
+			AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, recv_chat_conn, 0);
+
 		aim_sendcookie(session, chat_conn, redirect->cookielen, redirect->cookie);
 	}
 
 	return (1);
 }
 
-FAIM_CB(aim_recv_search_error) {
+static FAIM_CB(aim_recv_search_error) {
 	va_list ap;
 	char *address;
 	struct pork_acct *acct = session->aux_data;
@@ -1630,7 +1783,7 @@ FAIM_CB(aim_recv_search_error) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_search_reply) {
+static FAIM_CB(aim_recv_search_reply) {
 	va_list ap;
 	char *address;
 	char *usernames;
@@ -1690,7 +1843,7 @@ FAIM_CB(aim_recv_search_reply) {
 	return (1);
 }
 
-FAIM_CB(aim_ssi_recv_rights) {
+static FAIM_CB(aim_ssi_recv_rights) {
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
 	int num;
@@ -1717,7 +1870,7 @@ FAIM_CB(aim_ssi_recv_rights) {
 	return (1);
 }
 
-FAIM_CB(aim_ssi_recv_list) {
+static FAIM_CB(aim_ssi_recv_list) {
 	struct aim_ssi_item *cur;
 	struct pork_acct *acct = session->aux_data;
 
@@ -1814,7 +1967,7 @@ FAIM_CB(aim_ssi_recv_list) {
 	return (1);
 }
 
-FAIM_CB(aim_recv_userinfo) {
+static FAIM_CB(aim_recv_userinfo) {
 	struct pork_acct *acct = session->aux_data;
 	aim_userinfo_t *userinfo;
 	va_list ap;
@@ -1903,7 +2056,7 @@ FAIM_CB(aim_recv_userinfo) {
 	return (1);
 }
 
-FAIM_CB(aim_parse_login) {
+static FAIM_CB(aim_parse_login) {
 	struct pork_acct *acct = session->aux_data;
 	char *key;
 	va_list ap;
@@ -1919,7 +2072,7 @@ FAIM_CB(aim_parse_login) {
 	return (1);
 }
 
-FAIM_CB(aim_file_send_done) {
+static FAIM_CB(aim_file_send_done) {
 	va_list ap;
 	aim_conn_t *conn;
 	fu8_t *cookie;
@@ -1937,7 +2090,7 @@ FAIM_CB(aim_file_send_done) {
 	return (transfer_send_complete(xfer));
 }
 
-FAIM_CB(aim_file_send_ready) {
+static FAIM_CB(aim_file_send_ready) {
 	va_list ap;
 	fu8_t *cookie;
 	struct aim_fileheader_t *header;
@@ -1994,9 +2147,14 @@ FAIM_CB(aim_file_send_accepted) {
 
 	aim_clearhandlers(conn);
 
-	aim_conn_addhandler(session, conn, AIM_CB_FAM_OFT, AIM_CB_OFT_ACK, aim_file_send_ready, 0);
-	aim_conn_addhandler(session, conn, AIM_CB_FAM_OFT, AIM_CB_OFT_DONE, aim_file_send_done, 0);
-	aim_conn_addhandler(session, conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_file_transfer_dead, 0);
+	aim_conn_addhandler(session, conn,
+		AIM_CB_FAM_OFT, AIM_CB_OFT_ACK, aim_file_send_ready, 0);
+
+	aim_conn_addhandler(session, conn,
+		AIM_CB_FAM_OFT, AIM_CB_OFT_DONE, aim_file_send_done, 0);
+
+	aim_conn_addhandler(session, conn,
+		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_file_transfer_dead, 0);
 
 	aim_oft_sendheader(session, AIM_CB_OFT_PROMPT, oft_info);
 	transfer_send_accepted(xfer);
@@ -2046,7 +2204,7 @@ FAIM_CB(aim_file_recv_accept) {
 	return (0);
 }
 
-FAIM_CB(aim_parse_authresp) {
+static FAIM_CB(aim_parse_authresp) {
 	va_list ap;
 	struct aim_authresp_info *authresp;
 	aim_conn_t *bos_conn;
@@ -2121,1026 +2279,66 @@ FAIM_CB(aim_parse_authresp) {
 		return (0);
 	}
 
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, aim_recv_conn_complete, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BOS, AIM_CB_BOS_RIGHTS, aim_recv_bos_rights, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_ACK, AIM_CB_ACK_ACK, NULL, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_REDIRECT, aim_recv_redirect, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_LOC, AIM_CB_LOC_RIGHTSINFO, aim_recv_locrights, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BUD, AIM_CB_BUD_RIGHTSINFO, aim_recv_buddy_rights, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BUD, AIM_CB_BUD_ONCOMING, aim_recv_oncoming, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BUD, AIM_CB_BUD_OFFGOING, aim_recv_offgoing, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_MSG, AIM_CB_MSG_INCOMING, aim_recv_msg, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_LOC, AIM_CB_LOC_ERROR, aim_recv_err_loc, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_MSG, AIM_CB_MSG_MISSEDCALL, aim_recv_missed, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_RATECHANGE, aim_recv_rate_change, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_EVIL, aim_recv_evil, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_LOK, AIM_CB_LOK_ERROR, aim_recv_search_error, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_LOK, 0x0003, aim_recv_search_reply, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_MSG, AIM_CB_MSG_ERROR, aim_recv_err_msg, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_MSG, AIM_CB_MSG_MTN, aim_recv_typing, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_LOC, AIM_CB_LOC_USERINFO, aim_recv_userinfo, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_MSG, AIM_CB_MSG_PARAMINFO, aim_recv_icbm_param_info, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_ERROR, aim_recv_err_other, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BUD, AIM_CB_BUD_ERROR, aim_recv_err_other, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_BOS, AIM_CB_BOS_ERROR, aim_recv_err_other, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_SELFINFO, aim_recv_selfinfo, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_GEN, AIM_CB_GEN_MOTD, aim_recv_motd, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SSI, AIM_CB_SSI_RIGHTSINFO, aim_ssi_recv_rights, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SSI, AIM_CB_SSI_LIST, aim_ssi_recv_list, 0);
-	aim_conn_addhandler(session, bos_conn, AIM_CB_FAM_SSI, AIM_CB_SSI_NOLIST, aim_ssi_recv_list, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_conn_dead, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNINITDONE, aim_recv_conn_complete, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BOS, AIM_CB_BOS_RIGHTS, aim_recv_bos_rights, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_ACK, AIM_CB_ACK_ACK, NULL, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_REDIRECT, aim_recv_redirect, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_LOC, AIM_CB_LOC_RIGHTSINFO, aim_recv_locrights, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BUD, AIM_CB_BUD_RIGHTSINFO, aim_recv_buddy_rights, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BUD, AIM_CB_BUD_ONCOMING, aim_recv_oncoming, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BUD, AIM_CB_BUD_OFFGOING, aim_recv_offgoing, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_MSG, AIM_CB_MSG_INCOMING, aim_recv_msg, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_LOC, AIM_CB_LOC_ERROR, aim_recv_err_loc, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_MSG, AIM_CB_MSG_MISSEDCALL, aim_recv_missed, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_RATECHANGE, aim_recv_rate_change, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_EVIL, aim_recv_evil, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_LOK, AIM_CB_LOK_ERROR, aim_recv_search_error, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_LOK, 0x0003, aim_recv_search_reply, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_MSG, AIM_CB_MSG_ERROR, aim_recv_err_msg, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_MSG, AIM_CB_MSG_MTN, aim_recv_typing, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_LOC, AIM_CB_LOC_USERINFO, aim_recv_userinfo, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_MSG, AIM_CB_MSG_PARAMINFO, aim_recv_icbm_param_info, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_ERROR, aim_recv_err_other, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BUD, AIM_CB_BUD_ERROR, aim_recv_err_other, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_BOS, AIM_CB_BOS_ERROR, aim_recv_err_other, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_SELFINFO, aim_recv_selfinfo, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_GEN, AIM_CB_GEN_MOTD, aim_recv_motd, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SSI, AIM_CB_SSI_RIGHTSINFO, aim_ssi_recv_rights, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SSI, AIM_CB_SSI_LIST, aim_ssi_recv_list, 0);
+	aim_conn_addhandler(session, bos_conn,
+		AIM_CB_FAM_SSI, AIM_CB_SSI_NOLIST, aim_ssi_recv_list, 0);
 
 	aim_sendcookie(session, bos_conn, authresp->cookielen, authresp->cookie);
 
 	return (1);
-}
-
-static int aim_login(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-	int sock;
-	aim_conn_t *auth_conn;
-	char *server;
-
-	server = getenv("AIM_SERVER");
-	if (server == NULL)
-		server = FAIM_LOGIN_SERVER;
-
-	acct->connected = 0;
-	screen_win_msg(cur_window(), 1, 1, 0,
-		MSG_TYPE_STATUS, "Logging in as %s...", acct->username);
-
-	auth_conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_AUTH, NULL);
-	if (auth_conn == NULL) {
-		screen_err_msg("Connection error while logging in as %s",
-			acct->username);
-
-		return (-1);
-	}
-
-	ret = aim_sock_connect(server, &acct->laddr, &sock);
-	if (ret == 0) {
-		aim_connected(sock, 0, auth_conn);
-	} else if (ret == -EINPROGRESS) {
-		auth_conn->status |= AIM_CONN_STATUS_INPROGRESS;
-		pork_io_add(sock, IO_COND_WRITE, auth_conn, auth_conn, aim_connected);
-	} else {
-		screen_err_msg("Error connecting to the authorizer server as %s",
-			acct->username);
-		aim_conn_kill(&priv->aim_session, &auth_conn);
-		return (-1);
-	}
-
-	aim_conn_addhandler(&priv->aim_session, auth_conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNERR, aim_connerr, 0);
-	aim_conn_addhandler(&priv->aim_session, auth_conn, AIM_CB_FAM_ATH, AIM_CB_ATH_AUTHRESPONSE, aim_parse_login, 0);
-	aim_conn_addhandler(&priv->aim_session, auth_conn, AIM_CB_FAM_ATH, AIM_CB_ATH_LOGINRESPONSE, aim_parse_authresp, 0);
-
-	aim_request_login(&priv->aim_session, auth_conn, acct->username);
-	return (1);
-}
-
-static int aim_setup(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-	aim_session_t *session = &priv->aim_session;
-
-	memset(session, 0, sizeof(*session));
-
-	aim_session_init(session, 0, 0);
-	aim_setdebuggingcb(session, aim_debug);
-
-	aim_tx_setenqueue(session, AIM_TX_IMMEDIATE, NULL);
-	session->aux_data = acct;
-
-	return (0);
-}
-
-static int aim_send_msg_auto(struct pork_acct *acct, char *dest, char *msg) {
-	struct aim_priv *priv = acct->data;
-	char *msg_html = text_to_html(msg);
-
-	return (aim_im_sendch1(&priv->aim_session, dest, 1, msg_html));
-}
-
-static int aim_send_msg(struct pork_acct *acct, char *dest, char *msg) {
-	struct aim_priv *priv = acct->data;
-	char *msg_html = text_to_html(msg);
-
-	return (aim_im_sendch1(&priv->aim_session, dest, 0, msg_html));
-}
-
-static int aim_action(struct pork_acct *acct, char *dest, char *msg) {
-	char buf[8192];
-	int ret;
-
-	if (!strncasecmp(msg, "<html>", 6))
-		ret = snprintf(buf, sizeof(buf), "<HTML>/me %s", &msg[6]);
-	else
-		ret = snprintf(buf, sizeof(buf), "/me %s", msg);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf)) {
-		debug("snprintf failed");
-		return (-1);
-	}
-
-	return (aim_send_msg(acct, dest, buf));
-}
-
-static int aim_add_block(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-
-	if (priv->aim_session.ssi.received_data == 0)
-		return (-1);
-
-	return (aim_ssi_adddeny(&priv->aim_session, target));
-}
-
-static int aim_unblock(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-
-	if (priv->aim_session.ssi.received_data == 0) {
-		debug("unblock failed");
-		return (-1);
-	}
-
-	return (aim_ssi_deldeny(&priv->aim_session, target));
-}
-
-static int aim_add_permit(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-
-	if (priv->aim_session.ssi.received_data == 0) {
-		debug("add permit failed");
-		return (-1);
-	}
-
-	return (aim_ssi_addpermit(&priv->aim_session, target));
-}
-
-static int aim_remove_permit(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-
-	if (priv->aim_session.ssi.received_data == 0) {
-		debug("remove permit failed");
-		return (-1);
-	}
-
-	return (aim_ssi_delpermit(&priv->aim_session, target));
-}
-
-static int aim_buddy_add(struct pork_acct *acct, struct buddy *buddy) {
-	int ret;
-	struct aim_priv *priv = acct->data;
-	aim_session_t *session = &priv->aim_session;
-
-	if (session->ssi.received_data == 0) {
-		debug("buddy add failed");
-		return (-1);
-	}
-
-	if (aim_ssi_itemlist_exists(session->ssi.local, buddy->nname)) {
-		debug("buddy %s already exists for %s", buddy->nname, acct->username);
-		return (-1);
-	}
-
-	ret = aim_ssi_addbuddy(session, buddy->nname,
-			buddy->group->name, buddy->name, NULL, NULL, 0);
-
-	return (ret);
-}
-
-static int aim_buddy_remove(struct pork_acct *acct, struct buddy *buddy) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-
-	if (priv->aim_session.ssi.received_data == 0) {
-		debug("buddy remove failed");
-		return (-1);
-	}
-
-	ret = aim_ssi_delbuddy(&priv->aim_session, buddy->nname,
-			buddy->group->name);
-
-	return (ret);
-}
-
-static int aim_buddy_alias(struct pork_acct *acct, struct buddy *buddy) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-
-	if (priv->aim_session.ssi.received_data == 0) {
-		debug("buddy alias failed");
-		return (-1);
-	}
-
-	ret = aim_ssi_aliasbuddy(&priv->aim_session,
-			buddy->group->name, buddy->nname, buddy->name);
-
-	return (ret);
-}
-
-static int aim_warn(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_im_warn(&priv->aim_session, priv->bos_conn, target, 0));
-}
-
-static int aim_warn_anon(struct pork_acct *acct, char *target) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-
-	ret = aim_im_warn(&priv->aim_session, priv->bos_conn,
-			target, AIM_WARN_ANON);
-
-	return (ret);
-}
-
-static int aim_set_back(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-
-	ret = aim_locate_setprofile(&priv->aim_session, NULL, NULL, 0, NULL, "", 0);
-	return (ret);
-}
-
-static int aim_set_away(struct pork_acct *acct, char *away_msg) {
-	size_t len;
-	int ret;
-	char *msg_html;
-	struct aim_priv *priv = acct->data;
-
-	msg_html = text_to_html(away_msg);
-
-	len = strlen(msg_html);
-	if (len > priv->rights.max_away_len) {
-		screen_err_msg("%s's away message is too long. The maximum length is %u characters",
-			acct->username, priv->rights.max_away_len);
-		return (-1);
-	}
-
-	ret = aim_locate_setprofile(&priv->aim_session,
-			NULL, NULL, 0, "us-ascii", msg_html, len);
-
-	return (ret);
-}
-
-static int aim_keepalive(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_flap_nop(&priv->aim_session, priv->bos_conn));
-}
-
-static int aim_set_idle(struct pork_acct *acct, u_int32_t idle_secs) {
-	struct aim_priv *priv = acct->data;
-	int ret;
-
-	ret = aim_srv_setidle(&priv->aim_session, idle_secs);
-	if (ret >= 0) {
-		if (idle_secs > 0)
-			acct->marked_idle = 1;
-		else
-			acct->marked_idle = 0;
-	}
-
-	return (ret);
-}
-
-static int aim_set_profile(struct pork_acct *acct, char *profile) {
-	int ret;
-	size_t len;
-	char *profile_html;
-	struct aim_priv *priv = acct->data;
-
-	if (profile == NULL) {
-		ret = aim_locate_setprofile(&priv->aim_session,
-				NULL, "", 0, NULL, NULL, 0);
-
-		return (ret);
-	}
-
-	profile_html = text_to_html(profile);
-
-	len = strlen(profile_html);
-	if (len > priv->rights.max_profile_len) {
-		screen_err_msg("%s's profile is too long. The maximum length is %u characters",
-			acct->username, priv->rights.max_profile_len);
-		return (-1);
-	}
-
-	ret = aim_locate_setprofile(&priv->aim_session, "us-ascii",
-			profile_html, len, NULL, NULL, 0);
-
-	return (ret);
-}
-
-static int aim_get_away_msg(struct pork_acct *acct, char *buddy) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_locate_getinfoshort(&priv->aim_session, buddy, 0x00000002));
-}
-
-static int aim_whois(struct pork_acct *acct, char *buddy) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_locate_getinfoshort(&priv->aim_session, buddy, 0x00000003));
-}
-
-static void aim_kill_pending_chats(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-	dlist_t *cur;
-
-	cur = priv->chat_create_list;
-	while (cur != NULL) {
-		struct chatroom_info *info = cur->data;
-		dlist_t *next = cur->next;
-
-		free(info->name);
-		free(info);
-		free(cur);
-
-		cur = next;
-	}
-}
-
-static int aim_kill_all_conn(struct pork_acct *acct) {
-	struct aim_priv *priv = acct->data;
-	aim_conn_t *conn;
-	dlist_t *cur;
-
-	if (priv == NULL)
-		return (-1);
-
-	conn = priv->aim_session.connlist;
-
-	if (acct->connected) {
-		aim_rxdispatch(&priv->aim_session);
-		aim_tx_flushqueue(&priv->aim_session);
-	}
-
-	while (conn != NULL) {
-		pork_io_del(conn);
-		conn = conn->next;
-	}
-
-	aim_kill_pending_chats(acct);
-
-	cur = acct->chat_list;
-	while (cur != NULL) {
-		dlist_t *next = cur->next;
-
-		aim_free_chat(acct, cur);
-		cur = next;
-	}
-
-	aim_session_kill(&priv->aim_session);
-	return (0);
-}
-
-static int aim_connect_abort(struct pork_acct *acct) {
-	aim_kill_all_conn(acct);
-	aim_setup(acct);
-
-	return (0);
-}
-
-static int aim_set_privacy_mode(struct pork_acct *acct, int mode) {
-	struct aim_priv *priv = acct->data;
-
-	if (mode >= 0 && mode <= 5) {
-		acct->buddy_pref->privacy_mode = mode;
-		aim_ssi_setpermdeny(&priv->aim_session,
-			acct->buddy_pref->privacy_mode, 0xffffffff);
-	}
-
-	return (acct->buddy_pref->privacy_mode);
-}
-
-static int aim_report_idle(struct pork_acct *acct, int mode) {
-	struct aim_priv *priv = acct->data;
-
-	u_int32_t report_idle = aim_ssi_getpresence(priv->aim_session.ssi.local);
-	int ret;
-
-	if (mode != 0)
-		report_idle |= 0x0000400;
-	else
-		report_idle &= ~0x0000400;
-
-	acct->report_idle = ((report_idle & 0x0000400) != 0);
-	ret = aim_ssi_setpresence(&priv->aim_session, report_idle);
-	return (ret);
-}
-
-static int aim_chat_parse_name(const char *name, struct chatroom_info *info) {
-	int exchange;
-	char *p;
-
-	p = strchr(name, '/');
-	if (p != NULL) {
-		p++;
-
-		if (str_to_int(p, &exchange) != 0)
-			return (-1);
-
-		if (exchange < 4)
-			exchange = 4;
-		else if (exchange > 16)
-			exchange = 16;
-
-		info->name = xstrndup(name, p - name - 1);
-		info->exchange = exchange;
-	} else {
-		info->name = xstrdup(name);
-		info->exchange = AIM_DEFAULT_CHAT_EXCHANGE;
-	}
-
-	return (0);
-}
-
-static int aim_chat_get_name(	const char *str,
-								char *buf,
-								size_t len,
-								char *arg_buf,
-								size_t arg_len)
-{
-	struct chatroom_info info;
-	int ret;
-
-	if (aim_chat_parse_name(str, &info) != 0) {
-		debug("aim_chat_parse_name failed for %s", str);
-		return (-1);
-	}
-
-	ret = snprintf(buf, len, "%s/%d", info.name, info.exchange);
-	free(info.name);
-
-	if (ret < 0 || (size_t) ret >= len)
-		return (-1);
-
-	return (0);
-}
-
-static dlist_t *aim_find_chat(	struct pork_acct *acct,
-								const char *name,
-								int exchange)
-{
-	dlist_t *cur;
-
-	cur = acct->chat_list;
-	while (cur != NULL) {
-		struct chatroom *chat = cur->data;
-		struct aim_chat *a_chat = chat->data;
-
-		if (!strcasecmp(name, a_chat->title) && exchange == a_chat->exchange)
-			return (cur);
-
-		cur = cur->next;
-	}
-
-	return (NULL);
-}
-
-static dlist_t *aim_find_chat_name(struct pork_acct *acct, char *name) {
-	dlist_t *ret;
-	struct chatroom_info info;
-
-	if (aim_chat_parse_name(name, &info) != 0) {
-		debug("aim_chat_parse_name failed for %s", name);
-		return (NULL);
-	}
-
-	ret = aim_find_chat(acct, info.name, info.exchange);
-	free(info.name);
-	return (ret);
-}
-
-static struct chatroom *aim_find_chat_name_data(struct pork_acct *acct,
-												char *name)
-{
-	dlist_t *ret;
-
-	ret = aim_find_chat_name(acct, name);
-	if (ret == NULL || ret->data == NULL)
-		return (NULL);
-
-	return (ret->data);
-}
-
-static int aim_leave_chatroom(struct pork_acct *acct, struct chatroom *chat) {
-	struct aim_priv *priv = acct->data;
-	struct aim_chat *a_chat;
-
-	a_chat = chat->data;
-
-	pork_io_del(a_chat->conn);
-	aim_conn_kill(&priv->aim_session, &a_chat->conn);
-
-	a_chat->conn = NULL;
-	return (0);
-}
-
-static int aim_join_chatroom(struct pork_acct *acct, char *name, char *args) {
-	int ret;
-	struct aim_priv *priv = acct->data;
-	aim_conn_t *chatnav_conn;
-	struct chatroom_info info;
-	struct chatroom *chat;
-
-	chat = chat_find(acct, name);
-	if (chat != NULL && chat->data != NULL)
-		return (0);
-
-	if (aim_chat_parse_name(name, &info) != 0) {
-		debug("aim_chat_parse_name failed for %s", name);
-		return (-1);
-	}
-
-	chatnav_conn = priv->chatnav_conn;
-	if (chatnav_conn == NULL) {
-		struct chatroom_info *chat_info = xcalloc(1, sizeof(*chat_info));
-
-		chat_info->name = xstrdup(info.name);
-		chat_info->exchange = (u_int16_t) info.exchange;
-
-		priv->chat_create_list = dlist_add_head(priv->chat_create_list,
-									chat_info);
-		aim_reqservice(&priv->aim_session, priv->bos_conn,
-			AIM_CONN_TYPE_CHATNAV);
-
-		free(info.name);
-		return (0);
-	}
-
-	ret = aim_chatnav_createroom(&priv->aim_session, chatnav_conn,
-			info.name, info.exchange);
-
-	free(info.name);
-	return (ret);
-}
-
-static int aim_chat_send(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *target __notused,
-							char *msg)
-{
-	char *msg_html;
-	int msg_len;
-	int ret;
-	struct aim_priv *priv = acct->data;
-	struct aim_chat *a_chat;
-
-	if (msg == NULL) {
-		debug("aim_chat_send with NULL msg");
-		return (-1);
-	}
-
-	a_chat = chat->data;
-
-	msg_html = text_to_html(msg);
-	msg_len = strlen(msg_html);
-
-	if (msg_len > a_chat->max_msg_len) {
-		debug("msg len too long");
-		return (-1);
-	}
-
-	ret = aim_chat_send_im(&priv->aim_session, a_chat->conn,
-			AIM_CHATFLAGS_NOREFLECT, msg_html, msg_len, "us-ascii", "en");
-
-	return (ret);
-}
-
-static int aim_chat_action(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *target __notused,
-							char *msg)
-{
-	char buf[8192];
-	int ret;
-
-	if (!strncasecmp(msg, "<html>", 6))
-		ret = snprintf(buf, sizeof(buf), "<HTML>/me %s", &msg[6]);
-	else
-		ret = snprintf(buf, sizeof(buf), "/me %s", msg);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (aim_chat_send(acct, chat, chat->title_quoted, buf));
-}
-
-static int aim_chat_send_invite(struct pork_acct *acct,
-								struct chatroom *chat,
-								char *dest,
-								char *msg)
-{
-	struct aim_priv *priv = acct->data;
-	int ret;
-	struct aim_chat *a_chat;
-
-	a_chat = chat->data;
-
-	if (msg == NULL)
-		msg = "";
-
-	ret = aim_im_sendch2_chatinvite(&priv->aim_session, dest, msg,
-			a_chat->exchange, a_chat->fullname, 0);
-
-	return (ret);
-}
-
-static int aim_chat_print_users(struct pork_acct *acct __notused,
-								struct chatroom *chat)
-{
-	int ret;
-	dlist_t *cur;
-	char buf[2048];
-	size_t i = 0;
-	size_t len = sizeof(buf);
-	struct chat_user *chat_user;
-	struct aim_chat *a_chat;
-	struct imwindow *win = chat->win;
-
-	a_chat = chat->data;
-	cur = chat->user_list;
-	if (cur == NULL) {
-		screen_win_msg(win, 0, 0, 1, MSG_TYPE_CHAT_STATUS,
-			"%%D--%%m--%%M--%%x No %%Cu%%csers%%x in %%C%s%%x (%%W%s%%x)",
-			chat->title_quoted, chat->title_full_quoted);
-
-		return (0);
-	}
-
-	screen_win_msg(win, 0, 0, 1, MSG_TYPE_CHAT_STATUS,
-		"%%D--%%m--%%M--%%x %u %%Cu%%csers%%x in %%C%s%%x (%%W%s%%x)",
-		chat->num_users, chat->title_quoted, chat->title_full_quoted);
-
-	while (cur != NULL) {
-		chat_user = cur->data;
-
-		if (chat_user->ignore)
-			ret = snprintf(&buf[i], len, "[%%R%s%%x] ", chat_user->name);
-		else
-			ret = snprintf(&buf[i], len, "[%%B%s%%x] ", chat_user->name);
-
-		if (ret < 0 || (size_t) ret >= len) {
-			screen_err_msg("The results were too long to display");
-			return (0);
-		}
-
-		len -= ret;
-		i += ret;
-
-		cur = cur->next;
-	}
-
-	if (i > 0 && buf[i - 1] == ' ')
-		buf[--i] = '\0';
-
-	screen_win_msg(win, 0, 0, 1, MSG_TYPE_CHAT_STATUS, "%s", buf);
-	return (0);
-}
-
-static int aim_search(struct pork_acct *acct, char *str) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_search_address(&priv->aim_session, priv->bos_conn, str));
-}
-
-static int aim_update_buddy(struct pork_acct *acct __notused,
-							struct buddy *buddy,
-							void *data)
-{
-	aim_userinfo_t *userinfo = data;
-
-	buddy->signon_time = userinfo->onlinesince;
-	buddy->warn_level = (float) userinfo->warnlevel / 10;
-
-	if (userinfo->present & AIM_USERINFO_PRESENT_FLAGS)
-		buddy->type = userinfo->flags;
-
-	if (userinfo->present & AIM_USERINFO_PRESENT_SESSIONLEN)
-		buddy->idle_time = userinfo->idletime;
-
-	buddy->status = STATUS_ACTIVE;
-
-	if (buddy->idle_time > 0)
-		buddy->status = STATUS_IDLE;
-
-	if (userinfo->flags & AIM_FLAG_AWAY)
-		buddy->status = STATUS_AWAY;
-
-	return (0);
-}
-
-static int aim_acct_update(struct pork_acct *acct) {
-	struct aim_priv *priv;
-
-	if (!acct->connected)
-		return (-1);
-
-	/*
-	** We've got to keep track of AIM buddies' idle time
-	** ourselves; the AIM server reports an idle time
-	** for them only when there's a change (i.e. they
-	** go idle, come back from idle or their client reports
-	** a new idle time). This routine will run every minute
-	** and increment the idle time of buddies where appropriate.
-	*/
-
-	priv = acct->data;
-	if (time(NULL) >= priv->last_update + 60) {
-		aim_keepalive(acct);
-		buddy_update_idle(acct);
-		aim_cleansnacs(&priv->aim_session, 59);
-		time(&priv->last_update);
-	}
-
-	return (0);
-}
-
-static int aim_acct_init(struct pork_acct *acct) {
-	char buf[NUSER_LEN];
-	struct aim_priv *priv;
-
-	normalize(buf, acct->username, sizeof(buf));
-
-	/*
-	** You can't have the same screen name logged in more than
-	** once with AIM.
-	*/
-	if (pork_acct_find_name(buf, PROTO_AIM) != NULL)
-		return (-1);
-
-	free(acct->username);
-	acct->username = xstrdup(buf);
-
-	priv = xcalloc(1, sizeof(*priv));
-	acct->data = priv;
-
-	if (aim_setup(acct) != 0) {
-		free(priv);
-		return (-1);
-	}
-
-	if (acct->profile == NULL)
-		acct->profile = xstrdup(DEFAULT_AIM_PROFILE);
-
-	return (0);
-}
-
-static int aim_acct_free(struct pork_acct *acct) {
-	aim_kill_all_conn(acct);
-	free(acct->data);
-	return (0);
-}
-
-static int aim_connect(struct pork_acct *acct, char *args) {
-	if (acct->passwd == NULL) {
-		if (args != NULL && !blank_str(args)) {
-			acct->passwd = xstrdup(args);
-			memset(args, 0, strlen(args));
-		} else {
-			char buf[128];
-
-			screen_prompt_user("Password: ", buf, sizeof(buf));
-			if (buf[0] == '\0') {
-				screen_err_msg("There was an error reading your password");
-				return (-1);
-			}
-
-			acct->passwd = xstrdup(buf);
-			memset(buf, 0, sizeof(buf));
-		}
-	}
-
-	return (aim_login(acct));
-}
-
-static int aim_read_config(struct pork_acct *acct) {
-	return (read_user_config(acct));
-}
-
-static int aim_write_config(struct pork_acct *acct) {
-	return (save_user_config(acct));
-}
-
-static int aim_file_recv_data(struct file_transfer *xfer, char *buf, size_t len)
-{
-	struct aim_oft_info *oft_info = xfer->data;
-
-	oft_info->fh.recvcsum = aim_oft_checksum_chunk(buf, len,
-								oft_info->fh.recvcsum);
-
-	if (xfer->bytes_sent + xfer->start_offset >= xfer->file_len)
-		transfer_recv_complete(xfer);
-
-	return (0);
-}
-
-static int aim_file_recv_complete(struct file_transfer *xfer) {
-	struct aim_oft_info *oft_info = xfer->data;
-
-	oft_info->fh.nrecvd = xfer->bytes_sent;
-
-	aim_oft_sendheader(oft_info->sess, AIM_CB_OFT_DONE, oft_info);
-
-	aim_clearhandlers(oft_info->conn);
-	aim_conn_kill(oft_info->sess, &oft_info->conn);
-	aim_oft_destroyinfo(oft_info);
-
-	pork_io_del(xfer);
-	return (0);
-}
-
-static int aim_file_send_complete(struct file_transfer *xfer) {
-	struct aim_oft_info *oft_info = xfer->data;
-
-	aim_clearhandlers(oft_info->conn);
-	aim_conn_kill(oft_info->sess, &oft_info->conn);
-	aim_oft_destroyinfo(oft_info);
-
-	pork_io_del(xfer);
-	return (0);
-}
-
-static int aim_file_send(struct file_transfer *xfer) {
-	struct aim_priv *priv = xfer->acct->data;
-	struct aim_oft_info *oft_info;
-
-	if (transfer_bind_listen_sock(xfer, priv->bos_conn->fd) == -1)
-		return (-1);
-
-	oft_info = aim_oft_createinfo(&priv->aim_session, NULL,
-				xfer->peer_username, xfer->laddr_ip, xfer->lport,
-				xfer->file_len, 0, xfer->fname_base);
-
-	oft_info->fh.checksum = aim_oft_checksum_file(xfer->fname_local);
-	oft_info->port = xfer->lport;
-
-	aim_sendfile_listen(&priv->aim_session, oft_info, xfer->sock);
-
-	if (oft_info->conn == NULL) {
-		aim_oft_destroyinfo(oft_info);
-		return (-1);
-	}
-
-	oft_info->conn->priv = xfer;
-	xfer->data = oft_info;
-
-	pork_io_add(xfer->sock, IO_COND_RW, oft_info->conn, oft_info->conn,
-		aim_listen_conn_event);
-
-	aim_im_sendch2_sendfile_ask(&priv->aim_session, oft_info);
-	aim_conn_addhandler(&priv->aim_session, oft_info->conn, AIM_CB_FAM_OFT, AIM_CB_OFT_ESTABLISHED, aim_file_send_accepted, 0);
-
-	transfer_request_send(xfer);
-	return (0);
-}
-
-static int aim_file_send_data(	struct file_transfer *xfer,
-								char *buf __notused,
-								size_t len __notused)
-{
-	if (xfer->status == TRANSFER_STATUS_COMPLETE) {
-		pork_io_del(xfer);
-		return (transfer_send_complete(xfer));
-	}
-
-	return (0);
-}
-
-static int aim_file_abort(struct file_transfer *xfer) {
-	struct aim_oft_info *oft_info = xfer->data;
-
-	pork_io_del(xfer);
-
-	if (oft_info != NULL) {
-		pork_io_del(oft_info->conn);
-		aim_im_sendch2_sendfile_cancel(oft_info->sess, oft_info);
-		aim_clearhandlers(oft_info->conn);
-
-		if (!(xfer->protocol_flags & AIM_XFER_IN_HANDLER))
-			aim_conn_kill(oft_info->sess, &oft_info->conn);
-		else
-			aim_conn_close(oft_info->conn);
-
-		aim_oft_destroyinfo(oft_info);
-	}
-
-	return (0);
-}
-
-static int aim_file_accept(struct file_transfer *xfer) {
-	struct aim_oft_info *oft_info;
-	struct aim_priv *priv = xfer->acct->data;
-	char buf[512];
-	int ret;
-	int sock;
-
-	oft_info = xfer->data;
-
-	snprintf(buf, sizeof(buf), "%s:%d", oft_info->verifiedip,
-		oft_info->port);
-
-	oft_info->conn = aim_newconn(&priv->aim_session,
-						AIM_CONN_TYPE_RENDEZVOUS, NULL);
-
-	if (oft_info->conn == NULL) {
-		screen_err_msg("Error connecting to %s@%s while receiving %s",
-			xfer->peer_username, buf, xfer->fname_local);
-		return (-1);
-	}
-
-	oft_info->conn->subtype = AIM_CONN_SUBTYPE_OFT_SENDFILE;
-	oft_info->conn->priv = xfer;
-
-	ret = aim_sock_connect(buf, &xfer->acct->laddr, &sock);
-	if (ret == 0) {
-		aim_connected(sock, 0, oft_info->conn);
-	} else if (ret == -EINPROGRESS) {
-		oft_info->conn->status |= AIM_CONN_STATUS_INPROGRESS;
-		pork_io_add(sock, IO_COND_WRITE, oft_info->conn, oft_info->conn,
-			aim_connected);
-	} else {
-		aim_conn_kill(&priv->aim_session, &oft_info->conn);
-		screen_err_msg("Error connecting to %s@%s while receiving %s",
-			xfer->peer_username, buf, xfer->fname_local);
-		return (-1);
-	}
-
-	aim_conn_addhandler(&priv->aim_session, oft_info->conn,
-		AIM_CB_FAM_OFT, AIM_CB_OFT_PROMPT, aim_file_recv_accept, 0);
-	aim_conn_addhandler(&priv->aim_session, oft_info->conn,
-		AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNDEAD, aim_file_transfer_dead, 0);
-
-	transfer_recv_accepted(xfer);
-	return (0);
-}
-
-static char *aim_filter_text_out(char *msg) {
-	if (!strncasecmp(msg, "<HTML", 5))
-		return (strip_html(msg));
-
-	return (color_quote_codes(msg));
-}
-
-int aim_proto_init(struct pork_proto *proto) {
-	proto->buddy_add = aim_buddy_add;
-	proto->buddy_alias = aim_buddy_alias;
-	proto->buddy_block = aim_add_block;
-	proto->buddy_permit = aim_add_permit;
-	proto->buddy_remove = aim_buddy_remove;
-	proto->buddy_remove_permit = aim_remove_permit;
-	proto->buddy_unblock = aim_unblock;
-	proto->buddy_update = aim_update_buddy;
-
-	proto->chat_free = __aim_free_chat;
-	proto->chat_find = aim_find_chat_name_data;
-	proto->chat_action = aim_chat_action;
-	proto->chat_invite = aim_chat_send_invite;
-	proto->chat_join = aim_join_chatroom;
-	proto->chat_leave = aim_leave_chatroom;
-	proto->chat_name = aim_chat_get_name;
-	proto->chat_send = aim_chat_send;
-	proto->chat_users = aim_chat_print_users;
-	proto->chat_who = aim_chat_print_users;
-
-	proto->who = aim_search;
-	proto->connect = aim_connect;
-	proto->connect_abort = aim_connect_abort;
-	proto->reconnect = aim_connect;
-	proto->free = aim_acct_free;
-	proto->get_away_msg = aim_get_away_msg;
-	proto->get_profile = aim_whois;
-	proto->init = aim_acct_init;
-	proto->keepalive = aim_keepalive;
-	proto->filter_text = strip_html;
-	proto->filter_text_out = aim_filter_text_out;
-	proto->normalize = normalize;
-	proto->user_compare = aim_sncmp;
-	proto->read_config = aim_read_config;
-	proto->send_msg = aim_send_msg;
-	proto->send_msg_auto = aim_send_msg_auto;
-	proto->set_away = aim_set_away;
-	proto->set_back = aim_set_back;
-	proto->set_idle_time = aim_set_idle;
-	proto->set_privacy_mode = aim_set_privacy_mode;
-	proto->set_profile = aim_set_profile;
-	proto->set_report_idle = aim_report_idle;
-	proto->update = aim_acct_update;
-	proto->warn = aim_warn;
-	proto->send_action = aim_action;
-	proto->warn_anon = aim_warn_anon;
-	proto->write_config = aim_write_config;
-
-	proto->file_send = aim_file_send;
-	proto->file_send_data = aim_file_send_data;
-	proto->file_accept = aim_file_accept;
-	proto->file_abort = aim_file_abort;
-	proto->file_recv_data = aim_file_recv_data;
-	proto->file_recv_complete = aim_file_recv_complete;
-	proto->file_send_complete = aim_file_send_complete;
-
-	return (0);
 }

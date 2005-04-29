@@ -36,7 +36,8 @@ libaim_a_SOURCES = \
 	libfaim/translate.c \
 	libfaim/txqueue.c \
 	libfaim/util.c \
-	pork_aim.c
+	pork_aim.c \
+	pork_aim_proto.c
 
 noinst_HEADERS = \
 	libfaim/aim.h \
@@ -44,4 +45,5 @@ noinst_HEADERS = \
 	libfaim/aim_internal.h \
 	libfaim/faimconfig.h \
 	libfaim/md5.h \
-	pork_aim.h
+	pork_aim.h \
+	pork_aim_proto.h
