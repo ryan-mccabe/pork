@@ -171,21 +171,28 @@ static void __screen_win_msg(	struct imwindow *win,
 	ch = xmalloc(sizeof(chtype) * chlen);
 
 	chlen = cstr_conv(ch, chlen, tstxt, banner_txt, buf, NULL);
+	ch = xrealloc(ch, sizeof(chtype) * (chlen + 1));
 	imwindow_add(win, imsg_new(&win->swindow, ch, chlen), msgtype);
 
 	while (p != NULL) {
 		char *next;
+		size_t len;
 
 		next = strchr(p, '\n');
-		if (next != NULL)
+		if (next != NULL) {
 			*next++ = '\0';
+			len = next - p + 1;
+		} else
+			len = strlen(p);
+
+		len += 128;
+		ch = xmalloc(sizeof(chtype) * len);
 
 		/* XXX - this should be configurable */
-		chlen = next - p + 1;
-		chlen += 128;
-		ch = xmalloc(sizeof(chtype) * chlen);
-		chlen = cstr_conv(ch, chlen, " ", p, NULL);
-		imwindow_add(win, imsg_new(&win->swindow, ch, chlen), msgtype);
+		len = cstr_conv(ch, len, " ", p, NULL);
+
+		ch = xrealloc(ch, sizeof(chtype) * (len + 1));
+		imwindow_add(win, imsg_new(&win->swindow, ch, len), msgtype);
 
 		p = next;
 	}
@@ -193,34 +200,39 @@ static void __screen_win_msg(	struct imwindow *win,
 	free(buf);
 }
 
-void screen_print_str(struct imwindow *win, char *buf, size_t len, int type) {
+void screen_print_str(struct imwindow *win, char *buf, size_t chlen, int type) {
 	char *p;
 	chtype *ch;
 
 	p = strchr(buf, '\n');
 	if (p != NULL) {
-		len = p - buf - 1;
+		chlen = p - buf - 1;
 		*p++ = '\0';
 	}
 
-	len += 128;
+	chlen += 128;
 
-	ch = xmalloc(sizeof(chtype) * (len + 1));
-	len = plaintext_to_cstr(ch, len + 1, buf, NULL);
-	imwindow_add(win, imsg_new(&win->swindow, ch, len), type);
+	ch = xmalloc(sizeof(chtype) * (chlen + 1));
+	chlen = plaintext_to_cstr(ch, chlen + 1, buf, NULL);
+	ch = xrealloc(ch, sizeof(chtype) * (chlen + 1));
+	imwindow_add(win, imsg_new(&win->swindow, ch, chlen), type);
 
 	while (p != NULL) {
 		chtype *ch;
 		char *next;
+		size_t len;
 
 		next = strchr(p, '\n');
-		if (next != NULL)
+		if (next != NULL) {
 			*next++ = '\0';
+			len = next - p + 1;
+		} else
+			len = strlen(p) + 1;
 
-		len = next - p + 1;
 		len += 128;
 		ch = xmalloc(sizeof(chtype) * len);
 		len = plaintext_to_cstr(ch, len, " ", p, NULL);
+		ch = xrealloc(ch, sizeof(chtype) * (len + 1));
 		imwindow_add(win, imsg_new(&win->swindow, ch, len), type);
 
 		p = next;

@@ -227,11 +227,6 @@ int execute_perl_va(char *function, const char *fmt, va_list ap) {
 	if (SvTRUE(ERRSV)) {
 		size_t notused;
 		char *err_msg = SvPV(ERRSV, notused);
-		char *p;
-
-		p = strchr(err_msg, '\n');
-		if (p != NULL)
-			*p = '\0';
 
 		screen_err_msg("Perl error: %s", err_msg);
 		(void) POPs;
@@ -265,11 +260,6 @@ int execute_perl(char *function, char **args) {
 	if (SvTRUE(ERRSV)) {
 		size_t notused;
 		char *err_msg = SvPV(ERRSV, notused);
-		char *p;
-
-		p = strchr(err_msg, '\n');
-		if (p != NULL)
-			*p = '\0';
 
 		screen_err_msg("Perl error: %s", err_msg);
 		(void) POPs;

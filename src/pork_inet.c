@@ -334,7 +334,7 @@ int sock_is_error(int sock) {
 		if (errno == ENOTSOCK)
 			return (0);
 
-		debug("getsockopt: %s", strerror(errno));
+		debug("getsockopt: %d: %s", sock, strerror(errno));
 		return (errno);
 	}
 

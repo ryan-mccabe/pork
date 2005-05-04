@@ -36,6 +36,17 @@ void strtoupper(char *s) {
 		*s = toupper(*s);
 }
 
+void *xrealloc(void *ptr, size_t size) {
+	void *ret = realloc(ptr, size);
+
+	if (ret == NULL) {
+		debug("out of memory: %u", size);
+		exit(-1);
+	}
+
+	return (ret);
+}
+
 void *xmalloc(size_t len) {
 	void *ret = malloc(len);
 

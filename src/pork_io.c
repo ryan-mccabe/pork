@@ -92,7 +92,6 @@ int pork_io_del(void *key) {
 		return (-1);
 
 	io = node->data;
-	close(io->fd);
 	io->fd = -2;
 	io->callback = NULL;
 	return (0);

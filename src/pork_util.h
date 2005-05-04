@@ -32,11 +32,13 @@
 #	define max(x,y) ((x) > (y) ? (x) : (y))
 #endif
 
-void strtoupper(char *s);
 char *xstrdup(const char *str);
 void *xmalloc(size_t len);
 void *xcalloc(size_t nmemb, size_t len);
 char *xstrndup(const char *str, size_t len);
+void *xrealloc(void *ptr, size_t size);
+
+void strtoupper(char *s);
 void free_str_wipe(char *str);
 
 int xstrncpy(char *dest, const char *src, size_t n);
