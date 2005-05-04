@@ -1,9 +1,9 @@
 dnl Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org> (GPL v2)
 
-AC_INIT(pork, 0.99.8.1, ryan@numb.org)
-AM_INIT_AUTOMAKE(pork, 0.99.8.1)
+AC_INIT(pork, 0.99.9, ryan@numb.org)
+AM_INIT_AUTOMAKE(pork, 0.99.9)
 
-AC_DEFINE(PACKAGE_EXTRAVERSION, "\"I'm an idiot\" edition", [extraversion])
+AC_DEFINE(PACKAGE_EXTRAVERSION, "CVS", [extraversion])
 AC_DEFINE(PACKAGE_WEBSITE, ["http://dev.ojnk.net"], [website])
 AC_DEFINE(PACKAGE_AUTHOR, ["Ryan McCabe"], [author])
 
