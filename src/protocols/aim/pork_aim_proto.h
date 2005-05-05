@@ -3,11 +3,6 @@
 ** pork_aim_proto.h - AIM OSCAR protocol interface to pork.
 ** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
 **
-** This file is heavily based on src/protocols/oscar/oscar.c from gaim,
-** which is more or less to say that chunks of code have been mostly
-** copied from there. In turn, I think that oscar.c file was mostly lifted
-** from faimtest. Any copyrights there apply here.
-**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
 ** as published by the Free Software Foundation.

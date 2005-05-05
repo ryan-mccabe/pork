@@ -1,6 +1,13 @@
 INCLUDES = -I. -I.. -I../.. -I../../.. -I../../missing -Ilibfaim
 AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS)
 
+EXTRA_DIST = \
+	libfaim/AUTHORS \
+	libfaim/BUGS \
+	libfaim/CHANGES \
+	libfaim/COPYING \
+	libfaim/README
+
 noinst_LIBRARIES = libaim.a
 
 libaim_a_SOURCES = \
@@ -37,6 +44,7 @@ libaim_a_SOURCES = \
 	libfaim/txqueue.c \
 	libfaim/util.c \
 	pork_aim.c \
+	pork_aim_cmd.c \
 	pork_aim_proto.c
 
 noinst_HEADERS = \
@@ -46,4 +54,5 @@ noinst_HEADERS = \
 	libfaim/faimconfig.h \
 	libfaim/md5.h \
 	pork_aim.h \
+	pork_aim_cmd.h \
 	pork_aim_proto.h

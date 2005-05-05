@@ -16,6 +16,7 @@ struct file_transfer;
 struct chatroom;
 struct chat_user;
 struct buddy;
+struct command;
 
 enum {
 	PROTO_NULL = -1,

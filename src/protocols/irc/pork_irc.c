@@ -39,6 +39,7 @@
 
 #include <pork_irc.h>
 #include <pork_irc_dcc.h>
+#include <pork_irc_cmd.h>
 
 #define HIGHLIGHT_BOLD			0x01
 #define HIGHLIGHT_UNDERLINE		0x02
@@ -869,5 +870,6 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->file_abort = irc_file_abort;
 	proto->file_send = irc_file_send;
 
+	irc_cmd_setup(proto);
 	return (0);
 }

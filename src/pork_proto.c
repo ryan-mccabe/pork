@@ -33,7 +33,7 @@ inline struct pork_proto *proto_get(int protocol) {
 	return (proto_table[protocol + 1]);
 }
 
-struct pork_proto *proto_get_name(const char *name) { 
+struct pork_proto *proto_get_name(const char *name) {
 	size_t i;
 
 	for (i = 1 ; i <= PROTO_MAX ; i++) {

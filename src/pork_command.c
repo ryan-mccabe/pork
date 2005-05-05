@@ -775,12 +775,10 @@ static struct command buddy_command[] = {
 	{ "list_block",		cmd_buddy_list_block	},
 	{ "list_permit",	cmd_buddy_list_permit	},
 	{ "permit",			cmd_buddy_permit		},
-	{ "privacy_mode",	cmd_buddy_privacy_mode	},
 	{ "profile",		cmd_buddy_profile		},
 	{ "remove",			cmd_buddy_remove		},
 	{ "remove_group",	cmd_buddy_remove_group	},
 	{ "remove_permit",	cmd_buddy_remove_permit	},
-	{ "report_idle",	cmd_buddy_report_idle	},
 	{ "search",			cmd_who					},
 	{ "seen",			cmd_buddy_seen			},
 	{ "unblock",		cmd_buddy_unblock		},
@@ -913,20 +911,6 @@ USER_COMMAND(cmd_buddy_clear_block) {
 
 USER_COMMAND(cmd_buddy_clear_permit) {
 	buddy_clear_permit(cur_window()->owner);
-}
-
-USER_COMMAND(cmd_buddy_privacy_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-	int mode = -1;
-
-	if (acct->proto->set_privacy_mode == NULL)
-		return;
-
-	if (args != NULL)
-		str_to_int(args, &mode);
-
-	mode = acct->proto->set_privacy_mode(acct, mode);
-	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
 }
 
 USER_COMMAND(cmd_buddy_list) {
@@ -1106,27 +1090,6 @@ USER_COMMAND(cmd_buddy_remove_group) {
 		screen_cmd_output("The group %s was removed from %s's buddy list",
 			args, acct->username);
 	}
-}
-
-USER_COMMAND(cmd_buddy_report_idle) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (acct->proto->set_report_idle == NULL)
-		return;
-
-	if (args != NULL && !blank_str(args)) {
-		u_int32_t mode;
-
-		if (str_to_uint(args, &mode) != 0) {
-			screen_err_msg("Invalid number: %s", args);
-			return;
-		}
-
-		acct->proto->set_report_idle(acct, mode);
-	}
-
-	screen_cmd_output("The reporting of idle time for %s is %s",
-		acct->username, (acct->report_idle ? "enabled" : "disabled"));
 }
 
 USER_COMMAND(cmd_buddy_seen) {
