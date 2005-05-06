@@ -82,7 +82,6 @@ static struct command command[] = {
 	{ "buddy",		cmd_buddy			},
 	{ "chat",		cmd_chat			},
 	{ "connect",	cmd_connect			},
-	{ "ctcp",		cmd_ctcp			},
 	{ "disconnect", cmd_disconnect		},
 	{ "echo",		cmd_echo			},
 	{ "event",		cmd_event			},
@@ -96,7 +95,6 @@ static struct command command[] = {
 	{ "load",		cmd_load			},
 	{ "lport",		cmd_lport			},
 	{ "me",			cmd_me				},
-	{ "mode",		cmd_mode			},
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
 	{ "notice",		cmd_notice			},
@@ -107,7 +105,6 @@ static struct command command[] = {
 	{ "profile",	cmd_profile,		},
 	{ "query",		cmd_query			},
 	{ "quit",		cmd_quit			},
-	{ "quote",		cmd_quote			},
 	{ "refresh",	cmd_refresh			},
 	{ "save",		cmd_save			},
 	{ "scroll",		cmd_scroll			},
@@ -115,8 +112,6 @@ static struct command command[] = {
 	{ "timer",		cmd_timer			},
 	{ "unalias",	cmd_unalias			},
 	{ "unbind",		cmd_unbind			},
-	{ "who",		cmd_who				},
-	{ "whowas",		cmd_whowas			},
 	{ "win",		cmd_win				},
 };
 
@@ -383,6 +378,7 @@ USER_COMMAND(cmd_file_list) {
 		while (cur != NULL) {
 			struct file_transfer *xfer = cur->data;
 
+			/* XXX - make this a format str */
 			screen_cmd_output("%u: %s %s [%s: %u/%u (%.02f%%) - %.04f KB/s]",
 				xfer->refnum,
 				xfer->peer_username, xfer->fname_local,
@@ -779,7 +775,6 @@ static struct command buddy_command[] = {
 	{ "remove",			cmd_buddy_remove		},
 	{ "remove_group",	cmd_buddy_remove_group	},
 	{ "remove_permit",	cmd_buddy_remove_permit	},
-	{ "search",			cmd_who					},
 	{ "seen",			cmd_buddy_seen			},
 	{ "unblock",		cmd_buddy_unblock		},
 	{ "warn",			cmd_buddy_warn			},
@@ -2071,20 +2066,6 @@ USER_COMMAND(cmd_connect) {
 	pork_acct_connect(user, args, protocol);
 }
 
-USER_COMMAND(cmd_ctcp) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *dest;
-
-	if (acct->proto->ctcp == NULL)
-		return;
-
-	dest = strsep(&args, " ");
-	if (dest == NULL || args == NULL)
-		return;
-
-	acct->proto->ctcp(acct, dest, args);
-}
-
 USER_COMMAND(cmd_echo) {
 	if (args != NULL)
 		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, args);
@@ -2317,16 +2298,6 @@ USER_COMMAND(cmd_msg) {
 		pork_msg_send(acct, target, args);
 }
 
-USER_COMMAND(cmd_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (args == NULL || !acct->connected)
-		return;
-
-	if (acct->proto->mode != NULL)
-		acct->proto->mode(acct, args);
-}
-
 USER_COMMAND(cmd_query) {
 	struct imwindow *imwindow = cur_window();
 
@@ -2342,15 +2313,6 @@ USER_COMMAND(cmd_query) {
 USER_COMMAND(cmd_quit) {
 	if (!event_generate(cur_window()->owner->events, EVENT_QUIT, args))
 		pork_exit(0, args, NULL);
-}
-
-USER_COMMAND(cmd_quote) {
-	if (args != NULL) {
-		struct pork_acct *acct = cur_window()->owner;
-
-		if (acct->proto->quote != NULL)
-			acct->proto->quote(acct, args);
-	}
 }
 
 USER_COMMAND(cmd_refresh) {
@@ -2456,29 +2418,6 @@ USER_COMMAND(cmd_notice) {
 		chat_send_notice(acct, chat, target, args);
 	else
 		pork_notice_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_who) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->who != NULL && args != NULL)
-		acct->proto->who(acct, args);
-
-	if (args == NULL && win->type == WIN_TYPE_CHAT) {
-		if (win->data != NULL) {
-			struct chatroom *chat = win->data;
-
-			chat_who(acct, chat->title);
-		}
-	}
-}
-
-USER_COMMAND(cmd_whowas) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (acct->proto->whowas != NULL && args != NULL)
-		acct->proto->whowas(acct, args);
 }
 
 USER_COMMAND(cmd_perl) {
@@ -2777,14 +2716,15 @@ static int run_one_command(char *str, u_int32_t set) {
 			cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
 					sizeof(struct command), cmd_compare);
 
-			if (cmd == NULL)
-				screen_err_msg("Unknown %s command: %s", proto->name, cmd_str);
+			if (cmd == NULL) {
+				screen_err_msg("Unknown %s command: %s (%s)", proto->name, cmd_str, str);
+				return (-1);
+			}
 		} else {
 			screen_err_msg("Unknown %scommand: %s",
 				command_set[set].type, cmd_str);
+			return (-1);
 		}
-
-		return (-1);
 	}
 
 	cmd->cmd(str);
@@ -2793,7 +2733,7 @@ static int run_one_command(char *str, u_int32_t set) {
 
 static void print_binding(void *data, void *nothing __notused) {
 	struct binding *binding = data;
-	char key_name[32];
+	char key_name[64];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
 	screen_cmd_output("%s is bound to %s", key_name, binding->binding);

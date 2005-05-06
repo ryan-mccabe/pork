@@ -130,6 +130,12 @@ int irc_chanmode_has_arg(irc_session_t *session, char mode);
 int irc_input_dispatch(irc_session_t *session);
 char *irc_text_filter(char *str);
 
+inline int irc_mode(struct pork_acct *acct, char *str);
+inline int irc_ctcp(struct pork_acct *acct, char *dest, char *msg);
+inline int irc_whowas(struct pork_acct *acct, char *dest);
+inline int irc_who(struct pork_acct *acct, char *str);;
+int irc_quote(struct pork_acct *acct, char *str);
+
 int irc_callback_init(irc_session_t *session);
 int irc_callback_clear(irc_session_t *session);
 int irc_callback_add_defaults(irc_session_t *session);

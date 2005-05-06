@@ -474,7 +474,7 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 			ret = xstrncpy(buf, acct->username, len);
 			break;
 
-		/* Screen name / alias  of the receiver */
+		/* Screen name / alias of the receiver */
 		case 'R':
 			if (dest != NULL)
 				ret = xstrncpy(buf, buddy_name(acct, dest), len);
@@ -544,7 +544,7 @@ static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 				ret = xstrncpy(buf, buddy_name(acct, sender), len);
 			break;
 
-		/* Screen name / alias  of the receiver */
+		/* Screen name / alias of the receiver */
 		case 'R':
 			if (dest != NULL)
 				ret = xstrncpy(buf, buddy_name(acct, dest), len);

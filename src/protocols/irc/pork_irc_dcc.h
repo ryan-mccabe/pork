@@ -1,5 +1,5 @@
 /*
-** pork_irc_dcc.h
+** pork_irc_dcc.h - Support for IRC DCC file transfers.
 ** Copyright (C) 2004-2005 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify

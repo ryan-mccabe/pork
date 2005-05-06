@@ -52,6 +52,11 @@ static USER_COMMAND(aim_cmd_email) {
 static USER_COMMAND(aim_cmd_passwd) {
 }
 
+static USER_COMMAND(aim_cmd_search) {
+	if (args != NULL)
+		aim_search(cur_window()->owner, args);
+}
+
 static USER_COMMAND(aim_cmd_save) {
 }
 
@@ -66,7 +71,7 @@ static USER_COMMAND(aim_cmd_idle_mode) {
 			return;
 		}
 
-		acct->proto->set_report_idle(acct, mode);
+		aim_report_idle(acct, mode);
 	}
 
 	screen_cmd_output("The reporting of idle time for %s is %s",
@@ -80,7 +85,7 @@ static USER_COMMAND(aim_cmd_privacy_mode) {
 	if (args != NULL)
 		str_to_int(args, &mode);
 
-	mode = acct->proto->set_privacy_mode(acct, mode);
+	mode = aim_set_privacy_mode(acct, mode);
 	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
 } 
 
@@ -91,6 +96,7 @@ static struct command aim_command[] = {
 	{ "password",			aim_cmd_passwd			},
 	{ "privacy_mode",		aim_cmd_privacy_mode	},
 	{ "save",				aim_cmd_save			},
+	{ "search",				aim_cmd_search			},
 };
 
 void aim_cmd_setup(struct pork_proto *proto) {

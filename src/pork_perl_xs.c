@@ -313,6 +313,10 @@ XS(PORK_quit) {
 	XSRETURN_IV(0);
 }
 
+#if 0
+
+irc specific
+
 XS(PORK_quote) {
 	struct pork_acct *acct;
 	char *str;
@@ -339,6 +343,7 @@ XS(PORK_quote) {
 
 	XSRETURN_IV(acct->proto->quote(acct, str));
 }
+#endif
 
 XS(PORK_refresh) {
 	dXSARGS;
@@ -872,6 +877,10 @@ XS(PORK_get_buddy_away) {
 	XSRETURN_IV(acct->proto->get_away_msg(acct, target));
 }
 
+#if 0
+
+AIM SPECIFIC
+
 XS(PORK_privacy_mode) {
 	int privacy_mode;
 	struct pork_acct *acct;
@@ -925,6 +934,11 @@ XS(PORK_report_idle) {
 
 	XSRETURN_IV(acct->proto->set_report_idle(acct, report_idle));
 }
+#endif
+
+#if 0
+
+irc specific
 
 XS(PORK_search) {
 	size_t notused;
@@ -954,6 +968,8 @@ XS(PORK_search) {
 
 	XSRETURN_IV(acct->proto->who(acct, target));
 }
+
+#endif
 
 XS(PORK_set_away) {
 	size_t notused;

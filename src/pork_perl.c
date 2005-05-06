@@ -70,7 +70,6 @@ void xs_init(init_args) {
 	newXS("PORK::load_perl", PORK_load_perl, file);
 	newXS("PORK::prompt_user", PORK_prompt_user, file);
 	newXS("PORK::quit", PORK_quit, file);
-	newXS("PORK::quote", PORK_quote, file);
 	newXS("PORK::refresh", PORK_refresh, file);
 	newXS("PORK::run_cmd", PORK_run_cmd, file);
 	newXS("PORK::save", PORK_save, file);
@@ -116,9 +115,14 @@ void xs_init(init_args) {
 	newXS("PORK::get_buddy_away", PORK_get_buddy_away, file);
 	newXS("PORK::get_buddy_profile", PORK_get_buddy_profile, file);
 	newXS("PORK::get_profile", PORK_get_profile, file);
-	newXS("PORK::privacy_mode", PORK_privacy_mode, file);
-	newXS("PORK::report_idle", PORK_report_idle, file);
-	newXS("PORK::search", PORK_search, file);
+
+// IRC SPECIFIC
+//	newXS("PORK::quote", PORK_quote, file);
+// AIM SPECIFIC
+//	newXS("PORK::privacy_mode", PORK_privacy_mode, file);
+//	newXS("PORK::report_idle", PORK_report_idle, file);
+//	newXS("PORK::search", PORK_search, file);
+
 	newXS("PORK::send_msg", PORK_send_msg, file);
 	newXS("PORK::send_msg_auto", PORK_send_msg_auto, file);
 	newXS("PORK::set_away", PORK_set_away, file);
@@ -173,6 +177,7 @@ void xs_init(init_args) {
 	newXS("PORK::chat_target", PORK_chat_target, file);
 	newXS("PORK::chat_topic", PORK_chat_topic, file);
 	newXS("PORK::chat_unignore", PORK_chat_unignore, file);
+
 	newXS("PORK::input_send", PORK_input_send, file);
 	newXS("PORK::input_get_data", PORK_input_get_data, file);
 }

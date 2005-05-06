@@ -16,6 +16,8 @@ int aim_chat_free(struct pork_acct *acct, void *data);
 int aim_connect_abort(struct pork_acct *acct);
 int aim_report_idle(struct pork_acct *acct, int mode);
 int aim_login(struct pork_acct *acct);
+int aim_search(struct pork_acct *acct, char *str);
+int aim_set_privacy_mode(struct pork_acct *acct, int mode);
 
 int aim_chat_print_users(	struct pork_acct *acct __notused,
 							struct chatroom *chat);

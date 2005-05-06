@@ -301,12 +301,6 @@ static int aim_chat_send_invite(struct pork_acct *acct,
 	return (ret);
 }
 
-static int aim_search(struct pork_acct *acct, char *str) {
-	struct aim_priv *priv = acct->data;
-
-	return (aim_search_address(&priv->aim_session, priv->bos_conn, str));
-}
-
 static int aim_keepalive(struct pork_acct *acct) {
 	struct aim_priv *priv = acct->data;
 
@@ -590,18 +584,6 @@ static int aim_chat_get_name(	const char *str,
 	return (0);
 }
 
-static int aim_set_privacy_mode(struct pork_acct *acct, int mode) {
-	struct aim_priv *priv = acct->data;
-
-	if (mode >= 0 && mode <= 5) {
-		acct->buddy_pref->privacy_mode = mode;
-		aim_ssi_setpermdeny(&priv->aim_session,
-			acct->buddy_pref->privacy_mode, 0xffffffff);
-	}
-
-	return (acct->buddy_pref->privacy_mode);
-}
-
 static int aim_send_msg_auto(struct pork_acct *acct, char *dest, char *msg) {
 	struct aim_priv *priv = acct->data;
 	char *msg_html = text_to_html(msg);
@@ -825,6 +807,24 @@ int aim_report_idle(struct pork_acct *acct, int mode) {
 	return (ret);
 }
 
+int aim_search(struct pork_acct *acct, char *str) {
+	struct aim_priv *priv = acct->data;
+
+	return (aim_search_address(&priv->aim_session, priv->bos_conn, str));
+}
+
+int aim_set_privacy_mode(struct pork_acct *acct, int mode) {
+	struct aim_priv *priv = acct->data;
+
+	if (mode >= 0 && mode <= 5) {
+		acct->buddy_pref->privacy_mode = mode;
+		aim_ssi_setpermdeny(&priv->aim_session,
+			acct->buddy_pref->privacy_mode, 0xffffffff);
+	}
+
+	return (acct->buddy_pref->privacy_mode);
+}
+
 int aim_connect_abort(struct pork_acct *acct) {
 	aim_kill_all_conn(acct);
 	aim_setup(acct);
@@ -853,7 +853,6 @@ int aim_proto_init(struct pork_proto *proto) {
 	proto->chat_users = aim_chat_print_users;
 	proto->chat_who = aim_chat_print_users;
 
-	proto->who = aim_search;
 	proto->connect = aim_connect;
 	proto->connect_abort = aim_connect_abort;
 	proto->reconnect = aim_connect;
@@ -872,9 +871,7 @@ int aim_proto_init(struct pork_proto *proto) {
 	proto->set_away = aim_set_away;
 	proto->set_back = aim_set_back;
 	proto->set_idle_time = aim_set_idle;
-	proto->set_privacy_mode = aim_set_privacy_mode;
 	proto->set_profile = aim_set_profile;
-	proto->set_report_idle = aim_report_idle;
 	proto->update = aim_acct_update;
 	proto->warn = aim_warn;
 	proto->send_action = aim_action;

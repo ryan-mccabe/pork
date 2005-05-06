@@ -39,6 +39,7 @@ struct pork_proto {
 	int (*update)(struct pork_acct *);
 	int (*normalize)(char *dest, const char *str, size_t len);
 	int (*user_compare)(const char *u1, const char *u2);
+
 	char *(*filter_text)(char *);
 	char *(*filter_text_out)(char *);
 
@@ -85,9 +86,7 @@ struct pork_proto {
 	int (*file_recv_complete)(struct file_transfer *xfer);
 	int (*file_send_complete)(struct file_transfer *xfer);
 
-	int (*set_report_idle)(struct pork_acct *, int);
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
-	int (*set_privacy_mode)(struct pork_acct *, int);
 
 	int (*warn)(struct pork_acct *, char *);
 	int (*warn_anon)(struct pork_acct *, char *);
@@ -102,12 +101,7 @@ struct pork_proto {
 	int (*set_profile)(struct pork_acct *, char *);
 	int (*get_profile)(struct pork_acct *, char *);
 
-	int (*whowas)(struct pork_acct *, char *);
-	int (*quote)(struct pork_acct *acct, char *str);
-	int (*mode)(struct pork_acct *, char *);
-	int (*who)(struct pork_acct *, char *str);
 	int (*ping)(struct pork_acct *, char *str);
-	int (*ctcp)(struct pork_acct *, char *dest, char *str);
 
 	int (*keepalive)(struct pork_acct *);
 	int (*change_nick)(struct pork_acct *acct, char *nick);

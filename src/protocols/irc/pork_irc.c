@@ -243,14 +243,6 @@ static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
 	return (irc_send_privmsg(acct->data, dest, msg));
 }
 
-static int irc_mode(struct pork_acct *acct, char *str) {
-	return (irc_send_mode(acct->data, str));
-}
-
-static int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
-	return (irc_send_ctcp(acct->data, dest, msg));
-}
-
 static int irc_chan_send(	struct pork_acct *acct,
 							struct chatroom *chat,
 							char *target,
@@ -288,15 +280,6 @@ static int irc_whois(struct pork_acct *acct, char *dest) {
 
 	while ((p = strsep(&dest, ",")) != NULL)
 		irc_send_whois(acct->data, p);
-
-	return (0);
-}
-
-static int irc_whowas(struct pork_acct *acct, char *dest) {
-	char *p;
-
-	while ((p = strsep(&dest, ",")) != NULL)
-		irc_send_whowas(acct->data, p);
 
 	return (0);
 }
@@ -407,10 +390,6 @@ static int irc_notice(struct pork_acct *acct, char *dest, char *msg) {
 	return (irc_send_notice(acct->data, dest, msg));
 }
 
-static int irc_who(struct pork_acct *acct, char *str) {
-	return (irc_send_who(acct->data, str));
-}
-
 static int irc_ping(struct pork_acct *acct, char *str) {
 	return (irc_send_ping(acct->data, str));
 }
@@ -431,23 +410,6 @@ static int irc_is_chat(struct pork_acct *acct, char *str) {
 		return (1);
 
 	return (0);
-}
-
-static int irc_quote(struct pork_acct *acct, char *str) {
-	char *p = str;
-
-	if (str == NULL)
-		return (-1);
-
-	while (*p == ' ')
-		p++;
-
-	if (!strncasecmp(p, "NICK ", 5)) {
-		screen_err_msg("Use the /nick command.");
-		return (-1);
-	}
-
-	return (irc_send_raw(acct->data, str));
 }
 
 static int irc_action(struct pork_acct *acct, char *dest, char *msg) {
@@ -820,6 +782,44 @@ static int irc_rejoin(struct pork_acct *acct, struct chatroom *chat) {
 	return (irc_send_join(acct->data, chat->title, chan_key));
 }
 
+inline int irc_mode(struct pork_acct *acct, char *str) {
+	return (irc_send_mode(acct->data, str));
+}
+
+inline int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
+	return (irc_send_ctcp(acct->data, dest, msg));
+}
+
+inline int irc_whowas(struct pork_acct *acct, char *dest) {
+	char *p;
+
+	while ((p = strsep(&dest, ",")) != NULL)
+		irc_send_whowas(acct->data, p);
+
+	return (0);
+}
+
+inline int irc_who(struct pork_acct *acct, char *str) {
+	return (irc_send_who(acct->data, str));
+}
+
+int irc_quote(struct pork_acct *acct, char *str) {
+	char *p = str;
+
+	if (str == NULL)
+		return (-1);
+
+	while (*p == ' ')
+		p++;
+
+	if (!strncasecmp(p, "NICK ", 5)) {
+		screen_err_msg("Use the /nick command.");
+		return (-1);
+	}
+
+	return (irc_send_raw(acct->data, str));
+}
+
 int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_action = irc_chan_action;
 	proto->chat_join = irc_join;
@@ -843,11 +843,8 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->connect_abort = irc_connect_abort;
 	proto->reconnect = irc_reconnect;
 	proto->free = irc_free;
-	proto->mode = irc_mode;
 	proto->init = irc_init;
-	proto->who = irc_who;
 	proto->ping = irc_ping;
-	proto->whowas = irc_whowas;
 	proto->send_notice = irc_notice;
 	proto->signoff = irc_quit;
 	proto->normalize = xstrncpy;
@@ -859,11 +856,9 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->change_nick = irc_change_nick;
 	proto->filter_text = irc_text_filter;
 	proto->filter_text_out = irc_text_filter;
-	proto->quote = irc_quote;
 	proto->is_chat = irc_is_chat;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
-	proto->ctcp = irc_ctcp;
 
 	proto->file_accept = irc_file_accept;
 	proto->file_recv_data = irc_recv_data;
