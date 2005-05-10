@@ -135,6 +135,7 @@ static struct command input_command[] = {
 	{ "next_word",				cmd_input_next_word			},
 	{ "prev_word",				cmd_input_prev_word			},
 	{ "prompt",					cmd_input_prompt			},
+	{ "remove",					cmd_input_remove			},
 	{ "right",					cmd_input_right				},
 	{ "send",					cmd_input_send				},
 	{ "start",					cmd_input_start				},
@@ -207,6 +208,17 @@ USER_COMMAND(cmd_input_prompt) {
 
 USER_COMMAND(cmd_input_next_word) {
 	input_next_word(cur_window()->input);
+}
+
+USER_COMMAND(cmd_input_remove) {
+	if (args != NULL && !blank_str(args)) {
+		int len;
+
+		if (str_to_int(args, &len) == -1)
+			screen_err_msg("Bad number of characters: %s", args);
+		else
+			input_remove(cur_window()->input, len);
+	}
 }
 
 USER_COMMAND(cmd_input_right) {

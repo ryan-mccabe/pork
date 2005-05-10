@@ -23,9 +23,13 @@ faim_internal int aim_recv(int fd, void *buf, size_t count)
 
 		ret = recv(fd, ((unsigned char *)buf)+cur, left, 0);
 
-		/* Of course EOF is an error, only morons disagree with that. */
-		if (ret <= 0)
-			return -1;
+		if (ret <= 0) {
+			if (errno != EAGAIN && errno != EINTR)
+				return (-1);
+			if (ret < 0)
+				continue;
+			break;
+		}
 
 		cur += ret;
 		left -= ret;
@@ -42,7 +46,7 @@ faim_internal int aim_bstream_recv(aim_bstream_t *bs, int fd, size_t count)
 {
 	int red = 0;
 
-	if (!bs || (fd < 0) || (count < 0))
+	if (!bs || fd < 0)
 		return -1;
 
 	if (count > (bs->len - bs->offset))

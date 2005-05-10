@@ -40,12 +40,9 @@ inline void input_delete(struct input *input) {
 	if (input->input_buf[cur] == '\0')
 		return;
 
-	input->cur++;
-
 	memmove(&input->input_buf[cur], &input->input_buf[cur + 1],
 		input->len - cur);
 
-	input->cur--;
 	input->begin_completion = input->cur;
 	input->len--;
 	input->dirty = 1;
@@ -66,7 +63,7 @@ inline void input_bkspace(struct input *input) {
 	memmove(&input->input_buf[cur], &input->input_buf[cur + 1],
 		input->len - cur);
 
-	input->cur = cur + input->prompt_len;
+	input->cur -= 1;
 	input->begin_completion = input->cur;
 	input->len--;
 	input->dirty = 1;
@@ -151,6 +148,42 @@ inline void input_clear_to_end(struct input *input) {
 
 	input->len = cur;
 	input->input_buf[cur] = '\0';
+	input->begin_completion = input->cur;
+	input->dirty = 1;
+}
+
+/*
+** Deletes "num" characters starting at the current cursor
+** position. If "num" is negative, it deletes from the cursor
+** back, otherwise it deletes from the cursor forward.
+*/
+
+inline void input_remove(struct input *input, int num) {
+	u_int32_t cur = input->cur - input->prompt_len;
+
+	if (num < 0) {
+		num = -num;
+		if ((u_int32_t) num >= cur) {
+			input_clear_to_start(input);
+			return;
+		}
+
+		memmove(&input->input_buf[cur - num], &input->input_buf[cur],
+			input->len - cur + 1);
+
+		input->cur -= num;
+		input->len -= num;
+	} else {
+		if (cur + num >= input->len) {
+			input_clear_to_end(input);
+			return;
+		}
+
+		input->len -= num;
+		memmove(&input->input_buf[cur], &input->input_buf[cur + num],
+			input->len - cur + 1);
+	}
+
 	input->begin_completion = input->cur;
 	input->dirty = 1;
 }

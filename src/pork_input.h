@@ -42,6 +42,7 @@ void input_init(struct input *input, u_int32_t width);
 
 void input_delete(struct input *input);
 void input_bkspace(struct input *input);
+void input_remove(struct input *input, int num);
 void input_insert(struct input *input, int c);
 void input_insert_str(struct input *input, char *str);
 void input_clear_line(struct input *input);

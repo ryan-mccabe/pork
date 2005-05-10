@@ -38,7 +38,9 @@
 
 #include <libfaim/faimconfig.h>
 #include <libfaim/aim.h>
+
 #include <pork_aim.h>
+#include <pork_aim_proto.h>
 #include <pork_aim_cmd.h>
 
 /* XXX - todo */

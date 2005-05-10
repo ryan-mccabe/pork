@@ -374,8 +374,8 @@ void aim_connected(int sock, u_int32_t cond __notused, void *data) {
 		}
 	} else {
 		conn->fd = sock;
-		sock_setflags(sock, 0);
 		aim_conn_completeconnect(session, conn);
+		sock_setflags(sock, O_NONBLOCK);
 
 		pork_io_add(sock, IO_COND_RW, conn, conn,
 			aim_conn_event);

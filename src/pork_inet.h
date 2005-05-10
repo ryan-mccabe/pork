@@ -56,7 +56,7 @@ int nb_connect(	struct sockaddr_storage *ss,
 				in_port_t port,
 				int *dsock);
 
-ssize_t sock_write(int sock, void *buf, size_t len);
+ssize_t sock_write(int sock, const void *buf, size_t len);
 int sockprintf(int fd, const char *fmt, ...);
 int get_port(const char *name, in_port_t *port);
 int get_addr(const char *hostname, struct sockaddr_storage *addr);

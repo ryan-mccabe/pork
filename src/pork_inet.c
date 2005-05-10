@@ -32,10 +32,12 @@
 ** the number of characters written to the socket on success, -1 on failure.
 */
 
-ssize_t sock_write(int sock, void *buf, size_t len) {
-	ssize_t n, written = 0;
+ssize_t sock_write(int sock, const void *buf, size_t len) {
+	ssize_t written = 0;
 
 	while (len > 0) {
+		ssize_t n;
+
 		n = write(sock, buf, len);
 		if (n == -1) {
 			if (errno == EINTR || errno == EAGAIN)
@@ -388,33 +390,31 @@ int sock_listen(struct sockaddr_storage *ss, in_port_t listen_port) {
 
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) != 0) {
 		debug("setsockopt: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
+		goto err_out;
 	}
 
 	if (bind(sock, cur->ai_addr, cur->ai_addrlen) != 0) {
 		debug("bind: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
+		goto err_out;
 	}
 
 	if (listen(sock, SOMAXCONN) != 0) {
 		debug("listen: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
+		goto err_out;
 	}
 
-	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1) {
-		debug("fcntl: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-	}
+	if (sock_setflags(sock, O_NONBLOCK) == -1)
+		goto err_out;
 
 done:
 	free(cur->ai_addr);
 	free(cur);
 	return (sock);
+
+err_out:
+	free(cur->ai_addr);
+	free(cur);
+	close(sock);
+	return (-1);
+
 }
