@@ -508,5 +508,8 @@ void pork_acct_reconnect_all(void) {
 }
 
 int pork_acct_save(struct pork_acct *acct) {
-	return (0);
+	if (acct->proto->write_config != NULL)
+		return (acct->proto->write_config(acct));
+
+	return (-1);
 }
