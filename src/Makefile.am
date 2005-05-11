@@ -1,4 +1,4 @@
-SUBDIRS = missing protocols
+SUBDIRS = missing protocols perl
 bin_PROGRAMS = pork
 
 if IRC_SUPPORT
@@ -6,17 +6,14 @@ irc_lib = protocols/irc/libirc.a
 endif
 
 
-AM_CFLAGS = -funsigned-char -Imissing -Wall -Iprotocols -fPIC
+AM_CFLAGS = -funsigned-char -Imissing -Wall -Iprotocols -fPIC -Iperl
 AM_CFLAGS += -DHELP_PATH=\"$(pkgdatadir)/help\" -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
 AM_CFLAGS += $(PERL_CFLAGS) $(DEBUG_CFLAGS)
 
-pork_LDADD = missing/libmissing.a protocols/aim/libaim.a $(irc_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
+pork_LDADD = missing/libmissing.a protocols/aim/libaim.a $(irc_lib) -lncurses $(perl_lib) $(PERL_LIBS) $(DEBUG_LIBS)
 
 if COMPILE_PERL
-pork_perl = pork_perl.c
-pork_perl_xs = pork_perl_xs.c
-else
-pork_perl = pork_perl_stub.c
+perl_lib = perl/libporkperl.a
 endif
 
 noinst_HEADERS = \
@@ -45,8 +42,6 @@ noinst_HEADERS = \
 	pork_misc.h			\
 	pork_msg.h			\
 	pork_opt.h			\
-	pork_perl.h			\
-	pork_perl_xs.h		\
 	pork_proto.h		\
 	pork_queue.h		\
 	pork_screen.h		\
@@ -85,8 +80,6 @@ pork_SOURCES = \
 	pork_misc.c			\
 	pork_msg.c			\
 	pork_opt.c			\
-	$(pork_perl)		\
-	$(pork_perl_xs)		\
 	pork_proto.c		\
 	pork_queue.c		\
 	pork_screen.c		\
