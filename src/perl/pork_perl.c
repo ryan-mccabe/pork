@@ -1,6 +1,6 @@
 /*
 ** pork_perl.c - Perl scripting support
-** Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
 **
 ** The init, execute_perl, and destroy functions were pretty much copied
 ** from the gaim perl.c source file.

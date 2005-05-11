@@ -5,16 +5,17 @@ if IRC_SUPPORT
 irc_lib = protocols/irc/libirc.a
 endif
 
-
-AM_CFLAGS = -funsigned-char -Imissing -Wall -Iprotocols -fPIC -Iperl
-AM_CFLAGS += -DHELP_PATH=\"$(pkgdatadir)/help\" -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
-AM_CFLAGS += $(PERL_CFLAGS) $(DEBUG_CFLAGS)
-
-pork_LDADD = missing/libmissing.a protocols/aim/libaim.a $(irc_lib) -lncurses $(perl_lib) $(PERL_LIBS) $(DEBUG_LIBS)
-
 if COMPILE_PERL
 perl_lib = perl/libporkperl.a
 endif
+
+INCLUDES = -Imissing -Iperl -I.. -I.
+
+AM_CFLAGS = -funsigned-char
+AM_CFLAGS += -DHELP_PATH=\"$(pkgdatadir)/help\" -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
+AM_CFLAGS += $(PERL_CFLAGS) $(DEBUG_CFLAGS)
+
+pork_LDADD = missing/libmissing.a protocols/aim/libaim.a $(irc_lib) $(perl_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
 
 noinst_HEADERS = \
 	pork.h				\
