@@ -34,30 +34,19 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
-#include <pork_events.h>
-#include <pork_buddy.h>
 #include <pork_set.h>
-#include <pork_swindow.h>
+#include <pork_imsg.h>
 #include <pork_imwindow.h>
-#include <pork_proto.h>
 #include <pork_acct.h>
 #include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_screen.h>
-#include <pork_imsg.h>
 #include <pork_screen_io.h>
-#include <pork_status.h>
-#include <pork_screen.h>
-#include <pork_timer.h>
+#include <pork_alias.h>
+#include <pork_conf.h>
+#include <pork_msg.h>
 #include <pork_command.h>
 #include <pork_command_defs.h>
-#include <pork_slist.h>
-#include <pork_buddy_list.h>
-#include <pork_conf.h>
-#include <pork_alias.h>
-#include <pork_chat.h>
-#include <pork_msg.h>
-#include <pork_events.h>
 #include <pork_perl.h>
 #include <pork_perl_xs.h>
 
@@ -611,34 +600,6 @@ XS(PORK_get_opt) {
 	XSRETURN_PV(buf);
 }
 
-XS(PORK_send_profile) {
-	size_t notused;
-	char *profile;
-	struct pork_acct *acct;
-	dXSARGS;
-
-	(void) cv;
-
-	if (items != 1 && items != 2)
-		XSRETURN_IV(-1);
-
-	profile = SvPV(ST(0), notused);
-
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
-	if (!acct->connected)
-		XSRETURN_IV(-1);
-
-	XSRETURN_IV(acct->proto->set_profile(acct, profile));
-}
-
 /* XXX - fix */
 
 XS(PORK_get_acct_list) {
@@ -787,66 +748,6 @@ XS(PORK_send_msg_auto) {
 		XSRETURN_IV(-1);
 
 	return (XSRETURN_IV(pork_msg_autoreply(acct, dest, msg)));
-}
-
-XS(PORK_get_buddy_profile) {
-	size_t notused;
-	char *target;
-	struct pork_acct *acct;
-	dXSARGS;
-
-	(void) cv;
-
-	if (items != 1 && items != 2)
-		XSRETURN_IV(-1);
-
-	target = SvPV(ST(0), notused);
-	if (target == NULL)
-		XSRETURN_IV(-1);
-
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
-	if (!acct->connected)
-		XSRETURN_IV(-1);
-
-	XSRETURN_IV(acct->proto->get_profile(acct, target));
-}
-
-XS(PORK_get_buddy_away) {
-	size_t notused;
-	char *target;
-	struct pork_acct *acct;
-	dXSARGS;
-
-	(void) cv;
-
-	if (items != 1 && items != 2)
-		XSRETURN_IV(-1);
-
-	target = SvPV(ST(0), notused);
-	if (target == NULL)
-		XSRETURN_IV(-1);
-
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
-	if (!acct->connected)
-		XSRETURN_IV(-1);
-
-	XSRETURN_IV(acct->proto->get_away_msg(acct, target));
 }
 
 XS(PORK_set_away) {
@@ -1036,5 +937,31 @@ XS(PORK_search) {
 	XSRETURN_IV(acct->proto->who(acct, target));
 }
 
-#endif
+XS(PORK_send_profile) {
+	size_t notused;
+	char *profile;
+	struct pork_acct *acct;
+	dXSARGS;
 
+	(void) cv;
+
+	if (items != 1 && items != 2)
+		XSRETURN_IV(-1);
+
+	profile = SvPV(ST(0), notused);
+
+	if (items == 2) {
+		u_int32_t acct_refnum = SvIV(ST(1));
+
+		acct = pork_acct_get_data(acct_refnum);
+		if (acct == NULL)
+			XSRETURN_IV(-1);
+	} else
+		acct = cur_window()->owner;
+
+	if (!acct->connected)
+		XSRETURN_IV(-1);
+
+	XSRETURN_IV(acct->proto->set_profile(acct, profile));
+}
+#endif
