@@ -122,13 +122,13 @@ void xs_init(init_args) {
 //	newXS("PORK::privacy_mode", PORK_privacy_mode, file);
 //	newXS("PORK::report_idle", PORK_report_idle, file);
 //	newXS("PORK::search", PORK_search, file);
+//	newXS("PORK::send_profile", PORK_send_profile, file);
 
 	newXS("PORK::send_msg", PORK_send_msg, file);
 	newXS("PORK::send_msg_auto", PORK_send_msg_auto, file);
 	newXS("PORK::set_away", PORK_set_away, file);
 	newXS("PORK::set_idle", PORK_set_idle, file);
 	newXS("PORK::set_profile", PORK_set_profile, file);
-	newXS("PORK::send_profile", PORK_send_profile, file);
 	newXS("PORK::warn", PORK_warn, file);
 
 	newXS("PORK::scroll_by", PORK_scroll_by, file);

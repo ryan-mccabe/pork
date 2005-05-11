@@ -36,6 +36,7 @@
 #include <pork_list.h>
 #include <pork_buddy.h>
 #include <pork_imwindow.h>
+#include <pork_proto.h>
 #include <pork_acct.h>
 #include <pork_screen.h>
 #include <pork_perl_xs.h>
@@ -508,4 +509,64 @@ XS(PORK_buddy_remove_permit) {
 		acct = cur_window()->owner;
 
 	XSRETURN_IV(buddy_remove_permit(acct, target, 1));
+}
+
+XS(PORK_get_buddy_profile) {
+	size_t notused;
+	char *target;
+	struct pork_acct *acct;
+	dXSARGS;
+
+	(void) cv;
+
+	if (items != 1 && items != 2)
+		XSRETURN_IV(-1);
+
+	target = SvPV(ST(0), notused);
+	if (target == NULL)
+		XSRETURN_IV(-1);
+
+	if (items == 2) {
+		u_int32_t acct_refnum = SvIV(ST(1));
+
+		acct = pork_acct_get_data(acct_refnum);
+		if (acct == NULL)
+			XSRETURN_IV(-1);
+	} else
+		acct = cur_window()->owner;
+
+	if (!acct->connected)
+		XSRETURN_IV(-1);
+
+	XSRETURN_IV(acct->proto->get_profile(acct, target));
+}
+
+XS(PORK_get_buddy_away) {
+	size_t notused;
+	char *target;
+	struct pork_acct *acct;
+	dXSARGS;
+
+	(void) cv;
+
+	if (items != 1 && items != 2)
+		XSRETURN_IV(-1);
+
+	target = SvPV(ST(0), notused);
+	if (target == NULL)
+		XSRETURN_IV(-1);
+
+	if (items == 2) {
+		u_int32_t acct_refnum = SvIV(ST(1));
+
+		acct = pork_acct_get_data(acct_refnum);
+		if (acct == NULL)
+			XSRETURN_IV(-1);
+	} else
+		acct = cur_window()->owner;
+
+	if (!acct->connected)
+		XSRETURN_IV(-1);
+
+	XSRETURN_IV(acct->proto->get_away_msg(acct, target));
 }
