@@ -143,7 +143,6 @@ int swindow_init(	struct swindow *swindow,
 	swindow->scrollbuf_max = wopt_get_int(wopt, WOPT_SCROLLBUF_LEN);
 	swindow->scroll_on_input = wopt_get_bool(wopt, WOPT_SCROLL_ON_INPUT);
 	swindow->scroll_on_output = wopt_get_bool(wopt, WOPT_SCROLL_ON_OUTPUT);
-	swindow->timestamp = wopt_get_bool(wopt, WOPT_TIMESTAMP);
 	swindow->wordwrap = wopt_get_bool(wopt, WOPT_WORDWRAP);
 	swindow->wordwrap_char = wopt_get_char(wopt, WOPT_WORDWRAP_CHAR);
 	swindow->logged = wopt_get_bool(wopt, WOPT_LOG);
@@ -248,7 +247,7 @@ static void swindow_adjust_top(struct swindow *swindow, u_int32_t n) {
 ** Recalculate the number of lines for each message.
 **
 ** This should be called when the window is resized
-** and when timestamps are turned on or off.
+** and when wordwrap is turned on or off.
 */
 
 static void swindow_recalculate(struct swindow *swindow,
@@ -756,14 +755,6 @@ int swindow_print_matching(	struct swindow *swindow,
 	}
 
 	return (0);
-}
-
-/*
-** Turn timestamping on or off, depending on the value of "value"
-*/
-
-inline void swindow_set_timestamp(struct swindow *swindow, u_int32_t value) {
-	swindow->timestamp = value;
 }
 
 inline void swindow_set_wordwrap(struct swindow *swindow, u_int32_t value) {

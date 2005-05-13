@@ -131,7 +131,22 @@ XS(PORK_chat_target);
 XS(PORK_chat_topic);
 XS(PORK_chat_unignore);
 
-XS(PORK_input_send);
+XS(PORK_input_bkspace);
+XS(PORK_input_clear);
+XS(PORK_input_clear_next_word);
+XS(PORK_input_clear_prev_word);
+XS(PORK_input_clear_to_end);
+XS(PORK_input_clear_to_start);
+XS(PORK_input_delete);
 XS(PORK_input_get_data);
+XS(PORK_input_insert);
+XS(PORK_input_move_cursor_end);
+XS(PORK_input_move_cursor_left);
+XS(PORK_input_move_cursor_next_word);
+XS(PORK_input_move_cursor_prev_word);
+XS(PORK_input_move_cursor_right);
+XS(PORK_input_move_cursor_start);
+XS(PORK_input_remove);
+XS(PORK_input_send);
 
 #endif

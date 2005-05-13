@@ -51,7 +51,6 @@ static void wopt_changed_scrollbuf_len(struct imwindow *imwindow);
 static void wopt_changed_scroll_on_output(struct imwindow *imwindow);
 static void wopt_changed_scroll_on_input(struct imwindow *imwindow);
 static void wopt_changed_show_blist(struct imwindow *imwindow);
-static void wopt_changed_timestamp(struct imwindow *imwindow);
 static void wopt_changed_wordwrap(struct imwindow *imwindow);
 
 /*
@@ -750,12 +749,6 @@ struct global_pref global_pref[] = {
 		opt_set_str,
 		NULL,
 		SET_STR(DEFAULT_TEXT_WARN_ANONYMOUS),
-	},{	"TIMESTAMP",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_TIMESTAMP),
 	},{	"TRANSFER_PORT_MAX",
 		OPT_INT,
 		0,
@@ -835,10 +828,6 @@ static struct window_var window_var[] = {
 		OPT_BOOL,
 		wopt_set_bool,
 		wopt_changed_show_blist
-	},{	"TIMESTAMP",
-		OPT_BOOL,
-		wopt_set_bool,
-		wopt_changed_timestamp
 	},{	"WORDWRAP",
 		OPT_BOOL,
 		wopt_set_bool,
@@ -1212,11 +1201,6 @@ static void wopt_changed_show_blist(struct imwindow *imwindow) {
 		imwindow_blist_hide(imwindow);
 }
 
-static void wopt_changed_timestamp(struct imwindow *imwindow) {
-	swindow_set_timestamp(&imwindow->swindow,
-		wopt_get_bool(imwindow->opts, WOPT_TIMESTAMP));
-}
-
 static void wopt_changed_wordwrap(struct imwindow *imwindow) {
 	swindow_set_wordwrap(&imwindow->swindow,
 		wopt_get_bool(imwindow->opts, WOPT_WORDWRAP));
@@ -1241,7 +1225,6 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 	wopt[WOPT_SCROLL_ON_OUTPUT].b = opt_get_bool(OPT_SCROLL_ON_OUTPUT);
 	wopt[WOPT_SCROLLBUF_LEN].i = opt_get_int(OPT_SCROLLBUF_LEN);
 	wopt[WOPT_SHOW_BLIST].b = opt_get_bool(OPT_SHOW_BLIST);
-	wopt[WOPT_TIMESTAMP].b = opt_get_bool(OPT_TIMESTAMP);
 	wopt[WOPT_WORDWRAP].b = opt_get_bool(OPT_WORDWRAP);
 	wopt[WOPT_WORDWRAP_CHAR].c = opt_get_char(OPT_WORDWRAP_CHAR);
 

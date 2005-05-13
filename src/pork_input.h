@@ -19,7 +19,7 @@
 
 #define CTRL_KEY(x)		((x) & 0x1f)
 
-struct input {
+struct pork_input {
 	u_int32_t width;
 	u_int16_t cur;
 	u_int16_t len;
@@ -35,35 +35,35 @@ struct input {
 	char input_buf[INPUT_BUFFER_LEN];
 };
 
-char *input_partial(struct input *input);
-void input_resize(struct input *input, u_int32_t width);
-void input_destroy(struct input *input);
-void input_init(struct input *input, u_int32_t width);
+char *input_partial(struct pork_input *input);
+void input_resize(struct pork_input *input, u_int32_t width);
+void input_destroy(struct pork_input *input);
+void input_init(struct pork_input *input, u_int32_t width);
 
-void input_delete(struct input *input);
-void input_bkspace(struct input *input);
-void input_remove(struct input *input, int num);
-void input_insert(struct input *input, int c);
-void input_insert_str(struct input *input, char *str);
-void input_clear_line(struct input *input);
-void input_clear_to_end(struct input *input);
-void input_clear_to_start(struct input *input);
-void input_home(struct input *input);
-void input_end(struct input *input);
-void input_prev_word(struct input *input);
-void input_next_word(struct input *input);
-void input_clear_prev_word(struct input *input);
-void input_clear_next_word(struct input *input);
-void input_move_left(struct input *input);
-void input_move_right(struct input *input);
-void input_history_prune(struct input *input);
-void input_history_add(struct input *input);
-void input_history_next(struct input *input);
-void input_history_prev(struct input *input);
-void input_history_clear(struct input *input);
-int input_set_buf(struct input *input, char *str);
-int input_set_prompt(struct input *input, char *prompt);
-char *input_get_buf_str(struct input *input);
-u_int32_t input_get_cursor_pos(struct input *input);
+void input_delete(struct pork_input *input);
+void input_bkspace(struct pork_input *input);
+void input_remove(struct pork_input *input, int num);
+void input_insert(struct pork_input *input, int c);
+void input_insert_str(struct pork_input *input, char *str);
+void input_clear_line(struct pork_input *input);
+void input_clear_to_end(struct pork_input *input);
+void input_clear_to_start(struct pork_input *input);
+void input_home(struct pork_input *input);
+void input_end(struct pork_input *input);
+void input_prev_word(struct pork_input *input);
+void input_next_word(struct pork_input *input);
+void input_clear_prev_word(struct pork_input *input);
+void input_clear_next_word(struct pork_input *input);
+void input_move_left(struct pork_input *input);
+void input_move_right(struct pork_input *input);
+void input_history_prune(struct pork_input *input);
+void input_history_add(struct pork_input *input);
+void input_history_next(struct pork_input *input);
+void input_history_prev(struct pork_input *input);
+void input_history_clear(struct pork_input *input);
+int input_set_buf(struct pork_input *input, char *str);
+int input_set_prompt(struct pork_input *input, char *prompt);
+char *input_get_buf_str(struct pork_input *input);
+u_int32_t input_get_cursor_pos(struct pork_input *input);
 
 #endif

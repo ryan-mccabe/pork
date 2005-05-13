@@ -26,7 +26,7 @@ enum {
 
 struct imwindow {
 	struct swindow swindow;
-	struct input *input;
+	struct pork_input *input;
 	struct pork_acct *owner;
 	struct key_binds *active_binds;
 	char *target;

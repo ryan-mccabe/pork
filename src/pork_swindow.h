@@ -59,7 +59,6 @@ struct swindow {
 	u_int32_t beep_on_output:1;
 	u_int32_t scroll_on_input:1;
 	u_int32_t scroll_on_output:1;
-	u_int32_t timestamp:1;
 	u_int32_t logged:1;
 	u_int32_t wordwrap:1;
 };
@@ -90,7 +89,6 @@ int swindow_dump_buffer(struct swindow *swindow, char *file);
 int swindow_set_log(struct swindow *swindow);
 void swindow_end_log(struct swindow *swindow);
 void swindow_set_logfile(struct swindow *swindow, char *logfile);
-void swindow_set_timestamp(struct swindow *swindow, u_int32_t value);
 void swindow_set_wordwrap(struct swindow *swindow, u_int32_t value);
 void swindow_prune(struct swindow *swindow);
 

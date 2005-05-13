@@ -51,7 +51,7 @@ inline void screen_doupdate(void) {
 }
 
 int screen_draw_input(void) {
-	struct input *input = cur_window()->input;
+	struct pork_input *input = cur_window()->input;
 
 	if (input->dirty) {
 		char *input_line;

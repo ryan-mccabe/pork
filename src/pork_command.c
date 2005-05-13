@@ -227,7 +227,7 @@ USER_COMMAND(cmd_input_right) {
 
 USER_COMMAND(cmd_input_send) {
 	struct imwindow *imwindow = cur_window();
-	struct input *input = imwindow->input;
+	struct pork_input *input = imwindow->input;
 	struct pork_acct *acct = imwindow->owner;
 	static int recursion;
 
@@ -743,7 +743,7 @@ USER_COMMAND(cmd_history_clear) {
 
 USER_COMMAND(cmd_history_list) {
 	struct imwindow *win = cur_window();
-	struct input *input = win->input;
+	struct pork_input *input = win->input;
 	dlist_t *cur = input->history_end;
 	u_int32_t i = 0;
 
@@ -2779,7 +2779,7 @@ USER_COMMAND(cmd_input_find_next_cmd) {
 	u_int32_t end_word;
 	size_t elements = 0;
 	char *input_buf;
-	struct input *input;
+	struct pork_input *input;
 	struct command *cmd = NULL;
 
 	input = cur_window()->input;

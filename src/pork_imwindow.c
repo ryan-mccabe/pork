@@ -49,7 +49,7 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 {
 	WINDOW *swin;
 	struct imwindow *imwindow;
-	struct input *input;
+	struct pork_input *input;
 	char nname[NUSER_LEN];
 
 	swin = newwin(rows, cols, 0, 0);
@@ -119,7 +119,7 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	** Give this imwindow its own input buffer and history.
 	*/
 	if (val == 1) {
-		struct input *input = xmalloc(sizeof(*input));
+		struct pork_input *input = xmalloc(sizeof(*input));
 
 		input_init(input, imwindow->swindow.cols);
 		imwindow->input = input;

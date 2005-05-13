@@ -34,7 +34,7 @@ static inline void input_free(void *param __notused, void *data);
 ** Deletes the character at the cursor position.
 */
 
-inline void input_delete(struct input *input) {
+inline void input_delete(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (input->input_buf[cur] == '\0')
@@ -52,7 +52,7 @@ inline void input_delete(struct input *input) {
 ** Deletes the character before the cursor.
 */
 
-inline void input_bkspace(struct input *input) {
+inline void input_bkspace(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (cur == 0)
@@ -73,7 +73,7 @@ inline void input_bkspace(struct input *input) {
 ** Add the character "c" at the cursor position.
 */
 
-inline void input_insert(struct input *input, int c) {
+inline void input_insert(struct pork_input *input, int c) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (input->len >= sizeof(input->input_buf) - 1) {
@@ -95,7 +95,7 @@ inline void input_insert(struct input *input, int c) {
 ** Insert the string "str" at the cursor position.
 */
 
-inline void input_insert_str(struct input *input, char *str) {
+inline void input_insert_str(struct pork_input *input, char *str) {
 	u_int32_t cur = input->cur - input->prompt_len;
 	size_t len = strlen(str);
 
@@ -116,7 +116,7 @@ inline void input_insert_str(struct input *input, char *str) {
 ** Clear the input line.
 */
 
-inline void input_clear_line(struct input *input) {
+inline void input_clear_line(struct pork_input *input) {
 	input->input_buf[0] = '\0';
 	input->cur = input->prompt_len;
 	input->begin_completion = input->cur;
@@ -128,7 +128,7 @@ inline void input_clear_line(struct input *input) {
 ** Clear from the cursor position the start of the line.
 */
 
-inline void input_clear_to_start(struct input *input) {
+inline void input_clear_to_start(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 	u_int32_t new_len = input->len - cur;
 
@@ -143,7 +143,7 @@ inline void input_clear_to_start(struct input *input) {
 ** Clear from the cursor position to the end of the line.
 */
 
-inline void input_clear_to_end(struct input *input) {
+inline void input_clear_to_end(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	input->len = cur;
@@ -158,7 +158,7 @@ inline void input_clear_to_end(struct input *input) {
 ** back, otherwise it deletes from the cursor forward.
 */
 
-inline void input_remove(struct input *input, int num) {
+inline void input_remove(struct pork_input *input, int num) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (num < 0) {
@@ -192,7 +192,7 @@ inline void input_remove(struct input *input, int num) {
 ** Move to the start of the line.
 */
 
-inline void input_home(struct input *input) {
+inline void input_home(struct pork_input *input) {
 	input->cur = input->prompt_len;
 	input->begin_completion = input->cur;
 	input->dirty = 1;
@@ -202,7 +202,7 @@ inline void input_home(struct input *input) {
 ** Move to the end of the line.
 */
 
-inline void input_end(struct input *input) {
+inline void input_end(struct pork_input *input) {
 	input->cur = input->len + input->prompt_len;
 	input->begin_completion = input->cur;
 	input->dirty = 1;
@@ -212,7 +212,7 @@ inline void input_end(struct input *input) {
 ** Move the cursor left.
 */
 
-inline void input_move_left(struct input *input) {
+inline void input_move_left(struct pork_input *input) {
 	if (input->cur > input->prompt_len) {
 		input->cur--;
 		input->dirty = 1;
@@ -225,7 +225,7 @@ inline void input_move_left(struct input *input) {
 ** Move the cursor right.
 */
 
-inline void input_move_right(struct input *input) {
+inline void input_move_right(struct pork_input *input) {
 	if (input->cur < input->len + input->prompt_len) {
 		input->cur++;
 		input->dirty = 1;
@@ -239,7 +239,7 @@ inline void input_move_right(struct input *input) {
 ** word.
 */
 
-void input_prev_word(struct input *input) {
+void input_prev_word(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (cur == 0)
@@ -273,7 +273,7 @@ start_of_line:
 ** previous word.
 */
 
-void input_clear_prev_word(struct input *input) {
+void input_clear_prev_word(struct pork_input *input) {
 	u_int32_t cur;
 	u_int32_t del_end = input->cur - input->prompt_len;
 	u_int32_t old_end = input->len;
@@ -296,7 +296,7 @@ void input_clear_prev_word(struct input *input) {
 ** Move the cursor to the start of the next word.
 */
 
-void input_next_word(struct input *input) {
+void input_next_word(struct pork_input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (cur == input->len)
@@ -321,7 +321,7 @@ void input_next_word(struct input *input) {
 ** Clear the next word after the cursor.
 */
 
-void input_clear_next_word(struct input *input) {
+void input_clear_next_word(struct pork_input *input) {
 	u_int32_t cur;
 	u_int32_t del_start = input->cur - input->prompt_len;
 	u_int32_t old_end = input->len;
@@ -346,7 +346,7 @@ void input_clear_next_word(struct input *input) {
 ** exceed the maximum length that's been set for it.
 */
 
-void input_history_prune(struct input *input) {
+void input_history_prune(struct pork_input *input) {
 	dlist_t *cur = input->history_end;
 
 	while (input->history_len > input->max_history_len && cur != NULL) {
@@ -365,7 +365,7 @@ void input_history_prune(struct input *input) {
 ** Add a line to the history list.
 */
 
-void input_history_add(struct input *input) {
+void input_history_add(struct pork_input *input) {
 	input->history = dlist_add_head(input->history, xstrdup(input->input_buf));
 	input->history_cur = NULL;
 	input->history_len++;
@@ -382,7 +382,7 @@ void input_history_add(struct input *input) {
 ** copy it to the input line.
 */
 
-void input_history_prev(struct input *input) {
+void input_history_prev(struct pork_input *input) {
 	if (input->history == NULL)
 		return;
 
@@ -412,7 +412,7 @@ void input_history_prev(struct input *input) {
 ** history buffer, and write it to the input line.
 */
 
-void input_history_next(struct input *input) {
+void input_history_next(struct pork_input *input) {
 	if (input->history_cur == NULL)
 		return;
 
@@ -447,7 +447,7 @@ void input_history_next(struct input *input) {
 ** Clear the input history list.
 */
 
-inline void input_history_clear(struct input *input) {
+inline void input_history_clear(struct pork_input *input) {
 	dlist_destroy(input->history, NULL, input_free);
 	input->history = NULL;
 	input->history_end = NULL;
@@ -466,7 +466,7 @@ inline void input_history_clear(struct input *input) {
 ** Initialize the input handler.
 */
 
-void input_init(struct input *input, u_int32_t width) {
+void input_init(struct pork_input *input, u_int32_t width) {
 	char *prompt;
 
 	memset(input, 0, sizeof(*input));
@@ -483,17 +483,17 @@ static inline void input_free(void *param __notused, void *data) {
 	free(data);
 }
 
-inline void input_destroy(struct input *input) {
+inline void input_destroy(struct pork_input *input) {
 	free(input->prompt);
 	dlist_destroy(input->history, NULL, input_free);
 }
 
-inline void input_resize(struct input *input, u_int32_t width) {
+inline void input_resize(struct pork_input *input, u_int32_t width) {
 	input->width = width;
 	input->dirty = 1;
 }
 
-char *input_partial(struct input *input) {
+char *input_partial(struct pork_input *input) {
 	u_int32_t offset;
 
 	if (input->prompt_len >= input->width)
@@ -511,7 +511,7 @@ char *input_partial(struct input *input) {
 ** Returns the x position of the cursor.
 */
 
-inline u_int32_t input_get_cursor_pos(struct input *input) {
+inline u_int32_t input_get_cursor_pos(struct pork_input *input) {
 	return (input->cur % input->width);
 }
 
@@ -519,7 +519,7 @@ inline u_int32_t input_get_cursor_pos(struct input *input) {
 ** Set the input prompt to the string specified by "prompt"
 */
 
-int input_set_prompt(struct input *input, char *prompt) {
+int input_set_prompt(struct pork_input *input, char *prompt) {
 	u_int32_t cur;
 
 	if (prompt != NULL && strlen(prompt) >= input->width)
@@ -550,7 +550,7 @@ int input_set_prompt(struct input *input, char *prompt) {
 ** Fetches the contents of the input buffer as a C string.
 */
 
-inline char *input_get_buf_str(struct input *input) {
+inline char *input_get_buf_str(struct pork_input *input) {
 	return (input->input_buf);
 }
 
@@ -558,7 +558,7 @@ inline char *input_get_buf_str(struct input *input) {
 ** Sets the input buffer to the specified string.
 */
 
-int input_set_buf(struct input *input, char *str) {
+int input_set_buf(struct pork_input *input, char *str) {
 	size_t len = strlen(str);
 
 	if (str == NULL || len >= sizeof(input->input_buf) - 1)

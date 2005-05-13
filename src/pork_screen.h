@@ -37,7 +37,7 @@ struct screen {
 	WINDOW *status_bar;
 	u_int32_t quiet:1;
 	struct pork_acct *null_acct;
-	struct input input;
+	struct pork_input input;
 	struct binds binds;
 	hash_t alias_hash;
 	struct event events;
