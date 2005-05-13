@@ -40,6 +40,7 @@
 #include <pork_acct.h>
 #include <pork_screen.h>
 #include <pork_perl_xs.h>
+#include <pork_perl_macro.h>
 
 XS(PORK_buddy_add) {
 	size_t notused;
@@ -49,9 +50,7 @@ XS(PORK_buddy_add) {
 	struct bgroup *bgroup;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
@@ -60,15 +59,7 @@ XS(PORK_buddy_add) {
 	if (target == NULL || group == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	bgroup = group_find(acct, group);
 	if (group == NULL)
 		XSRETURN_IV(-1);
@@ -82,24 +73,14 @@ XS(PORK_buddy_add_block) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(buddy_add_block(acct, target, 1));
 }
 
@@ -107,20 +88,7 @@ XS(PORK_buddy_clear_permit) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	buddy_clear_permit(acct);
 	XSRETURN_IV(0);
 }
@@ -129,20 +97,7 @@ XS(PORK_buddy_clear_block) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	buddy_clear_block(acct);
 	XSRETURN_IV(0);
 }
@@ -153,24 +108,14 @@ XS(PORK_buddy_add_permit) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(buddy_add_permit(acct, target, 1));
 }
 
@@ -182,9 +127,7 @@ XS(PORK_buddy_alias) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
@@ -193,15 +136,7 @@ XS(PORK_buddy_alias) {
 	if (target == NULL || alias == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	buddy = buddy_find(acct, target);
 	if (buddy == NULL)
 		XSRETURN_IV(-1);
@@ -217,24 +152,14 @@ XS(PORK_buddy_get_alias) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_EMPTY;
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_EMPTY;
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, EMPTY);
 	buddy = buddy_find(acct, target);
 	if (buddy == NULL)
 		XSRETURN_EMPTY;
@@ -248,24 +173,14 @@ XS(PORK_buddy_remove_block) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(buddy_remove_block(acct, target, 1));
 }
 
@@ -275,17 +190,7 @@ XS(PORK_buddy_get_groups) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, EMPTY);
 	if (acct->buddy_pref == NULL)
 		XSRETURN_EMPTY;
 
@@ -306,17 +211,7 @@ XS(PORK_buddy_get_block) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, EMPTY);
 	if (acct->buddy_pref == NULL)
 		XSRETURN_EMPTY;
 
@@ -335,17 +230,7 @@ XS(PORK_buddy_get_permit) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, EMPTY);
 	if (acct->buddy_pref == NULL)
 		XSRETURN_EMPTY;
 
@@ -367,24 +252,14 @@ XS(PORK_buddy_get_group_members) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_EMPTY;
 
 	group = SvPV(ST(0), notused);
 	if (group == NULL)
 		XSRETURN_EMPTY;
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, EMPTY);
 	bgroup = group_find(acct, group);
 	if (bgroup == NULL)
 		XSRETURN_EMPTY;
@@ -406,24 +281,14 @@ XS(PORK_buddy_remove) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(buddy_remove(acct, target, 1));
 }
 
@@ -433,24 +298,14 @@ XS(PORK_buddy_remove_group) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(group_remove(acct, target, 1));
 }
 
@@ -460,24 +315,14 @@ XS(PORK_buddy_add_group) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	if (group_add(acct, target) == NULL)
 		XSRETURN_IV(-1);
 
@@ -490,24 +335,14 @@ XS(PORK_buddy_remove_permit) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(buddy_remove_permit(acct, target, 1));
 }
 
@@ -517,24 +352,14 @@ XS(PORK_get_buddy_profile) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	if (!acct->connected)
 		XSRETURN_IV(-1);
 
@@ -547,24 +372,14 @@ XS(PORK_get_buddy_away) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	target = SvPV(ST(0), notused);
 	if (target == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	if (!acct->connected)
 		XSRETURN_IV(-1);
 

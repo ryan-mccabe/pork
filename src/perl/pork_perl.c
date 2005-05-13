@@ -165,7 +165,7 @@ void xs_init(init_args) {
 
 	newXS("PORK::chat_ban", PORK_chat_ban, file);
 	newXS("PORK::chat_kick", PORK_chat_kick, file);
-	newXS("PORK::chat_topic", PORK_chat_topic, file);
+	newXS("PORK::chat_set_topic", PORK_chat_set_topic, file);
 	newXS("PORK::chat_get_list", PORK_chat_get_list, file);
 	newXS("PORK::chat_get_users", PORK_chat_get_users, file);
 	newXS("PORK::chat_get_window", PORK_chat_get_window, file);
@@ -175,7 +175,6 @@ void xs_init(init_args) {
 	newXS("PORK::chat_leave", PORK_chat_leave, file);
 	newXS("PORK::chat_send", PORK_chat_send, file);
 	newXS("PORK::chat_target", PORK_chat_target, file);
-	newXS("PORK::chat_topic", PORK_chat_topic, file);
 	newXS("PORK::chat_unignore", PORK_chat_unignore, file);
 
 	newXS("PORK::input_send", PORK_input_send, file);

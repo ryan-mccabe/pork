@@ -128,7 +128,7 @@ XS(PORK_chat_kick);
 XS(PORK_chat_leave);
 XS(PORK_chat_send);
 XS(PORK_chat_target);
-XS(PORK_chat_topic);
+XS(PORK_chat_set_topic);
 XS(PORK_chat_unignore);
 
 XS(PORK_input_bkspace);

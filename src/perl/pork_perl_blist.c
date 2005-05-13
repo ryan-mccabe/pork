@@ -41,6 +41,7 @@
 #include <pork_screen.h>
 #include <pork_buddy.h>
 #include <pork_perl_xs.h>
+#include <pork_perl_macro.h>
 
 XS(PORK_blist_collapse) {
 	struct pork_acct *acct;
@@ -50,24 +51,14 @@ XS(PORK_blist_collapse) {
 	struct bgroup *bgroup;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	group = SvPV(ST(0), notused);
 	if (group == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	bgroup = group_find(acct, group);
 	if (bgroup == NULL)
 		XSRETURN_IV(-1);
@@ -86,20 +77,7 @@ XS(PORK_blist_cursor) {
 	struct slist_cell *cell;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_EMPTY;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, EMPTY);
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_EMPTY;
@@ -129,20 +107,7 @@ XS(PORK_blist_down) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -155,20 +120,7 @@ XS(PORK_blist_end) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -177,24 +129,11 @@ XS(PORK_blist_end) {
 }
 
 XS(PORK_blist_hide) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_blist_hide(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_blist_hide(win);
 	XSRETURN_IV(0);
 }
 
@@ -203,20 +142,7 @@ XS(PORK_blist_page_down) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -229,20 +155,7 @@ XS(PORK_blist_page_up) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -255,20 +168,7 @@ XS(PORK_blist_refresh) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -277,24 +177,11 @@ XS(PORK_blist_refresh) {
 }
 
 XS(PORK_blist_show) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_blist_show(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_blist_show(win);
 	XSRETURN_IV(0);
 }
 
@@ -303,20 +190,7 @@ XS(PORK_blist_start) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -329,20 +203,7 @@ XS(PORK_blist_up) {
 	struct blist *blist;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);
@@ -356,22 +217,12 @@ XS(PORK_blist_width) {
 	int new_width;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	new_width = SvIV(ST(0));
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	blist = acct->blist;
 	if (blist == NULL)
 		XSRETURN_IV(-1);

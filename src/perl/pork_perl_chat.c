@@ -39,6 +39,7 @@
 #include <pork_screen.h>
 #include <pork_chat.h>
 #include <pork_perl_xs.h>
+#include <pork_perl_macro.h>
 
 XS(PORK_chat_ban) {
 	char *chat_name;
@@ -48,9 +49,7 @@ XS(PORK_chat_ban) {
 	struct chatroom *chat;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
@@ -59,15 +58,7 @@ XS(PORK_chat_ban) {
 	if (chat_name == NULL || ban_user == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	chat = chat_find(acct, chat_name);
 	if (chat == NULL)
 		XSRETURN_IV(-1);
@@ -84,8 +75,6 @@ XS(PORK_chat_kick) {
 	struct chatroom *chat;
 	dXSARGS;
 
-	(void) cv;
-
 	if (items < 2)
 		XSRETURN_IV(-1);
 
@@ -101,15 +90,7 @@ XS(PORK_chat_kick) {
 	if (reason == NULL)
 		reason = "";
 
-	if (items == 4) {
-		u_int32_t acct_refnum = SvIV(ST(3));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(3, IV(-1));
 	chat = chat_find(acct, chat_name);
 	if (chat == NULL)
 		XSRETURN_IV(-1);
@@ -117,7 +98,7 @@ XS(PORK_chat_kick) {
 	XSRETURN_IV(chat_kick(acct, chat, user, reason));
 }
 
-XS(PORK_chat_topic) {
+XS(PORK_chat_set_topic) {
 	char *chat_name;
 	char *topic;
 	size_t notused;
@@ -125,36 +106,19 @@ XS(PORK_chat_topic) {
 	struct chatroom *chat;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
 	topic = SvPV(ST(1), notused);
 
-	if (chat_name == NULL)
+	if (chat_name == NULL || topic == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	chat = chat_find(acct, chat_name);
 	if (chat == NULL)
 		XSRETURN_IV(-1);
-
-	if (topic == NULL || *topic == '\0') {
-		if (chat->topic != NULL)
-			XSRETURN_PV(chat->topic);
-		else
-			XSRETURN_UNDEF;
-	}
 
 	XSRETURN_IV(chat_set_topic(acct, chat, topic));
 }
@@ -165,17 +129,7 @@ XS(PORK_chat_get_list) {
 	struct pork_acct *acct;
 	u_int32_t i = 0;
 
-	(void) cv;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, EMPTY);
 	SP -= items;
 	for (cur = acct->chat_list ; cur != NULL ; cur = cur->next) {
 		struct chatroom *chat = cur->data;
@@ -194,24 +148,14 @@ XS(PORK_chat_get_window) {
 	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
 	if (chat_name == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	win = imwindow_find_chat_target(acct, chat_name);
 	if (win == NULL)
 		XSRETURN_IV(-1);
@@ -230,8 +174,6 @@ XS(PORK_chat_get_users) {
 	u_int32_t invert = 0;
 	dXSARGS;
 
-	(void) cv;
-
 	if (items < 3)
 		XSRETURN_EMPTY;
 
@@ -242,15 +184,7 @@ XS(PORK_chat_get_users) {
 	flags = SvIV(ST(1));
 	invert = SvIV(ST(2));
 
-	if (items == 4) {
-		u_int32_t acct_refnum = SvIV(ST(3));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_EMPTY;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(3, EMPTY);
 	chat = chat_find(acct, chat_name);
 	if (chat == NULL)
 		XSRETURN_EMPTY;
@@ -275,9 +209,7 @@ XS(PORK_chat_ignore) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	name = SvPV(ST(0), notused);
@@ -286,15 +218,7 @@ XS(PORK_chat_ignore) {
 	if (name == NULL || dest == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	XSRETURN_IV(chat_ignore(acct, name, dest));
 }
 
@@ -306,9 +230,7 @@ XS(PORK_chat_invite) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 3 && items != 4)
+	if (items < 3)
 		XSRETURN_IV(-1);
 
 	name = SvPV(ST(0), notused);
@@ -318,18 +240,7 @@ XS(PORK_chat_invite) {
 	if (name == NULL || dest == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 4) {
-		u_int32_t acct_refnum = SvIV(ST(3));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
-	if (!acct->connected)
-		XSRETURN_IV(-1);
-
+	ACCT_WIN_REFNUM(3, IV(-1));
 	XSRETURN_IV(chat_invite(acct, name, dest, msg));
 }
 
@@ -339,24 +250,14 @@ XS(PORK_chat_join) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
 	if (chat_name == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(chat_join(acct, chat_name));
 }
 
@@ -366,24 +267,14 @@ XS(PORK_chat_leave) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
 	if (chat_name == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(chat_leave(acct, chat_name, 0));
 }
 
@@ -395,9 +286,7 @@ XS(PORK_chat_send) {
 	struct chatroom *chat;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	chat_name = SvPV(ST(0), notused);
@@ -406,15 +295,7 @@ XS(PORK_chat_send) {
 	if (chat_name == NULL || msg == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	chat = chat_find(acct, chat_name);
 	if (chat == NULL)
 		XSRETURN_IV(-1);
@@ -429,9 +310,7 @@ XS(PORK_chat_unignore) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	name = SvPV(ST(0), notused);
@@ -440,15 +319,7 @@ XS(PORK_chat_unignore) {
 	if (name == NULL || dest == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	XSRETURN_IV(chat_unignore(acct, name, dest));
 }
 
@@ -458,8 +329,6 @@ XS(PORK_chat_target) {
 	struct pork_acct *acct;
 	struct chatroom *chat;
 	dXSARGS;
-
-	(void) cv;
 
 	if (items > 0) {
 		name = SvPV(ST(0), notused);
@@ -473,20 +342,10 @@ XS(PORK_chat_target) {
 		XSRETURN_PV(chat->title);
 	}
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_UNDEF;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, UNDEF);
 	chat = chat_find(acct, name);
 	if (chat == NULL)
 		XSRETURN_UNDEF;
 
 	XSRETURN_PV(chat->title);
 }
-
-
