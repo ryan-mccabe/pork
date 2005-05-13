@@ -90,6 +90,13 @@ void xs_init(init_args) {
 	newXS("PORK::win_prev", PORK_win_prev, file);
 	newXS("PORK::win_rename", PORK_win_rename, file);
 	newXS("PORK::win_renumber", PORK_win_renumber, file);
+	newXS("PORK::win_scroll_by", PORK_win_scroll_by, file);
+	newXS("PORK::win_scroll_down", PORK_win_scroll_down, file);
+	newXS("PORK::win_scroll_end", PORK_win_scroll_end, file);
+	newXS("PORK::win_scroll_page_down", PORK_win_scroll_page_down, file);
+	newXS("PORK::win_scroll_page_up", PORK_win_scroll_page_up, file);
+	newXS("PORK::win_scroll_start", PORK_win_scroll_start, file);
+	newXS("PORK::win_scroll_up", PORK_win_scroll_up, file);
 	newXS("PORK::win_set_opt", PORK_win_set_opt, file);
 	newXS("PORK::win_swap", PORK_win_swap, file);
 	newXS("PORK::win_target", PORK_win_target, file);
@@ -130,14 +137,6 @@ void xs_init(init_args) {
 	newXS("PORK::set_idle", PORK_set_idle, file);
 	newXS("PORK::set_profile", PORK_set_profile, file);
 	newXS("PORK::warn", PORK_warn, file);
-
-	newXS("PORK::scroll_by", PORK_scroll_by, file);
-	newXS("PORK::scroll_down", PORK_scroll_down, file);
-	newXS("PORK::scroll_end", PORK_scroll_end, file);
-	newXS("PORK::scroll_page_down", PORK_scroll_page_down, file);
-	newXS("PORK::scroll_page_up", PORK_scroll_page_up, file);
-	newXS("PORK::scroll_start", PORK_scroll_start, file);
-	newXS("PORK::scroll_up", PORK_scroll_up, file);
 
 	newXS("PORK::timer_add", PORK_timer_add, file);
 	newXS("PORK::timer_del", PORK_timer_del, file);

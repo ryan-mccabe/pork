@@ -39,6 +39,7 @@
 #include <pork_imwindow.h>
 #include <pork_screen.h>
 #include <pork_perl_xs.h>
+#include <pork_perl_macro.h>
 
 XS(PORK_event_add) {
 	struct pork_acct *acct;
@@ -48,9 +49,7 @@ XS(PORK_event_add) {
 	dXSARGS;
 	u_int32_t refnum;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_UNDEF;
 
 	type = SvPV(ST(0), notused);
@@ -59,15 +58,7 @@ XS(PORK_event_add) {
 	if (type == NULL || handler == NULL)
 		XSRETURN_UNDEF;
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_UNDEF;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, UNDEF);
 	if (event_add(acct->events, type, handler, &refnum) != 0)
 		XSRETURN_UNDEF;
 
@@ -81,9 +72,7 @@ XS(PORK_event_del) {
 	char *handler;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	type = SvPV(ST(0), notused);
@@ -92,15 +81,7 @@ XS(PORK_event_del) {
 	if (type == NULL || handler == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t acct_refnum = SvIV(ST(2));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(2, IV(-1));
 	XSRETURN_IV(event_del_type(acct->events, type, handler));
 }
 
@@ -110,22 +91,12 @@ XS(PORK_event_del_type) {
 	char *type;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	type = SvPV(ST(0), notused);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(event_del_type(acct->events, type, NULL));
 }
 
@@ -134,22 +105,12 @@ XS(PORK_event_del_refnum) {
 	u_int32_t refnum;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	refnum = SvIV(ST(0));
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(event_del_refnum(acct->events, refnum));
 }
 
@@ -157,17 +118,7 @@ XS(PORK_event_purge) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items == 1) {
-		u_int32_t acct_refnum = SvIV(ST(0));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(0, IV(-1));
 	event_purge(acct->events);
 	XSRETURN_IV(0);
 }

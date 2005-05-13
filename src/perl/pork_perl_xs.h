@@ -48,6 +48,14 @@ XS(PORK_win_prev);
 XS(PORK_win_rename);
 XS(PORK_win_renumber);
 XS(PORK_win_get_opt);
+XS(PORK_win_scroll_by);
+XS(PORK_win_scroll_down);
+XS(PORK_win_scroll_end);
+XS(PORK_win_scroll_page_down);
+XS(PORK_win_scroll_page_up);
+XS(PORK_win_scroll_start);
+XS(PORK_win_scroll_up);
+
 XS(PORK_win_set_opt);
 XS(PORK_win_swap);
 XS(PORK_win_target);
@@ -83,14 +91,6 @@ XS(PORK_buddy_remove);
 XS(PORK_buddy_remove_block);
 XS(PORK_buddy_remove_group);
 XS(PORK_buddy_remove_permit);
-
-XS(PORK_scroll_by);
-XS(PORK_scroll_down);
-XS(PORK_scroll_end);
-XS(PORK_scroll_page_down);
-XS(PORK_scroll_page_up);
-XS(PORK_scroll_start);
-XS(PORK_scroll_up);
 
 XS(PORK_timer_add);
 XS(PORK_timer_del);

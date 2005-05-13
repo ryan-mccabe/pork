@@ -40,167 +40,76 @@
 #include <pork_acct.h>
 #include <pork_screen.h>
 #include <pork_perl_xs.h>
+#include <pork_perl_macro.h>
 
-XS(PORK_scroll_by) {
+XS(PORK_win_scroll_by) {
 	int lines;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	lines = SvIV(ST(0));
 
-	if (items == 2) {
-		u_int32_t refnum = SvIV(ST(1));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_by(imwindow, lines);
+	WIN_REFNUM(1, IV(-1));
+	imwindow_scroll_by(win, lines);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_down) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_down) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_down(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_down(win);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_end) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_end) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_end(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_end(win);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_page_down) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_page_down) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_page_down(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_page_down(win);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_page_up) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_page_up) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_page_up(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_page_up(win);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_start) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_start) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_start(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_start(win);
 	XSRETURN_IV(0);
 }
 
-XS(PORK_scroll_up) {
-	struct imwindow *imwindow;
+XS(PORK_win_scroll_up) {
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_scroll_up(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_scroll_up(win);
 	XSRETURN_IV(0);
 }
-
-/*
-** window commands
-*/
 
 XS(PORK_win_find_name) {
 	char *str;
@@ -209,24 +118,14 @@ XS(PORK_win_find_name) {
 	struct imwindow *imwindow;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	str = SvPV(ST(0), notused);
 	if (str == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	imwindow = imwindow_find_name(acct, str);
 	if (imwindow == NULL)
 		XSRETURN_IV(-1);
@@ -240,22 +139,12 @@ XS(PORK_win_target) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
 	if (items == 0)
 		XSRETURN_PV(cur_window()->target);
 
 	win_refnum = SvIV(ST(0));
 
-	if (items > 1) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_UNDEF;
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, UNDEF);
 	imwindow = imwindow_find_refnum(win_refnum);
 	if (imwindow == NULL)
 		XSRETURN_UNDEF;
@@ -270,24 +159,14 @@ XS(PORK_win_find_target) {
 	struct pork_acct *acct;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	str = SvPV(ST(0), notused);
 	if (str == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t acct_refnum = SvIV(ST(1));
-
-		acct = pork_acct_get_data(acct_refnum);
-		if (acct == NULL)
-			XSRETURN_IV(-1);
-	} else
-		acct = cur_window()->owner;
-
+	ACCT_WIN_REFNUM(1, IV(-1));
 	imwindow = imwindow_find(acct, str);
 	if (imwindow == NULL)
 		XSRETURN_IV(-1);
@@ -297,90 +176,40 @@ XS(PORK_win_find_target) {
 
 XS(PORK_win_bind) {
 	u_int32_t acct_refnum;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	acct_refnum = SvIV(ST(0));
-
-	if (items == 2) {
-		u_int32_t refnum = SvIV(ST(1));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	XSRETURN_IV(imwindow_bind_acct(imwindow, acct_refnum));
+	WIN_REFNUM(1, IV(-1));
+	XSRETURN_IV(imwindow_bind_acct(win, acct_refnum));
 }
 
 XS(PORK_win_clear) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_clear(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_clear(win);
 	XSRETURN_IV(0);
 }
 
 XS(PORK_win_close) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	XSRETURN_IV(screen_close_window(imwindow));
+	WIN_REFNUM(0, IV(-1));
+	XSRETURN_IV(screen_close_window(win));
 }
 
 XS(PORK_win_erase) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 0 && items != 1)
-		XSRETURN_IV(-1);
-
-	if (items == 1) {
-		u_int32_t refnum = SvIV(ST(0));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_erase(imwindow);
+	WIN_REFNUM(0, IV(-1));
+	imwindow_erase(win);
 	XSRETURN_IV(0);
 }
 
@@ -388,9 +217,7 @@ XS(PORK_win_next) {
 	dXSARGS;
 
 	(void) cv;
-
-	if (items != 0)
-		XSRETURN_IV(-1);
+	(void) items;
 
 	screen_cycle_fwd();
 	XSRETURN_IV(0);
@@ -400,9 +227,7 @@ XS(PORK_win_prev) {
 	dXSARGS;
 
 	(void) cv;
-
-	if (items != 0)
-		XSRETURN_IV(-1);
+	(void) items;
 
 	screen_cycle_bak();
 	XSRETURN_IV(0);
@@ -410,83 +235,53 @@ XS(PORK_win_prev) {
 
 XS(PORK_win_rename) {
 	dXSARGS;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	char *new_name;
 	size_t notused;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	new_name = SvPV(ST(0), notused);
 	if (new_name == NULL)
 		XSRETURN_IV(-1);
 
-	if (items == 2) {
-		u_int32_t refnum = SvIV(ST(1));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	imwindow_rename(imwindow, new_name);
+	WIN_REFNUM(1, IV(-1));
+	imwindow_rename(win, new_name);
 	XSRETURN_IV(0);
 }
 
 XS(PORK_win_renumber) {
 	dXSARGS;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	u_int32_t new_refnum;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_IV(-1);
 
 	new_refnum = SvIV(ST(0));
 
-	if (items == 2) {
-		u_int32_t refnum = SvIV(ST(1));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	XSRETURN_IV(screen_renumber(imwindow, new_refnum));
+	WIN_REFNUM(1, IV(-1));
+	XSRETURN_IV(screen_renumber(win, new_refnum));
 }
 
 XS(PORK_win_get_opt) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	char *val;
 	size_t notused;
 	char buf[2048];
 
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 1 && items != 2)
+	if (items < 1)
 		XSRETURN_EMPTY;
 
 	val = SvPV(ST(0), notused);
 	if (val == NULL)
 		XSRETURN_EMPTY;
 
-	if (items == 2) {
-		u_int32_t refnum = SvIV(ST(1));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_EMPTY;
-	} else
-		imwindow = cur_window();
-
-	if (wopt_get_val(imwindow, val, buf, sizeof(buf)) == -1)
+	WIN_REFNUM(1, EMPTY);
+	if (wopt_get_val(win, val, buf, sizeof(buf)) == -1)
 		XSRETURN_EMPTY;
 
 	XSRETURN_PV(buf);
@@ -497,34 +292,24 @@ XS(PORK_win_set_opt) {
 	char *val;
 	size_t notused;
 	int opt;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	dXSARGS;
 
-	(void) cv;
-
-	if (items != 2 && items != 3)
+	if (items < 2)
 		XSRETURN_IV(-1);
 
 	var = SvPV(ST(0), notused);
 	val = SvPV(ST(1), notused);
 
-	if (var == NULL || var == NULL)
+	if (var == NULL || val == NULL)
 		XSRETURN_IV(-1);
 
 	opt = wopt_find(var);
 	if (opt == -1)
 		XSRETURN_IV(-1);
 
-	if (items == 3) {
-		u_int32_t refnum = SvIV(ST(2));
-
-		imwindow = imwindow_find_refnum(refnum);
-		if (imwindow == NULL)
-			XSRETURN_IV(-1);
-	} else
-		imwindow = cur_window();
-
-	XSRETURN_IV(wopt_set(imwindow, opt, val));
+	WIN_REFNUM(2, IV(-1));
+	XSRETURN_IV(wopt_set(win, opt, val));
 }
 
 XS(PORK_win_swap) {
