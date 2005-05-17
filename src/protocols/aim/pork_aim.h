@@ -20,6 +20,15 @@
 struct buddy;
 struct bgroup;
 
+enum {
+	AIM_BUDDY_TYPE_UNCONFIRMED,
+	AIM_BUDDY_TYPE_NORMAL,
+	AIM_BUDDY_TYPE_AOL,
+	AIM_BUDDY_TYPE_ADMIN,
+	AIM_BUDDY_TYPE_ACTIVEBUDDY,
+	AIM_BUDDY_TYPE_WIRELESS,
+};
+
 struct aim_chat {
 	char *title;
 	char *fullname;

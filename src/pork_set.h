@@ -135,6 +135,7 @@ enum {
 	OPT_TEXT_BUDDY_ACTIVE,
 	OPT_TEXT_BUDDY_AWAY,
 	OPT_TEXT_BUDDY_IDLE,
+	OPT_TEXT_BUDDY_MOBILE,
 	OPT_TEXT_NO_NAME,
 	OPT_TEXT_NO_ROOM,
 	OPT_TEXT_TYPING,
@@ -152,23 +153,6 @@ enum {
 /*
 ** Per-window options.
 */
-
-enum {
-	WOPT_ACTIVITY_TYPES = 0,
-	WOPT_BEEP_ON_OUTPUT,
-	WOPT_HISTORY_LEN,
-	WOPT_LOG,
-	WOPT_LOG_TYPES,
-	WOPT_LOGFILE,
-	WOPT_PRIVATE_INPUT,
-	WOPT_SCROLL_ON_INPUT,
-	WOPT_SCROLL_ON_OUTPUT,
-	WOPT_SCROLLBUF_LEN,
-	WOPT_SHOW_BLIST,
-	WOPT_WORDWRAP,
-	WOPT_WORDWRAP_CHAR,
-	WOPT_NUM_OPTS,
-};
 
 struct imwindow;
 
@@ -188,13 +172,6 @@ struct global_pref {
 	pref_val_t val;
 };
 
-struct window_var {
-	char *name;
-	u_int32_t type;
-	int (*set)(struct imwindow *, u_int32_t, char *);
-	void (*updated)(struct imwindow *);
-};
-
 extern struct global_pref global_pref[OPT_NUM_OPTS];
 
 int opt_set_bool(u_int32_t opt, char *args);
@@ -209,27 +186,13 @@ int opt_set_color(u_int32_t opt, char *args);
 #define SET_BOOL(x)	{ .b = (x) }
 
 void opt_destroy(void);
-void wopt_init(struct imwindow *imwindow, const char *target);
-void wopt_destroy(struct imwindow *imwindow);
-
-void wopt_print_var(struct imwindow *win, int var, const char *text);
-void wopt_print(struct imwindow *win);
-
 void opt_print_var(int var, const char *text);
 void opt_print(void);
 void opt_write(FILE *fp);
-
 int opt_set(u_int32_t opt, char *args);
-int wopt_set(struct imwindow *imwindow, u_int32_t opt, char *args);
-
+int opt_tristate(char *args);
 int opt_find(const char *name);
-int wopt_find(const char *name);
-
 int opt_get_val(const char *opt_name, char *buf, size_t len);
-int wopt_get_val(	struct imwindow *imwindow,
-					const char *opt_name,
-					char *buf,
-					size_t len);
 
 /*
 ** These used to be inline functions until I discovered
@@ -243,11 +206,6 @@ int wopt_get_val(	struct imwindow *imwindow,
 #define opt_get_bool(opt) (global_pref[(opt)].val.b)
 #define opt_get_char(opt) (global_pref[(opt)].val.c)
 #define opt_get_str(opt) (global_pref[(opt)].val.s)
-
-#define wopt_get_int(wopt, opt) ((wopt)[(opt)].i)
-#define wopt_get_str(wopt, opt) ((wopt)[(opt)].s)
-#define wopt_get_char(wopt, opt) ((wopt)[(opt)].c)
-#define wopt_get_bool(wopt, opt) ((wopt)[(opt)].b)
 
 #include "pork_set_defaults.h"
 

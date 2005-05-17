@@ -821,6 +821,9 @@ static FAIM_CB(aim_recv_err_loc) {
 	dest = va_arg(ap, char *);
 	va_end(ap);
 
+	if (dest == NULL && code == 0)
+		return (1);
+
 	if (code < array_elem(msgerrreason))
 		err_str = msgerrreason[code];
 	else
