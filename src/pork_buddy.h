@@ -51,7 +51,7 @@ struct buddy {
 	u_int32_t status:2;
 	u_int32_t notify:1;
 	u_int32_t ignore:1;
-	u_int32_t type:6;
+	u_int32_t type:4;
 	u_int32_t last_seen;
 	dlist_t *blist_line;
 };

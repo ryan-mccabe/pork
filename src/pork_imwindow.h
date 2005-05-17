@@ -16,6 +16,7 @@ struct pork_acct;
 struct imsg;
 
 #include <pork_set.h>
+#include <pork_imwindow_set.h>
 #include <pork_swindow.h>
 
 enum {

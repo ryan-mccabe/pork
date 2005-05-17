@@ -35,6 +35,7 @@ noinst_HEADERS = \
 	pork_help.h			\
 	pork_html.h			\
 	pork_imwindow.h		\
+	pork_imwindow_set.h	\
 	pork_imsg.h			\
 	pork_inet.h			\
 	pork_input.h		\
@@ -73,6 +74,7 @@ pork_SOURCES = \
 	pork_help.c			\
 	pork_html.c			\
 	pork_imwindow.c		\
+	pork_imwindow_set.c	\
 	pork_imsg.c			\
 	pork_inet.c			\
 	pork_input.c		\
