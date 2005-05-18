@@ -16,14 +16,17 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
+#include <pwd.h>
 
 #include <pork.h>
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_color.h>
-#include <pork_set.h>
+#include <pork_proto.h>
+#include <pork_acct.h>
 #include <pork_acct_set.h>
+#include <pork_set.h>
 #include <pork_imwindow.h>
 #include <pork_acct.h>
 #include <pork_cstr.h>
@@ -153,3 +156,29 @@ static struct pref_val acct_defaults = {
 	.set = &acct_pref_set,
 	.val = acct_default_pref_vals
 };
+
+int acct_init_prefs(struct pork_acct *acct) {
+	struct pref_val *prefs;
+	struct passwd *pw;
+	char buf[4096];
+	int ret;
+
+	pw = getpwuid(getuid());
+	if (pw == NULL)
+		return (-1);
+
+	ret = snprintf(buf, sizeof(buf), "%s/.pork/%s/%s",
+			pw->pw_dir, acct->proto->name, acct->username);
+	if (ret < 0 || (size_t) ret >= sizeof(buf))
+		return (-1);
+
+	prefs = xcalloc(1, sizeof(acct_defaults));
+	memcpy(prefs, &acct_defaults, sizeof(acct_defaults));
+
+	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
+	if (xstrncat(buf, "/dl", sizeof(buf) == -1))
+		return (-1);
+	opt_set(prefs, ACCT_OPT_DOWNLOAD_DIR, buf);
+
+	return (0);
+}

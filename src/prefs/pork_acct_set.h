@@ -10,6 +10,8 @@
 #ifndef __PORK_ACCT_SET_H
 #define __PORK_ACCT_SET_H
 
+int acct_init_prefs(struct pork_acct *acct);
+
 enum {
 	ACCT_OPT_AUTO_RECONNECT,
 	ACCT_OPT_AUTO_REJOIN,
