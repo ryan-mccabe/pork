@@ -40,7 +40,7 @@ struct imwindow {
 	u_int32_t input_focus:1;
 	u_int32_t ignore_activity:1;
 	u_int32_t skip:1;
-	pref_val_t opts[WOPT_NUM_OPTS];
+	pref_val_t opts[WIN_NUM_OPTS];
 };
 
 struct imwindow *imwindow_new(	u_int32_t rows,

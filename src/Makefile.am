@@ -1,4 +1,4 @@
-SUBDIRS = missing protocols perl
+SUBDIRS = missing perl prefs protocols
 bin_PROGRAMS = pork
 
 if IRC_SUPPORT
@@ -9,13 +9,13 @@ if COMPILE_PERL
 perl_lib = perl/libporkperl.a
 endif
 
-INCLUDES = -Imissing -Iperl -I.. -I.
+INCLUDES = -Imissing -Iperl -Iprefs -I.. -I.
 
 AM_CFLAGS = -funsigned-char
 AM_CFLAGS += -DHELP_PATH=\"$(pkgdatadir)/help\" -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
 AM_CFLAGS += $(PERL_CFLAGS) $(DEBUG_CFLAGS)
 
-pork_LDADD = missing/libmissing.a protocols/aim/libaim.a $(irc_lib) $(perl_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
+pork_LDADD = prefs/libporkprefs.a missing/libmissing.a protocols/aim/libaim.a $(irc_lib) $(perl_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
 
 noinst_HEADERS = \
 	pork.h				\
@@ -28,14 +28,12 @@ noinst_HEADERS = \
 	pork_color.h		\
 	pork_command.h		\
 	pork_command_defs.h	\
-	pork_conf.h			\
 	pork_cstr.h			\
 	pork_events.h		\
 	pork_format.h		\
 	pork_help.h			\
 	pork_html.h			\
 	pork_imwindow.h		\
-	pork_imwindow_set.h	\
 	pork_imsg.h			\
 	pork_inet.h			\
 	pork_input.h		\
@@ -48,8 +46,6 @@ noinst_HEADERS = \
 	pork_queue.h		\
 	pork_screen.h		\
 	pork_screen_io.h	\
-	pork_set.h			\
-	pork_set_defaults.h	\
 	pork_slist.h		\
 	pork_status.h		\
 	pork_swindow.h		\
@@ -67,14 +63,12 @@ pork_SOURCES = \
 	pork_chat.c			\
 	pork_color.c		\
 	pork_command.c		\
-	pork_conf.c			\
 	pork_cstr.c			\
 	pork_events.c		\
 	pork_format.c		\
 	pork_help.c			\
 	pork_html.c			\
 	pork_imwindow.c		\
-	pork_imwindow_set.c	\
 	pork_imsg.c			\
 	pork_inet.c			\
 	pork_input.c		\
@@ -88,7 +82,6 @@ pork_SOURCES = \
 	pork_screen.c		\
 	pork_screen_io.c	\
 	pork_slist.c		\
-	pork_set.c			\
 	pork_status.c		\
 	pork_swindow.c		\
 	pork_timer.c		\

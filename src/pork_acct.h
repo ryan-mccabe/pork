@@ -67,6 +67,7 @@ struct pork_acct {
 	in_port_t lport;
 	struct sockaddr_storage laddr;
 
+	struct pref_val *prefs;
 	struct event *events;
 	struct pork_proto *proto;
 	void *data;
@@ -80,8 +81,6 @@ inline dlist_t *pork_acct_find(u_int32_t refnum);
 inline struct pork_acct *pork_acct_get_data(u_int32_t refnum);
 inline void pork_acct_update(void);
 int pork_acct_disconnected(struct pork_acct *acct);
-void pork_acct_update_blist_format(void);
-void pork_acct_update_blist_color(void);
 void pork_acct_print_list(void);
 void pork_acct_reconnect_all(void);
 void pork_acct_connected(struct pork_acct *acct);
@@ -90,5 +89,8 @@ int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next);
 struct pork_acct *pork_acct_find_name(const char *name, int protocol);
 struct pork_acct *pork_acct_init(const char *user, int protocol);
 int pork_acct_save(struct pork_acct *acct);
+
+void pork_acct_update_blist_format(struct pref_val *pref, va_list ap);
+void pork_acct_update_blist_color(struct pref_val *pref, va_list ap);
 
 #endif

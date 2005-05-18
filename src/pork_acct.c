@@ -246,7 +246,7 @@ void pork_acct_del_all(char *reason) {
 	}
 }
 
-void pork_acct_update_blist_color(void) {
+void pork_acct_update_blist_color(struct pref_val *pref, va_list ap) {
 	dlist_t *cur = screen.acct_list;
 
 	while (cur != NULL) {
@@ -290,7 +290,7 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 	return (0);
 }
 
-void pork_acct_update_blist_format(void) {
+void pork_acct_update_blist_format(struct pref_val *pref, va_list ap) {
 	dlist_t *cur = screen.acct_list;
 
 	while (cur != NULL) {

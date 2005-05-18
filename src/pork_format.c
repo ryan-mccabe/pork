@@ -169,7 +169,7 @@ static int format_status_typing(char opt, char *buf, size_t len, va_list ap) {
 					str = opt_get_str(OPT_TEXT_TYPING);
 
 				if (xstrncpy(buf, str, len) == -1)
-					ret = -1;
+					return (-1);
 			} else
 				return (1);
 

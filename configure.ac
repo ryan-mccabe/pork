@@ -343,8 +343,9 @@ AM_CONDITIONAL(IRC_SUPPORT, test "$irc" = "yes")
 AC_OUTPUT([
 	Makefile
 	src/Makefile
-	src/perl/Makefile
 	src/missing/Makefile
+	src/perl/Makefile
+	src/prefs/Makefile
 	src/protocols/Makefile
 	src/protocols/aim/Makefile
 	src/protocols/irc/Makefile

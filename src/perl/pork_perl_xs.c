@@ -530,11 +530,14 @@ XS(PORK_set_opt) {
 	if (var == NULL || var == NULL)
 		XSRETURN_IV(-1);
 
+	return (-1);
+#if 0
 	opt = opt_find(var);
 	if (opt == -1)
 		XSRETURN_IV(-1);
 
 	XSRETURN_IV(opt_set(opt, val));
+#endif
 }
 
 XS(PORK_get_cur_user) {
@@ -562,10 +565,13 @@ XS(PORK_get_opt) {
 	if (val == NULL)
 		XSRETURN_EMPTY;
 
+	XSRETURN_EMPTY;
+#if 0
 	if (opt_get_val(val, buf, sizeof(buf)) == -1)
 		XSRETURN_EMPTY;
 
 	XSRETURN_PV(buf);
+#endif
 }
 
 /* XXX - fix */

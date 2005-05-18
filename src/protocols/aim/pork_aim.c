@@ -916,7 +916,7 @@ static FAIM_CB(aim_recv_evil) {
 		int ret;
 
 		ret = fill_format_str(OPT_FORMAT_WARN, buf, sizeof(buf), acct->username,
-				opt_get_str(OPT_TEXT_WARN_ANONYMOUS), warn_level);
+				opt_get_str(acct->prefs, OPT_TEXT_WARN_ANONYMOUS), warn_level);
 
 		if (ret > 0)
 			screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_STATUS);
