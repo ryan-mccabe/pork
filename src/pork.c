@@ -36,6 +36,7 @@
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
 #include <pork_acct.h>
+#include <pork_acct_set.h>
 #include <pork_misc.h>
 #include <pork_input.h>
 #include <pork_bind.h>
@@ -134,7 +135,9 @@ void keyboard_input(int fd __notused,
 	time(&acct->last_input);
 	bind_exec(imwindow->active_binds, key);
 
-	if (acct->connected && acct->marked_idle && opt_get_bool(OPT_REPORT_IDLE)) {
+	if (acct->connected && acct->marked_idle &&
+		opt_get_bool(acct->acct_prefs, ACCT_OPT_REPORT_IDLE))
+	{
 		if (acct->proto->set_idle_time != NULL)
 			acct->proto->set_idle_time(acct, 0);
 		acct->marked_idle = 0;
@@ -144,12 +147,10 @@ void keyboard_input(int fd __notused,
 }
 
 int main(int argc, char **argv) {
-	struct passwd *pw;
-	char buf[PATH_MAX];
 	struct imwindow *imwindow;
-	int ret;
 	time_t timer_last_run;
 	time_t status_last_update = 0;
+	int ret;
 
 	if (get_options(argc, argv) != 0) {
 		fprintf(stderr, "Fatal: Error getting options.\n");

@@ -579,7 +579,7 @@ int buddy_came_online(struct pork_acct *acct, char *user, void *data) {
 	if (event_generate(acct->events, EVENT_BUDDY_SIGNON, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_SIGNOFF)) {
+	if (opt_get_bool(OPT_SHOW_BUDDY_SIGNON)) {
 		struct imwindow *win;
 
 		win = imwindow_find(acct, user);

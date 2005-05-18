@@ -10,6 +10,8 @@
 #ifndef __PORK_SET_GLOBAL_H
 #define __PORK_SET_GLOBAL_H
 
+int init_global_prefs(struct screen *screen);
+
 enum {
 	OPT_BANNER = 0,
 	OPT_CMDCHARS,

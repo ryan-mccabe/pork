@@ -40,6 +40,7 @@ struct screen {
 	struct pork_input input;
 	struct binds binds;
 	hash_t alias_hash;
+	struct pref_val *global_prefs;
 	struct event events;
 };
 

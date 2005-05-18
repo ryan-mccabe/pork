@@ -28,6 +28,8 @@
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
+#include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_chat.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
@@ -140,6 +142,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	screen.rows = rows;
 	screen.cols = cols;
 
+	init_global_prefs(&screen);
 	bind_init(&screen.binds);
 	input_init(&screen.input, cols);
 
