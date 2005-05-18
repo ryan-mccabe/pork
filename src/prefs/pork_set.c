@@ -189,7 +189,7 @@ static int opt_compare(const void *l, const void *r) {
 ** in the pref option table.
 */
 
-int opt_find(struct pref_set *pref_set, const char *name) {
+int opt_find(const struct pref_set *pref_set, const char *name) {
 	struct pork_pref *ppref;
 	u_int32_t offset;
 
