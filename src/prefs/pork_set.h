@@ -74,6 +74,7 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len);
 #define opt_get_bool(pref,opt)		((pref)->val[(opt)].pref_val.b)
 #define opt_get_char(pref,opt)		((pref)->val[(opt)].pref_val.c)
 #define opt_get_str(pref,opt)		((pref)->val[(opt)].pref_val.s)
+#define pref_needs_free(pref,opt)	((pref)->val[(opt)].dynamic)
 
 #define pref_name(pref,opt)			((pref)->set->prefs[i].name)
 #define pref_type(pref,opt)			((pref)->set->prefs[i].type)

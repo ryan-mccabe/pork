@@ -289,18 +289,16 @@ int opt_set_int(struct pref_val *pref, u_int32_t opt, char *args, va_list ap) {
 }
 
 int opt_set_str(struct pref_val *pref, u_int32_t opt, char *args, va_list ap) {
-#if 0
 	if (pref_needs_free(pref, opt))
 		free(opt_get_str(pref, opt));
-#endif
 	if (args != NULL) {
 		char *str = xstrdup(args);
 
 		SET_STR(pref->val[opt], str);
-		//pref_needs_free(pref, opt) = 1;
+		pref_needs_free(pref, opt) = 1;
 	} else {
 		SET_STR(pref->val[opt], NULL);
-		//pref_needs_free(pref, opt) = 0;
+		pref_needs_free(pref, opt) = 0;
 	}
 
 	if (pref->set->prefs[opt].updated != NULL)
@@ -350,7 +348,7 @@ void opt_destroy(struct pref_val *pref) {
 	size_t i;
 
 	for (i = 0 ; i < pref->set->num_opts ; i++) {
-//		if (pref_needs_free(pref, i))
-//			free(opt_get_str(pref, i));
+		if (pref_needs_free(pref, i))
+			free(opt_get_str(pref, i));
 	}
 }
