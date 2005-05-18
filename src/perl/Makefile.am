@@ -1,4 +1,4 @@
-INCLUDES = -I. -I.. -I../.. -I../missing
+INCLUDES = -I. -I.. -I../.. -I../missing -I../prefs
 AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS)
 
 noinst_LIBRARIES = libporkperl.a

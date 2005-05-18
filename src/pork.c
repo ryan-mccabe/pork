@@ -151,15 +151,6 @@ int main(int argc, char **argv) {
 	time_t timer_last_run;
 	time_t status_last_update = 0;
 
-	pw = getpwuid(getuid());
-	if (pw == NULL) {
-		fprintf(stderr, "Fatal: Can't get your user info.\n");
-		exit(-1);
-	}
-
-	snprintf(buf, sizeof(buf), "%s/.pork", pw->pw_dir);
-	opt_set(OPT_PORK_DIR, buf);
-
 	if (get_options(argc, argv) != 0) {
 		fprintf(stderr, "Fatal: Error getting options.\n");
 		exit(-1);

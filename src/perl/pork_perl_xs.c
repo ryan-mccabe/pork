@@ -530,7 +530,7 @@ XS(PORK_set_opt) {
 	if (var == NULL || var == NULL)
 		XSRETURN_IV(-1);
 
-	return (-1);
+	XSRETURN_IV(-1);
 #if 0
 	opt = opt_find(var);
 	if (opt == -1)

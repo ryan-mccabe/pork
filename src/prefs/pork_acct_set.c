@@ -174,6 +174,7 @@ int acct_init_prefs(struct pork_acct *acct) {
 
 	prefs = xcalloc(1, sizeof(acct_defaults));
 	memcpy(prefs, &acct_defaults, sizeof(acct_defaults));
+	acct->acct_prefs = prefs;
 
 	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
 	if (xstrncat(buf, "/dl", sizeof(buf) == -1))

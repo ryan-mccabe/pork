@@ -265,6 +265,7 @@ XS(PORK_win_renumber) {
 	XSRETURN_IV(screen_renumber(win, new_refnum));
 }
 
+#if 0
 XS(PORK_win_get_opt) {
 	struct imwindow *win;
 	char *val;
@@ -311,6 +312,7 @@ XS(PORK_win_set_opt) {
 	WIN_REFNUM(2, IV(-1));
 	XSRETURN_IV(wopt_set(win, opt, val));
 }
+#endif
 
 XS(PORK_win_swap) {
 	u_int32_t refnum;

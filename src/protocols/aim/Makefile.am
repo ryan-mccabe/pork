@@ -1,4 +1,4 @@
-INCLUDES = -I. -I.. -I../.. -I../../.. -I../../missing -Ilibfaim
+INCLUDES = -I. -I.. -I../.. -I../../.. -I../../missing -I../../prefs -Ilibfaim
 AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS)
 
 EXTRA_DIST = \
