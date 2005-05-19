@@ -363,9 +363,6 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	acct->proto = proto_get(protocol);
 
-	if (protocol < 0)
-		return (acct);
-
 	if (acct_init_prefs(acct) == -1) {
 		if (acct->prefs != NULL) {
 			opt_destroy(acct->prefs);
@@ -373,6 +370,9 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 		}
 		goto out_fail2;
 	}
+	
+	if (protocol < 0)
+		return (acct);
 
 	if (buddy_init(acct) == -1)
 		goto out_fail2;
