@@ -47,8 +47,41 @@ static int pork_mkdir(const char *path) {
 
 	if (stat(path, &st) != 0) {
 		if (mkdir(path, 0700) != 0) {
-			screen_err_msg("Error: mkdir %s: %s", path, strerror(errno));
-			return (-1);
+			char *temp = xstrdup(path);
+			char *p;
+			char *next;
+			int ret = -1;
+
+			next = temp;
+			if (next[0] == '/')
+				next++;
+
+			while ((p = strchr(next, '/')) != NULL && p[1] != '\0') {
+				*p = '\0';
+				if (stat(temp, &st) == 0) {
+					if (!S_ISDIR(st.st_mode)) {
+						screen_err_msg("Error: %s is not a directory", temp);
+						free(temp);
+						return (-1);
+					}
+				}
+
+				ret = mkdir(temp, 0700);
+				if (ret != 0 && errno != EEXIST) {
+					screen_err_msg("Error: mkdir: %s: %s", temp, strerror(errno));
+					free(temp);
+					return (-1);
+				}
+				*p = '/';
+				next = &p[1];
+			}
+
+			free(temp);
+
+			if (ret != 0) {
+				screen_err_msg("Error: mkdir %s: %s", path, strerror(errno));
+				return (-1);
+			}
 		}
 	} else {
 		if (!S_ISDIR(st.st_mode)) {
@@ -296,32 +329,29 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 }
 
 int read_user_config(struct pork_acct *acct) {
-	char nname[NUSER_LEN];
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
+	char *log_dir = opt_get_str(acct->prefs, ACCT_OPT_LOG_DIR);
 
 	if (acct == NULL || pork_dir == NULL)
 		return (-1);
 
-	normalize(nname, acct->username, sizeof(nname));
-
-	snprintf(buf, sizeof(buf), "%s/%s", pork_dir, nname);
-	if (pork_mkdir(buf) != 0)
+	/* XXX - only after successful login. */
+	if (pork_mkdir(pork_dir) != 0)
 		return (-1);
 
-	snprintf(buf, sizeof(buf), "%s/%s/logs", pork_dir, nname);
-	if (pork_mkdir(buf) != 0)
+	if (pork_mkdir(log_dir) != 0)
 		return (-1);
 
-	snprintf(buf, sizeof(buf), "%s/%s/buddy_list", pork_dir, nname);
+	snprintf(buf, sizeof(buf), "%s/buddy_list", pork_dir);
 	if (read_buddy_list(acct, buf) != 0)
 		screen_err_msg("There was an error reading your buddy list");
 
-	snprintf(buf, sizeof(buf), "%s/%s/porkrc", pork_dir, nname);
+	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
 	if (read_conf(buf) != 0 && errno != ENOENT)
 		screen_err_msg("There was an error reading your porkrc file");
 
-	snprintf(buf, sizeof(buf), "%s/%s/account", pork_dir, nname);
+	snprintf(buf, sizeof(buf), "%s/account", pork_dir);
 	if (read_acct_conf(acct, buf) != 0)
 		screen_err_msg("Error: Can't read account config file, %s", buf);
 
@@ -424,7 +454,6 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 }
 
 int save_user_config(struct pork_acct *acct) {
-	char nname[NUSER_LEN];
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
 
@@ -433,13 +462,11 @@ int save_user_config(struct pork_acct *acct) {
 		return (-1);
 	}
 
-	normalize(nname, acct->username, sizeof(nname));
-
-	snprintf(buf, sizeof(buf), "%s/%s/buddy_list", pork_dir, nname);
+	snprintf(buf, sizeof(buf), "%s/buddy_list", pork_dir);
 	if (save_buddy_list(acct, buf) != 0)
 		screen_err_msg("There was an error writing your buddy list.");
 
-	snprintf(buf, sizeof(buf), "%s/%s/account", pork_dir, nname);
+	snprintf(buf, sizeof(buf), "%s/account", pork_dir);
 	if (save_acct_conf(acct, buf) != 0)
 		screen_err_msg("Error: Can't write account config file, %s.", buf);
 
@@ -449,7 +476,6 @@ int save_user_config(struct pork_acct *acct) {
 int read_global_config(void) {
 //	struct passwd *pw;
 //	char *pork_dir;
-	char buf[PATH_MAX];
 
 	if (read_conf(SYSTEM_PORKRC) != 0)
 		screen_err_msg("Error reading the system-wide porkrc file");

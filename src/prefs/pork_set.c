@@ -352,3 +352,40 @@ void opt_destroy(struct pref_val *pref) {
 			free(opt_get_str(pref, i));
 	}
 }
+
+int opt_set_var(struct pref_val *pref, char *args) {
+    char *var;
+    char *value;
+    int opt;
+
+    var = strsep(&args, " ");
+    if (var == NULL || blank_str(var)) {
+        opt_print(pref);
+        return (-1);
+    }
+
+    strtoupper(var);
+    opt = opt_find(pref->set, var);
+    if (opt == -1) {
+		if (pref->set->name == NULL)
+	        screen_err_msg("Unknown variable: %s", var);
+		else
+	        screen_err_msg("Unknown %s variable: %s", pref->set->name, var);
+
+        return (-1);
+    }
+
+    value = args;
+    if (value == NULL || blank_str(value)) {
+        opt_print_var(pref, opt, "is set to");
+        return (0);
+    }
+
+    if (opt_set(pref, opt, value) == -1) {
+        screen_nocolor_msg("Bad argument for %s: %s", var, value);
+		return (-1);
+    } else
+        opt_print_var(pref, opt, "set to");
+
+	return (0);
+}

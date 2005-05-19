@@ -133,7 +133,7 @@ int pork_help_print(char *section, char *command) {
 
 		p = buf;
 		while (len > 0 && *p != '\0') {
-			if (p == buf && isupper(*p) && isupper(*(p + 1))) {
+			if (p == buf && isupper(p[0]) && isupper(p[1])) {
 				/*
 				** This is a section heading.
 				*/

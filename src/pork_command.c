@@ -618,34 +618,7 @@ USER_COMMAND(cmd_win_renumber) {
 }
 
 USER_COMMAND(cmd_win_set) {
-	char *variable;
-	char *value;
-	int opt;
-	struct pref_val *prefs = cur_window()->prefs;
-
-	variable = strsep(&args, " ");
-	if (variable == NULL || blank_str(variable)) {
-		opt_print(prefs);
-		return;
-	}
-
-	opt = opt_find(prefs->set, variable);
-	strtoupper(variable);
-	if (opt == -1) {
-		screen_err_msg("Unknown variable: %s", variable);
-		return;
-	}
-
-	value = args;
-	if (value == NULL || blank_str(value)) {
-		opt_print_var(prefs, opt, "is set to");
-		return;
-	}
-
-	if (opt_set(prefs, opt, value) == -1)
-		screen_nocolor_msg("Bad argument for %s: %s", variable, value);
-	else
-		opt_print_var(prefs, opt, "set to");
+	opt_set_var(cur_window()->prefs, args);
 }
 
 USER_COMMAND(cmd_win_skip) {
@@ -1642,6 +1615,7 @@ USER_COMMAND(cmd_acct_save) {
 }
 
 USER_COMMAND(cmd_acct_set) {
+	opt_set_var(cur_window()->owner->prefs, args);
 }
 
 /*
@@ -2642,35 +2616,7 @@ USER_COMMAND(cmd_timer) {
 }
 
 USER_COMMAND(cmd_set) {
-	char *variable;
-	char *value;
-	int opt;
-	struct pref_val *pref = screen.global_prefs;
-
-	variable = strsep(&args, " ");
-	if (variable == NULL || blank_str(variable)) {
-		opt_print(pref);
-		return;
-	}
-
-	strtoupper(variable);
-	opt = opt_find(pref->set, variable);
-	if (opt == -1) {
-		screen_err_msg("Unknown variable: %s", variable);
-		return;
-	}
-
-	value = args;
-	if (value == NULL || blank_str(value)) {
-		opt_print_var(pref, opt, "is set to");
-		return;
-	}
-
-	if (opt_set(pref, opt, value) == -1) {
-		screen_nocolor_msg("Bad argument for %s: %s", variable, value);
-	} else {
-		opt_print_var(pref, opt, "set to");
-	}
+	opt_set_var(screen.global_prefs, args);
 }
 
 inline int run_command(char *str) {

@@ -53,6 +53,7 @@ int opt_set_int(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 int opt_set_color(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 int opt_set_str(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 #define opt_set_format opt_set_str
+int opt_set_var(struct pref_val *pref, char *args);
 
 void opt_destroy(struct pref_val *pref);
 void opt_print_var(struct pref_val *pref, int var, const char *text);

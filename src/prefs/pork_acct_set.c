@@ -173,8 +173,13 @@ int acct_init_prefs(struct pork_acct *acct) {
 	if (pw == NULL)
 		return (-1);
 
-	ret = snprintf(buf, sizeof(buf), "%s/.pork/%s/%s",
-			pw->pw_dir, acct->proto->name, acct->username);
+	if (acct->proto->protocol >= 0) {
+		ret = snprintf(buf, sizeof(buf), "%s/.pork/%s/%s",
+				pw->pw_dir, acct->proto->name, acct->username);
+	} else {
+		ret = snprintf(buf, sizeof(buf), "%s/.pork", pw->pw_dir);
+	}
+
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
@@ -183,6 +188,7 @@ int acct_init_prefs(struct pork_acct *acct) {
 	acct->prefs = prefs;
 
 	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
+
 	if (xstrncat(buf, "/dl", sizeof(buf) == -1))
 		return (-1);
 	opt_set(prefs, ACCT_OPT_DOWNLOAD_DIR, buf);
