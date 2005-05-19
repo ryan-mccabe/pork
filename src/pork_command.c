@@ -29,11 +29,13 @@
 #include <pork_list.h>
 #include <pork_buddy.h>
 #include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
+#include <pork_acct_set.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_html.h>
@@ -258,7 +260,7 @@ USER_COMMAND(cmd_input_send) {
 			goto out;
 		}
 
-		if (input_str[0] == opt_get_char(OPT_CMDCHARS))
+		if (input_str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
 			run_command(&input_str[1]);
 		else
 			cmd_send(input_str);
@@ -619,14 +621,15 @@ USER_COMMAND(cmd_win_set) {
 	char *variable;
 	char *value;
 	int opt;
+	const struct pref_val *prefs = cur_window()->prefs;
 
 	variable = strsep(&args, " ");
 	if (variable == NULL || blank_str(variable)) {
-		wopt_print(cur_window());
+		opt_print(prefs);
 		return;
 	}
 
-	opt = wopt_find(variable);
+	opt = opt_find(prefs, variable);
 	strtoupper(variable);
 	if (opt == -1) {
 		screen_err_msg("Unknown variable: %s", variable);
@@ -635,14 +638,14 @@ USER_COMMAND(cmd_win_set) {
 
 	value = args;
 	if (value == NULL || blank_str(value)) {
-		wopt_print_var(cur_window(), opt, "is set to");
+		opt_print_var(prefs, opt, "is set to");
 		return;
 	}
 
-	if (wopt_set(cur_window(), opt, value) == -1)
+	if (opt_set(prefs, opt, value) == -1)
 		screen_nocolor_msg("Bad argument for %s: %s", variable, value);
 	else
-		wopt_print_var(cur_window(), opt, "set to");
+		opt_print_var(prefs, opt, "set to");
 }
 
 USER_COMMAND(cmd_win_skip) {
@@ -2026,8 +2029,12 @@ USER_COMMAND(cmd_bind) {
 
 	func = args;
 	if (func != NULL) {
-		if (*func == opt_get_char(OPT_CMDCHARS) && *(func + 1) != '\0')
+		if (*func == opt_get_char(screen.global_prefs, OPT_CMDCHARS) &&
+			*(func + 1) != '\0')
+		{
 			func++;
+		}
+
 		if (blank_str(func))
 			func = NULL;
 	}
@@ -2638,15 +2645,16 @@ USER_COMMAND(cmd_set) {
 	char *variable;
 	char *value;
 	int opt;
+	const struct pref_val *pref = screen.global_prefs;
 
 	variable = strsep(&args, " ");
 	if (variable == NULL || blank_str(variable)) {
-		opt_print();
+		opt_print(pref);
 		return;
 	}
 
 	strtoupper(variable);
-	opt = opt_find(variable);
+	opt = opt_find(pref, variable);
 	if (opt == -1) {
 		screen_err_msg("Unknown variable: %s", variable);
 		return;
@@ -2654,14 +2662,14 @@ USER_COMMAND(cmd_set) {
 
 	value = args;
 	if (value == NULL || blank_str(value)) {
-		opt_print_var(opt, "is set to");
+		opt_print_var(pref, opt, "is set to");
 		return;
 	}
 
-	if (opt_set(opt, value) == -1) {
+	if (opt_set(pref, opt, value) == -1) {
 		screen_nocolor_msg("Bad argument for %s: %s", variable, value);
 	} else {
-		opt_print_var(opt, "set to");
+		opt_print_var(pref, opt, "set to");
 	}
 }
 
@@ -2680,7 +2688,7 @@ int run_mcommand(char *str) {
 		i = run_one_command(cmdstr, CMDSET_MAIN);
 	else {
 		while (curcmd != NULL && i != -1) {
-			char cmdchars = opt_get_char(OPT_CMDCHARS);
+			char cmdchars = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
 
 			while (*curcmd == ' ')
 				curcmd++;

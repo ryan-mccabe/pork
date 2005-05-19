@@ -136,7 +136,7 @@ void keyboard_input(int fd __notused,
 	bind_exec(imwindow->active_binds, key);
 
 	if (acct->connected && acct->marked_idle &&
-		opt_get_bool(acct->acct_prefs, ACCT_OPT_REPORT_IDLE))
+		opt_get_bool(acct->prefs, ACCT_OPT_REPORT_IDLE))
 	{
 		if (acct->proto->set_idle_time != NULL)
 			acct->proto->set_idle_time(acct, 0);

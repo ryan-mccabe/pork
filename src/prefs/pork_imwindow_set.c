@@ -23,9 +23,10 @@
 #include <pork_list.h>
 #include <pork_color.h>
 #include <pork_set.h>
-#include <pork_imwindow_set.h>
 #include <pork_imwindow.h>
+#include <pork_imwindow_set.h>
 #include <pork_acct.h>
+#include <pork_acct_set.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_screen.h>
@@ -155,35 +156,6 @@ static void optchanged_wordwrap(struct pref_val *pref, va_list ap) {
 
 void optinit(struct imwindow *imwindow, const char *target) {
 #if 0
-	char nnick[NUSER_LEN];
-	char buf[NUSER_LEN + 256];
-	char *pork_dir;
-	char *p;
-	pref_val_t *wopt = imwindow->opts;
-
-	memset(wopt, 0, sizeof(pref_val_t) * WIN_NUM_OPTS);
-
-	wopt[WIN_OPT_ACTIVITY_TYPES].i = opt_get_int(OPT_ACTIVITY_TYPES);
-	wopt[WIN_OPT_BEEP_ON_OUTPUT].b = opt_get_bool(OPT_BEEP_ON_OUTPUT);
-	wopt[WIN_OPT_HISTORY_LEN].i = opt_get_int(OPT_HISTORY_LEN);
-	wopt[WIN_OPT_LOG].b = opt_get_bool(OPT_LOG);
-	wopt[WIN_OPT_LOG_TYPES].i = opt_get_int(OPT_LOG_TYPES);
-	wopt[WIN_OPT_PRIVATE_INPUT].b = opt_get_bool(OPT_PRIVATE_INPUT);
-	wopt[WIN_OPT_SCROLL_ON_INPUT].b = opt_get_bool(OPT_SCROLL_ON_INPUT);
-	wopt[WIN_OPT_SCROLL_ON_OUTPUT].b = opt_get_bool(OPT_SCROLL_ON_OUTPUT);
-	wopt[WIN_OPT_SCROLLBUF_LEN].i = opt_get_int(OPT_SCROLLBUF_LEN);
-	wopt[WIN_OPT_SHOW_BLIST].b = opt_get_bool(OPT_SHOW_BLIST);
-	wopt[WIN_OPT_WORDWRAP].b = opt_get_bool(OPT_WORDWRAP);
-	wopt[WIN_OPT_WORDWRAP_CHAR].c = opt_get_char(OPT_WORDWRAP_CHAR);
-
-	normalize(nnick, target, sizeof(nnick));
-	while ((p = strchr(nnick, '/')) != NULL)
-		*p = '_';
-
-	pork_dir = opt_get_str(OPT_PORK_DIR);
-
-	snprintf(buf, sizeof(buf), "%s/%s/logs/%s.log",
-		pork_dir, imwindow->owner->username, nnick);
 
 	wopt[WIN_OPT_LOGFILE].s = xstrdup(buf);
 #endif
@@ -267,10 +239,6 @@ static const struct pork_pref win_pref_list[] = {
 		OPT_TYPE_BOOL,
 		opt_set_bool,
 		NULL,
-	},{ "SHOW_BUDDY_SIGNOFF",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL,
 	},{ "SHOW_BUDDY_SIGNON",
 		OPT_TYPE_BOOL,
 		opt_set_bool,
@@ -291,7 +259,6 @@ static const struct pref_set win_pref_set = {
 	.num_opts = WIN_NUM_OPTS,
 	.prefs = win_pref_list
 };
-
 
 static pref_val_t win_default_pref_vals[] = {
 	{	.pref_val.i = DEFAULT_WIN_ACTIVITY_TYPES,
@@ -326,8 +293,6 @@ static pref_val_t win_default_pref_vals[] = {
 		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_IDLE,
 		.dynamic = 0
-	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_SIGNOFF,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_SIGNON,
 		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_WORDWRAP,
@@ -341,3 +306,33 @@ static struct pref_val win_defaults = {
 	.set = &win_pref_set,
 	.val = win_default_pref_vals
 };
+
+int imwindow_init_prefs(struct imwindow *win) {
+	struct pref_val *pref;
+
+	pref = xmalloc(sizeof(win_defaults));
+	memcpy(pref, &win_defaults, sizeof(win_defaults));
+
+	if (win->target) {
+		char buf[1024];
+		char *p;
+		char *log_dir;
+		int ret;
+
+		normalize(buf, win->target, sizeof(buf));
+		while ((p = strchr(buf, '/')) != NULL)
+			*p = '_';
+
+		log_dir = opt_get_str(win->owner->prefs, ACCT_OPT_LOG_DIR);
+		if (log_dir != NULL) {
+			char logfile[4096];
+
+			ret = snprintf(logfile, sizeof(logfile), "%s/%s.log", log_dir, buf);
+			if (ret > 0 && (size_t) ret < sizeof(logfile))
+				opt_set(pref, WIN_OPT_LOGFILE, logfile);
+		}
+	}
+
+	win->prefs = pref;
+	return (0);
+}

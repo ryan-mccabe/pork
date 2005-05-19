@@ -10,6 +10,9 @@
 #ifndef __PORK_IMWINDOW_SET_H
 #define __PORK_IMWINDOW_SET_H
 
+struct imwindow;
+int imwindow_init_prefs(struct imwindow *win);
+
 enum {
 	WIN_OPT_ACTIVITY_TYPES = 0,
 	WIN_OPT_BEEP,
@@ -27,7 +30,6 @@ enum {
 	WIN_OPT_SHOW_BLIST,
 	WIN_OPT_SHOW_BUDDY_AWAY,
 	WIN_OPT_SHOW_BUDDY_IDLE,
-	WIN_OPT_SHOW_BUDDY_SIGNOFF,
 	WIN_OPT_SHOW_BUDDY_SIGNON,
 	WIN_OPT_WORDWRAP,
 	WIN_OPT_WORDWRAP_CHAR,
@@ -50,12 +52,8 @@ enum {
 #define DEFAULT_WIN_SHOW_BLIST					0
 #define DEFAULT_WIN_SHOW_BUDDY_AWAY				1
 #define DEFAULT_WIN_SHOW_BUDDY_IDLE				0
-#define DEFAULT_WIN_SHOW_BUDDY_SIGNOFF			1
 #define DEFAULT_WIN_SHOW_BUDDY_SIGNON			1
 #define DEFAULT_WIN_WORDWRAP					1
 #define DEFAULT_WIN_WORDWRAP_CHAR				' '
-
-struct imwindow;
-void wopt_destroy(struct imwindow *imwindow);
 
 #endif

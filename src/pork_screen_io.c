@@ -34,6 +34,8 @@
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_format.h>
+#include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_chat.h>
 #include <pork_status.h>
 #include <pork_screen.h>
@@ -143,7 +145,7 @@ static void __screen_win_msg(	struct imwindow *win,
 		tstxt[0] = '\0';
 
 	if (opt & MSG_OPT_BANNER) {
-		banner_txt = opt_get_str(OPT_BANNER);
+		banner_txt = opt_get_str(screen.global_prefs, OPT_BANNER);
 		if (banner_txt == NULL)
 			banner_txt = "\0";
 		else

@@ -30,6 +30,8 @@
 #include <pork_acct.h>
 #include <pork_set.h>
 #include <pork_set_global.h>
+#include <pork_acct_set.h>
+#include <pork_imwindow_set.h>
 #include <pork_chat.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
@@ -149,7 +151,8 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	if (status_init() == -1)
 		return (-1);
 
-	acct = pork_acct_init(opt_get_str(OPT_TEXT_NO_NAME), PROTO_NULL);
+	acct = pork_acct_init(opt_get_str(screen.global_prefs, OPT_TEXT_NO_NAME),
+			PROTO_NULL);
 	if (acct == NULL)
 		return (-1);
 	acct->refnum = -1UL;
@@ -166,7 +169,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	if (imwindow == NULL)
 		return (-1);
 
-	wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
+	opt_set(imwindow->prefs, WIN_OPT_SHOW_BLIST, "1");
 	screen_add_window(imwindow);
 	screen.status_win = imwindow;
 	return (0);
@@ -184,7 +187,7 @@ void screen_destroy(void) {
 		cur = next;
 	} while (cur != screen.window_list);
 
-	opt_destroy();
+	opt_destroy(screen.global_prefs);
 	input_destroy(&screen.input);
 	bind_destroy(&screen.binds);
 	hash_destroy(&screen.alias_hash);
@@ -330,7 +333,7 @@ void screen_window_swap(dlist_t *new_cur) {
 	if (screen.cur_window != NULL) {
 		imwindow = cur_window();
 
-		last_own_input = wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT);
+		last_own_input = opt_get_bool(imwindow->prefs, WIN_OPT_PRIVATE_INPUT);
 		imwindow->swindow.activity = 0;
 		imwindow->swindow.visible = 0;
 	}
@@ -340,7 +343,7 @@ void screen_window_swap(dlist_t *new_cur) {
 	imwindow = cur_window();
 	imwindow->swindow.visible = 1;
 	imwindow->swindow.activity = 0;
-	cur_own_input = wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT);
+	cur_own_input = opt_get_bool(imwindow->prefs, WIN_OPT_PRIVATE_INPUT);
 
 	/*
 	** If the current window and the one that we're going to switch
@@ -443,7 +446,7 @@ int screen_get_query_window(struct pork_acct *acct,
 
 	win = imwindow_find(acct, name);
 	if (win == NULL || win->type != WIN_TYPE_PRIVMSG) {
-		if (opt_get_bool(OPT_DUMP_MSGS_TO_STATUS))
+		if (opt_get_bool(acct->prefs, ACCT_OPT_DUMP_MSGS_TO_STATUS))
 			win = screen.status_win;
 		else {
 			win = screen_new_window(acct, name, buddy_name(acct, name));
@@ -512,8 +515,8 @@ void screen_bind_all_unbound(struct pork_acct *acct) {
 			imwindow_bind_acct(imwindow, acct->refnum);
 
 			if (!imwindow->blist_visible) {
-				if (wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST))
-					wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
+				if (opt_get_bool(imwindow->prefs, WIN_OPT_SHOW_BLIST))
+					opt_set(imwindow->prefs, WIN_OPT_SHOW_BLIST, "1");
 				}
 			}
 

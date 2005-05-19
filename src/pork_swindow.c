@@ -129,7 +129,7 @@ int swindow_init(	struct swindow *swindow,
 					WINDOW *win,
 					u_int32_t rows,
 					u_int32_t cols,
-					pref_val_t *wopt)
+					struct pref_val *pref)
 {
 	set_default_win_opts(win);
 
@@ -141,15 +141,15 @@ int swindow_init(	struct swindow *swindow,
 	swindow->visible = 0;
 	swindow->dirty = 1;
 
-	swindow->scrollbuf_max = wopt_get_int(wopt, WOPT_SCROLLBUF_LEN);
-	swindow->scroll_on_input = wopt_get_bool(wopt, WOPT_SCROLL_ON_INPUT);
-	swindow->scroll_on_output = wopt_get_bool(wopt, WOPT_SCROLL_ON_OUTPUT);
-	swindow->wordwrap = wopt_get_bool(wopt, WOPT_WORDWRAP);
-	swindow->wordwrap_char = wopt_get_char(wopt, WOPT_WORDWRAP_CHAR);
-	swindow->logged = wopt_get_bool(wopt, WOPT_LOG);
-	swindow->logfile = wopt_get_str(wopt, WOPT_LOGFILE);
-	swindow->activity_type = wopt_get_int(wopt, WOPT_ACTIVITY_TYPES);
-	swindow->log_type = wopt_get_int(wopt, WOPT_LOG_TYPES);
+	swindow->scrollbuf_max = opt_get_int(pref, WIN_OPT_SCROLLBUF_LEN);
+	swindow->scroll_on_input = opt_get_bool(pref, WIN_OPT_SCROLL_ON_INPUT);
+	swindow->scroll_on_output = opt_get_bool(pref, WIN_OPT_SCROLL_ON_OUTPUT);
+	swindow->wordwrap = opt_get_bool(pref, WIN_OPT_WORDWRAP);
+	swindow->wordwrap_char = opt_get_char(pref, WIN_OPT_WORDWRAP_CHAR);
+	swindow->logged = opt_get_bool(pref, WIN_OPT_LOG);
+	swindow->logfile = opt_get_str(pref, WIN_OPT_LOGFILE);
+	swindow->activity_type = opt_get_int(pref, WIN_OPT_ACTIVITY_TYPES);
+	swindow->log_type = opt_get_int(pref, WIN_OPT_LOG_TYPES);
 
 	if (swindow->scrollbuf_max < rows)
 		swindow->scrollbuf_max = rows;

@@ -63,6 +63,10 @@ static const struct pork_pref acct_pref_list[] = {
 		OPT_TYPE_INT,
 		opt_set_int,
 		NULL
+	},{	"LOG_DIR",
+		OPT_TYPE_STR,
+		opt_set_str,
+		NULL
 	},{	"LOGIN_ON_STARTUP",
 		OPT_TYPE_BOOL,
 		opt_set_bool,
@@ -127,6 +131,8 @@ static pref_val_t acct_default_pref_vals[] = {
 		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_IDLE_AFTER,
 		.dynamic = 0
+	},{	.pref_val.s = DEFAULT_ACCT_LOG_DIR,
+		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_LOGIN_ON_STARTUP,
 		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_ACCT_PORK_DIR,
@@ -172,14 +178,19 @@ int acct_init_prefs(struct pork_acct *acct) {
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
-	prefs = xcalloc(1, sizeof(acct_defaults));
+	prefs = xmalloc(sizeof(acct_defaults));
 	memcpy(prefs, &acct_defaults, sizeof(acct_defaults));
-	acct->acct_prefs = prefs;
+	acct->prefs = prefs;
 
 	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
 	if (xstrncat(buf, "/dl", sizeof(buf) == -1))
 		return (-1);
 	opt_set(prefs, ACCT_OPT_DOWNLOAD_DIR, buf);
+
+	buf[strlen(buf) - 3] = '\0';
+	if (xstrncat(buf, "/logs", sizeof(buf) == -1))
+		return (-1);
+	opt_set(prefs, ACCT_OPT_LOG_DIR, buf);
 
 	return (0);
 }

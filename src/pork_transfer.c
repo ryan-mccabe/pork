@@ -34,6 +34,8 @@
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_set.h>
+#include <pork_acct_set.h>
+#include <pork_set_global.h>
 #include <pork_proto.h>
 #include <pork_format.h>
 #include <pork_transfer.h>
@@ -99,12 +101,12 @@ int transfer_bind_listen_sock(struct file_transfer *xfer, int sock) {
 	if (get_local_addr(sock, &xfer->laddr) != 0)
 		return (-1);
 
-	temp = opt_get_int(OPT_TRANSFER_PORT_MIN);
+	temp = opt_get_int(xfer->acct->prefs, ACCT_OPT_TRANSFER_PORT_MIN);
 	if (temp < 1024 || temp > 0xffff)
 		temp = 1024;
 	lport = temp;
 
-	temp = opt_get_int(OPT_TRANSFER_PORT_MAX);
+	temp = opt_get_int(xfer->acct->prefs, ACCT_OPT_TRANSFER_PORT_MAX);
 	if (temp < lport)
 		temp = lport + 500;
 	lport_max = temp;
@@ -294,8 +296,10 @@ static int transfer_find_filename(struct file_transfer *xfer, char *filename) {
 
 	if (filename == NULL) {
 		size_t offset = 0;
-		char *download_dir = opt_get_str(OPT_DOWNLOAD_DIR);
+		char *download_dir;
 		char *p;
+
+		download_dir = opt_get_str(xfer->acct->prefs, ACCT_OPT_DOWNLOAD_DIR);
 
 		/*
 		** We're going to accept the filename given by our peer.

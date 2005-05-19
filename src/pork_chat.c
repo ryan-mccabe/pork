@@ -24,6 +24,8 @@
 #include <pork_events.h>
 #include <pork_acct.h>
 #include <pork_set.h>
+#include <pork_acct_set.h>
+#include <pork_set_global.h>
 #include <pork_proto.h>
 #include <pork_format.h>
 #include <pork_screen.h>
@@ -467,7 +469,7 @@ int chat_forced_leave(	struct pork_acct *acct,
 
 	chat_user_kicked(acct, chat, acct->username, target, reason);
 
-	if (opt_get_bool(OPT_AUTO_REJOIN))
+	if (opt_get_bool(acct->prefs, ACCT_OPT_AUTO_REJOIN))
 		return (chat_rejoin(acct, chat));
 
 	return (chat_free(acct, chat, 1));

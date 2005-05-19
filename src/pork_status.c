@@ -24,6 +24,7 @@
 #include <pork_list.h>
 #include <pork_misc.h>
 #include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_cstr.h>
 #include <pork_imwindow.h>
 #include <pork_screen.h>

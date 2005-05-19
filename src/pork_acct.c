@@ -62,6 +62,9 @@ static void pork_acct_free(struct pork_acct *acct) {
 		free(acct->blist);
 	}
 
+	opt_destroy(acct->prefs);
+	free(acct->prefs);
+
 	buddy_destroy(acct);
 
 	hash_destroy(&acct->autoreply);
@@ -209,7 +212,7 @@ void pork_acct_print_list(void) {
 			continue;
 
 		if (!acct->connected) {
-			max_reconnect_tries = opt_get_int(acct->acct_prefs,
+			max_reconnect_tries = opt_get_int(acct->prefs,
 									ACCT_OPT_RECONNECT_TRIES);
 		}
 
@@ -321,10 +324,10 @@ inline void pork_acct_update(void) {
 
 		if (acct->proto->set_idle_time != NULL && acct->report_idle &&
 			!acct->marked_idle &&
-			opt_get_bool(acct->acct_prefs, ACCT_OPT_REPORT_IDLE))
+			opt_get_bool(acct->prefs, ACCT_OPT_REPORT_IDLE))
 		{
 			time_t time_diff = time_now - acct->last_input;
-			int idle_after = opt_get_int(acct->acct_prefs, ACCT_OPT_IDLE_AFTER);
+			int idle_after = opt_get_int(acct->prefs, ACCT_OPT_IDLE_AFTER);
 
 			if (idle_after > 0 && time_diff >= 60 * idle_after) {
 				screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_IDLE,
@@ -364,9 +367,9 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 		return (acct);
 
 	if (acct_init_prefs(acct) == -1) {
-		if (acct->acct_prefs != NULL) {
-			opt_destroy(acct->acct_prefs);
-			free(acct->acct_prefs);
+		if (acct->prefs != NULL) {
+			opt_destroy(acct->prefs);
+			free(acct->prefs);
 		}
 		goto out_fail2;
 	}
@@ -443,7 +446,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	u_int32_t max_reconnect_tries;
 	u_int32_t connect_interval;
 	u_int32_t connect_interval_max;
-	struct pref_val *prefs = acct->acct_prefs;
+	struct pref_val *prefs = acct->prefs;
 
 	max_reconnect_tries = opt_get_int(prefs, ACCT_OPT_RECONNECT_TRIES);
 	connect_interval = opt_get_int(prefs, ACCT_OPT_RECONNECT_INTERVAL);
@@ -468,7 +471,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 
 int pork_acct_disconnected(struct pork_acct *acct) {
 	if (!acct->successful_connect ||
-		!opt_get_bool(acct->acct_prefs, ACCT_OPT_AUTO_RECONNECT) ||
+		!opt_get_bool(acct->prefs, ACCT_OPT_AUTO_RECONNECT) ||
 		event_generate(acct->events, EVENT_SIGNOFF, acct->refnum))
 	{
 		pork_acct_del_refnum(acct->refnum, NULL);
@@ -500,7 +503,7 @@ void pork_acct_reconnect_all(void) {
 	cur = screen.acct_list;
 	while (cur != NULL) {
 		struct pork_acct *acct = cur->data;
-		int timeout = opt_get_int(acct->acct_prefs, ACCT_OPT_CONNECT_TIMEOUT);
+		int timeout = opt_get_int(acct->prefs, ACCT_OPT_CONNECT_TIMEOUT);
 		dlist_t *next = cur->next;
 
 		if (acct->disconnected && !acct->reconnecting &&

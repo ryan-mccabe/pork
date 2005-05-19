@@ -23,6 +23,7 @@
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_screen_io.h>
 #include <pork_perl.h>
 #include <pork_command.h>
@@ -256,8 +257,9 @@ int event_del_type(struct event *events, const char *type, const char *func) {
 }
 
 static int event_should_generate(u_int32_t event_num) {
-	int recursive_events = opt_get_bool(OPT_RECURSIVE_EVENTS);
+	int recursive_events;
 
+	recursive_events = opt_get_bool(screen.global_prefs, OPT_RECURSIVE_EVENTS);
 	if (events_info[event_num].inside > 0 && !recursive_events)
 		return (0);
 

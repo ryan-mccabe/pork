@@ -27,11 +27,12 @@
 #include <pork_proto.h>
 #include <pork_events.h>
 #include <pork_imsg.h>
+#include <pork_set.h>
 #include <pork_imwindow.h>
+#include <pork_imwindow_set.h>
 #include <pork_buddy.h>
 #include <pork_buddy_list.h>
 #include <pork_misc.h>
-#include <pork_set.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
@@ -526,6 +527,7 @@ int buddy_went_offline(struct pork_acct *acct, char *user) {
 	struct buddy *buddy;
 	char *name = user;
 	int notify = 0;
+	struct imwindow *win;
 
 	buddy = buddy_find(acct, user);
 	if (buddy != NULL) {
@@ -545,15 +547,15 @@ int buddy_went_offline(struct pork_acct *acct, char *user) {
 	if (event_generate(acct->events, EVENT_BUDDY_SIGNOFF, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_SIGNOFF)) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win != NULL) {
-			win->typing = 0;
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		win->typing = 0;
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
 			screen_win_msg(win, 1, 1, 0,
 				MSG_TYPE_SIGNOFF, "%s has signed off", name);
-		} else if (notify) {
+		}
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
 				MSG_TYPE_SIGNOFF, "%s has signed off", name);
 		}
@@ -566,6 +568,7 @@ int buddy_came_online(struct pork_acct *acct, char *user, void *data) {
 	struct buddy *buddy;
 	char *name = user;
 	int notify = 0;
+	struct imwindow *win;
 
 	buddy = buddy_find(acct, user);
 	if (buddy != NULL) {
@@ -579,14 +582,14 @@ int buddy_came_online(struct pork_acct *acct, char *user, void *data) {
 	if (event_generate(acct->events, EVENT_BUDDY_SIGNON, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_SIGNON)) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win != NULL) {
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
 			screen_win_msg(win, 1, 1, 0,
 				MSG_TYPE_SIGNON, "%s has signed on", name);
-		} else if (notify) {
+		}
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
 				MSG_TYPE_SIGNON, "%s has signed on", name);
 		}
@@ -596,29 +599,32 @@ int buddy_came_online(struct pork_acct *acct, char *user, void *data) {
 }
 
 int buddy_went_idle(struct pork_acct *acct, char *user, u_int32_t seconds) {
+	struct imwindow *win;
+	char *name = user;
+	int notify = 0;
+	struct buddy *buddy;
+
 	if (event_generate(acct->events, EVENT_BUDDY_IDLE, user,
 		seconds, acct->refnum))
 	{
 		return (1);
 	}
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_IDLE)) {
-		struct imwindow *win;
-		char *name = user;
-		int notify = 0;
-		struct buddy *buddy;
+	buddy = buddy_find(acct, user);
+	if (buddy != NULL) {
+		name = buddy->name;
+		if (buddy->notify)
+			notify = 1;
+	}
 
-		buddy = buddy_find(acct, user);
-		if (buddy != NULL) {
-			name = buddy->name;
-			if (buddy->notify)
-				notify = 1;
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
+			screen_win_msg(win, 1, 1, 0,
+				MSG_TYPE_IDLE, "%s is now idle", name);
 		}
-
-		win = imwindow_find(acct, user);
-		if (win != NULL)
-			screen_win_msg(win, 1, 1, 0, MSG_TYPE_IDLE, "%s is now idle", name);
-		else if (notify) {
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
 				MSG_TYPE_IDLE, "%s is now idle", name);
 		}
@@ -628,27 +634,29 @@ int buddy_went_idle(struct pork_acct *acct, char *user, u_int32_t seconds) {
 }
 
 int buddy_went_unidle(struct pork_acct *acct, char *user) {
+	struct imwindow *win;
+	char *name = user;
+	int notify = 0;
+	struct buddy *buddy;
+
 	if (event_generate(acct->events, EVENT_BUDDY_UNIDLE, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_IDLE)) {
-		struct imwindow *win;
-		char *name = user;
-		int notify = 0;
-		struct buddy *buddy;
+	buddy = buddy_find(acct, user);
+	if (buddy != NULL) {
+		name = buddy->name;
+		if (buddy->notify)
+			notify = 1;
+	}
 
-		buddy = buddy_find(acct, user);
-		if (buddy != NULL) {
-			name = buddy->name;
-			if (buddy->notify)
-				notify = 1;
-		}
-
-		win = imwindow_find(acct, user);
-		if (win != NULL) {
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
 			screen_win_msg(win, 1, 1, 0,
 				MSG_TYPE_UNIDLE, "%s is no longer idle", name);
-		} else if (notify) {
+		}
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
 				MSG_TYPE_UNIDLE, "%s is no longer idle", name);
 		}
@@ -658,29 +666,31 @@ int buddy_went_unidle(struct pork_acct *acct, char *user) {
 }
 
 int buddy_went_away(struct pork_acct *acct, char *user) {
+	struct imwindow *win;
+	char *name = user;
+	int notify = 0;
+	struct buddy *buddy;
+
 	if (event_generate(acct->events, EVENT_BUDDY_AWAY, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_AWAY)) {
-		struct imwindow *win;
-		char *name = user;
-		int notify = 0;
-		struct buddy *buddy;
+	buddy = buddy_find(acct, user);
+	if (buddy != NULL) {
+		name = buddy->name;
+		if (buddy->notify)
+			notify = 1;
+	}
 
-		buddy = buddy_find(acct, user);
-		if (buddy != NULL) {
-			name = buddy->name;
-			if (buddy->notify)
-				notify = 1;
-		}
-
-		win = imwindow_find(acct, user);
-		if (win != NULL) {
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
 			screen_win_msg(win, 1, 1, 0,
 				MSG_TYPE_AWAY, "%s is now away", name);
-		} else if (notify) {
+		}
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
-				MSG_TYPE_AWAY, "%s is no longer away", name);
+				MSG_TYPE_AWAY, "%s is now away", name);
 		}
 	}
 
@@ -688,27 +698,29 @@ int buddy_went_away(struct pork_acct *acct, char *user) {
 }
 
 int buddy_went_unaway(struct pork_acct *acct, char *user) {
+	struct imwindow *win;
+	char *name = user;
+	int notify = 0;
+	struct buddy *buddy;
+
 	if (event_generate(acct->events, EVENT_BUDDY_BACK, user, acct->refnum))
 		return (1);
 
-	if (opt_get_bool(OPT_SHOW_BUDDY_AWAY)) {
-		struct imwindow *win;
-		char *name = user;
-		int notify = 0;
-		struct buddy *buddy;
+	buddy = buddy_find(acct, user);
+	if (buddy != NULL) {
+		name = buddy->name;
+		if (buddy->notify)
+			notify = 1;
+	}
 
-		buddy = buddy_find(acct, user);
-		if (buddy != NULL) {
-			name = buddy->name;
-			if (buddy->notify)
-				notify = 1;
-		}
-
-		win = imwindow_find(acct, user);
-		if (win != NULL) {
+	win = imwindow_find(acct, user);
+	if (win != NULL) {
+		if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
 			screen_win_msg(win, 1, 1, 0,
 				MSG_TYPE_BACK, "%s is no longer away", name);
-		} else if (notify) {
+		}
+	} else if (notify) {
+		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
 			screen_win_msg(screen.status_win, 1, 1, 0,
 				MSG_TYPE_BACK, "%s is no longer away", name);
 		}

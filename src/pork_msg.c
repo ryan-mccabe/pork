@@ -26,6 +26,8 @@
 #include <pork_misc.h>
 #include <pork_buddy.h>
 #include <pork_set.h>
+#include <pork_set_global.h>
+#include <pork_acct_set.h>
 #include <pork_format.h>
 #include <pork_events.h>
 #include <pork_imsg.h>
@@ -126,7 +128,7 @@ int pork_recv_msg(	struct pork_acct *acct,
 		imwindow_recv_msg(win);
 
 		if (acct->away_msg != NULL && !autoresp &&
-			opt_get_bool(OPT_AUTOSEND_AWAY))
+			opt_get_bool(acct->prefs, ACCT_OPT_AUTOSEND_AWAY))
 		{
 			pork_msg_send_auto(acct, sender);
 		}
@@ -223,7 +225,7 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 				int ret;
 
 				if (acct->away_msg != NULL) {
-					if (opt_get_bool(OPT_SEND_REMOVES_AWAY))
+					if (opt_get_bool(acct->prefs, ACCT_OPT_SEND_REMOVES_AWAY))
 						pork_set_back(acct);
 				}
 

@@ -16,7 +16,6 @@ struct pork_acct;
 struct imsg;
 
 #include <pork_set.h>
-#include <pork_imwindow_set.h>
 #include <pork_swindow.h>
 
 enum {
@@ -40,7 +39,7 @@ struct imwindow {
 	u_int32_t input_focus:1;
 	u_int32_t ignore_activity:1;
 	u_int32_t skip:1;
-	pref_val_t opts[WIN_NUM_OPTS];
+	struct pref_val *prefs;
 };
 
 struct imwindow *imwindow_new(	u_int32_t rows,

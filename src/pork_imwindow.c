@@ -26,6 +26,7 @@
 #include <pork_set.h>
 #include <pork_swindow.h>
 #include <pork_imwindow.h>
+#include <pork_imwindow_set.h>
 #include <pork_buddy_list.h>
 #include <pork_html.h>
 #include <pork_proto.h>
@@ -48,7 +49,7 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 								char *target)
 {
 	WINDOW *swin;
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	struct pork_input *input;
 	char nname[NUSER_LEN];
 
@@ -60,58 +61,56 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 
 	owner->proto->normalize(nname, target, sizeof(nname));
 
-	imwindow = xcalloc(1, sizeof(*imwindow));
-	imwindow->refnum = refnum;
-	imwindow->type = type;
-	imwindow->target = xstrdup(nname);
-	imwindow->name = color_quote_codes(target);
-	imwindow->active_binds = &screen.binds.main;
-	imwindow->owner = owner;
-	imwindow->owner->ref_count++;
+	win = xcalloc(1, sizeof(*win));
+	win->refnum = refnum;
+	win->type = type;
+	win->target = xstrdup(nname);
+	win->name = color_quote_codes(target);
+	win->active_binds = &screen.binds.main;
+	win->owner = owner;
+	win->owner->ref_count++;
 
-	wopt_init(imwindow, target);
-
-	swindow_init(&imwindow->swindow, swin, rows,
-		cols, imwindow->opts);
+	imwindow_init_prefs(win);
+	swindow_init(&win->swindow, swin, rows, cols, win->prefs);
 
 	/*
 	** Use a separate input handler.
 	*/
 
-	if (wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT)) {
+	if (opt_get_bool(win->prefs, WIN_OPT_PRIVATE_INPUT)) {
 		input = xmalloc(sizeof(*input));
 		input_init(input, cols);
 	} else
 		input = &screen.input;
 
-	imwindow->input = input;
+	win->input = input;
 
-	if (wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST)) {
+	if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BLIST)) {
 		if (owner->blist != NULL)
-			imwindow_blist_show(imwindow);
+			imwindow_blist_show(win);
 	}
 
-	return (imwindow);
+	return (win);
 }
 
-inline void imwindow_rename(struct imwindow *imwindow, char *new_name) {
-	free(imwindow->name);
-	imwindow->name = color_quote_codes(new_name);
+inline void imwindow_rename(struct imwindow *win, char *new_name) {
+	free(win->name);
+	win->name = color_quote_codes(new_name);
 }
 
-inline void imwindow_resize(struct imwindow *imwindow,
+inline void imwindow_resize(struct imwindow *win,
 							u_int32_t rows,
 							u_int32_t cols)
 {
-	swindow_resize(&imwindow->swindow, rows, cols);
-	swindow_scroll_to_start(&imwindow->swindow);
-	swindow_scroll_to_end(&imwindow->swindow);
+	swindow_resize(&win->swindow, rows, cols);
+	swindow_scroll_to_start(&win->swindow);
+	swindow_scroll_to_end(&win->swindow);
 }
 
-int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
+int imwindow_set_priv_input(struct imwindow *win, int val) {
 	int old_val;
 
-	old_val = !(imwindow->input == &screen.input);
+	old_val = !(win->input == &screen.input);
 	if (old_val == val)
 		return (-1);
 
@@ -121,129 +120,130 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	if (val == 1) {
 		struct pork_input *input = xmalloc(sizeof(*input));
 
-		input_init(input, imwindow->swindow.cols);
-		imwindow->input = input;
+		input_init(input, win->swindow.cols);
+		win->input = input;
 	} else {
 		/*
 		** Destroy this imwindow's private input, and set its input
 		** to the global input.
 		*/
 
-		input_destroy(imwindow->input);
-		free(imwindow->input);
-		imwindow->input = &screen.input;
+		input_destroy(win->input);
+		free(win->input);
+		win->input = &screen.input;
 	}
 
 	return (0);
 }
 
-inline int imwindow_blist_refresh(struct imwindow *imwindow) {
-	struct pork_acct *owner = imwindow->owner;
+inline int imwindow_blist_refresh(struct imwindow *win) {
+	struct pork_acct *owner = win->owner;
 
-	if (!imwindow->blist_visible)
+	if (!win->blist_visible)
 		return (0);
 
 	if (!owner->blist->slist.dirty)
 		return (0);
 
-	blist_draw_border(owner->blist, imwindow->input_focus);
+	blist_draw_border(owner->blist, win->input_focus);
 	blist_refresh(owner->blist);
 	return (1);
 }
 
-inline int imwindow_refresh(struct imwindow *imwindow) {
+inline int imwindow_refresh(struct imwindow *win) {
 	int was_dirty_win;
 	int was_dirty_blist;
 
-	was_dirty_win = swindow_refresh(&imwindow->swindow);
-	was_dirty_blist = imwindow_blist_refresh(imwindow);
+	was_dirty_win = swindow_refresh(&win->swindow);
+	was_dirty_blist = imwindow_blist_refresh(win);
 
 	return (was_dirty_win || was_dirty_blist);
 }
 
-void imwindow_blist_show(struct imwindow *imwindow) {
+void imwindow_blist_show(struct imwindow *win) {
 	u_int32_t new_width;
 
-	if (imwindow->owner->blist == NULL)
+	if (win->owner->blist == NULL)
 		return;
 
-	if (imwindow->blist_visible)
+	if (win->blist_visible)
 		return;
 
-	imwindow->blist_visible = 1;
-	imwindow->owner->blist->slist.dirty = 1;
-	new_width = imwindow->swindow.cols - imwindow->owner->blist->slist.cols;
-	imwindow_resize(imwindow, imwindow->swindow.rows, new_width);
+	win->blist_visible = 1;
+	win->owner->blist->slist.dirty = 1;
+	new_width = win->swindow.cols - win->owner->blist->slist.cols;
+	imwindow_resize(win, win->swindow.rows, new_width);
 }
 
-void imwindow_buffer_find(struct imwindow *imwindow, char *str, u_int32_t opt) {
+void imwindow_buffer_find(struct imwindow *win, char *str, u_int32_t opt) {
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "Matching lines:");
-	swindow_print_matching(&imwindow->swindow, str, opt);
+	swindow_print_matching(&win->swindow, str, opt);
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "End of matches");
 }
 
-void imwindow_blist_hide(struct imwindow *imwindow) {
+void imwindow_blist_hide(struct imwindow *win) {
 	u_int32_t new_width;
 
-	if (!imwindow->blist_visible)
+	if (!win->blist_visible)
 		return;
 
-	imwindow->blist_visible = 0;
-	if (imwindow->owner->blist != NULL) {
-		imwindow->owner->blist->slist.dirty = 1;
-		new_width = imwindow->swindow.cols + imwindow->owner->blist->slist.cols;
+	win->blist_visible = 0;
+	if (win->owner->blist != NULL) {
+		win->owner->blist->slist.dirty = 1;
+		new_width = win->swindow.cols + win->owner->blist->slist.cols;
 	} else
 		new_width = screen.cols;
 
-	imwindow->input_focus = BINDS_MAIN;
-	imwindow->active_binds = &screen.binds.main;
+	win->input_focus = BINDS_MAIN;
+	win->active_binds = &screen.binds.main;
 
-	imwindow_resize(imwindow, imwindow->swindow.rows, new_width);
+	imwindow_resize(win, win->swindow.rows, new_width);
 }
 
-void imwindow_blist_toggle(struct imwindow *imwindow) {
-	if (!imwindow->blist_visible)
-		imwindow_blist_show(imwindow);
+void imwindow_blist_toggle(struct imwindow *win) {
+	if (!win->blist_visible)
+		imwindow_blist_show(win);
 	else
-		imwindow_blist_hide(imwindow);
+		imwindow_blist_hide(win);
 }
 
-void imwindow_blist_draw(struct imwindow *imwindow) {
-	struct blist *blist = imwindow->owner->blist;
+void imwindow_blist_draw(struct imwindow *win) {
+	struct blist *blist = win->owner->blist;
 
-	if (blist == NULL || !imwindow->blist_visible)
+	if (blist == NULL || !win->blist_visible)
 		return;
 
-	blist_draw(imwindow->owner->blist);
+	blist_draw(win->owner->blist);
 }
 
-void imwindow_destroy(struct imwindow *imwindow) {
-	swindow_destroy(&imwindow->swindow);
+void imwindow_destroy(struct imwindow *win) {
+	swindow_destroy(&win->swindow);
 
-	if (wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT)) {
-		input_destroy(imwindow->input);
-		free(imwindow->input);
+	if (opt_get_bool(win->prefs, WIN_OPT_PRIVATE_INPUT)) {
+		input_destroy(win->input);
+		free(win->input);
 	}
 
-	if (imwindow->owner != NULL)
-		imwindow->owner->ref_count--;
+	if (win->owner != NULL)
+		win->owner->ref_count--;
 
-	wopt_destroy(imwindow);
-	free(imwindow->name);
-	free(imwindow->target);
-	free(imwindow);
+	opt_destroy(win->prefs);
+	free(win->prefs);
+	free(win->name);
+	free(win->target);
+	free(win);
 }
 
-void imwindow_switch_focus(struct imwindow *imwindow) {
-	if (!imwindow->blist_visible)
+void imwindow_switch_focus(struct imwindow *win) {
+	if (!win->blist_visible)
 		return;
 
-	if (imwindow->input_focus == BINDS_MAIN) {
-		imwindow->input_focus = BINDS_BUDDY;
-		imwindow->active_binds = &screen.binds.blist;
+	if (win->input_focus == BINDS_MAIN) {
+		win->input_focus = BINDS_BUDDY;
+		win->active_binds = &screen.binds.blist;
 	} else {
-		imwindow->input_focus = BINDS_MAIN;
-		imwindow->active_binds = &screen.binds.main;
+		win->input_focus = BINDS_MAIN;
+		win->active_binds = &screen.binds.main;
 	}
 }
 
@@ -255,12 +255,13 @@ struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
 	owner->proto->normalize(nname, target, sizeof(nname));
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *win = cur->data;
 
-		if (imwindow->owner == owner && imwindow->type == WIN_TYPE_PRIVMSG &&
-			!strcasecmp(imwindow->target, nname))
+		if (win->owner == owner &&
+			win->type == WIN_TYPE_PRIVMSG &&
+			!strcasecmp(win->target, nname))
 		{
-			return (imwindow);
+			return (win);
 		}
 
 		cur = cur->next;
@@ -279,13 +280,13 @@ struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
 	owner->proto->normalize(nname, target, sizeof(nname));
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *win = cur->data;
 
-		if (imwindow->owner == owner &&
-			imwindow->type == WIN_TYPE_CHAT &&
-			!strcasecmp(imwindow->target, nname))
+		if (win->owner == owner &&
+			win->type == WIN_TYPE_CHAT &&
+			!strcasecmp(win->target, nname))
 		{
-			return (imwindow);
+			return (win);
 		}
 
 		cur = cur->next;
@@ -299,10 +300,10 @@ struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name) {
 	dlist_t *cur = list_start;
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *win = cur->data;
 
-		if (imwindow->owner == owner && !strcasecmp(imwindow->name, name))
-			return (imwindow);
+		if (win->owner == owner && !strcasecmp(win->name, name))
+			return (win);
 
 		cur = cur->next;
 	} while (cur != list_start);
@@ -314,10 +315,10 @@ struct imwindow *imwindow_find_refnum(u_int32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *win = cur->data;
 
-		if (imwindow->refnum == refnum)
-			return (imwindow);
+		if (win->refnum == refnum)
+			return (win);
 
 		cur = cur->next;
 	} while (cur != screen.window_list);
@@ -330,7 +331,7 @@ inline void imwindow_send_msg(struct imwindow *win) {
 }
 
 inline void imwindow_recv_msg(struct imwindow *win) {
-	if (wopt_get_bool(win->opts, WOPT_BEEP_ON_OUTPUT))
+	if (opt_get_bool(win->prefs, WIN_OPT_BEEP_ON_OUTPUT))
 		beep();
 }
 
@@ -339,12 +340,12 @@ inline void imwindow_recv_msg(struct imwindow *win) {
 ** "imwindow".
 */
 
-int imwindow_bind_acct(struct imwindow *imwindow, u_int32_t refnum) {
+int imwindow_bind_acct(struct imwindow *win, u_int32_t refnum) {
 	struct pork_acct *owner;
-	struct pork_acct *old_acct = imwindow->owner;
+	struct pork_acct *old_acct = win->owner;
 
-	if (imwindow->type == WIN_TYPE_CHAT &&
-		imwindow->owner != screen.null_acct)
+	if (win->type == WIN_TYPE_CHAT &&
+		win->owner != screen.null_acct)
 	{
 		return (-1);
 	}
@@ -354,16 +355,16 @@ int imwindow_bind_acct(struct imwindow *imwindow, u_int32_t refnum) {
 		return (-1);
 
 	if (old_acct != owner) {
-		imwindow->owner->ref_count--;
-		imwindow->owner = owner;
-		imwindow->owner->ref_count++;
+		win->owner->ref_count--;
+		win->owner = owner;
+		win->owner->ref_count++;
 
-		if (imwindow->blist_visible) {
-			if (imwindow->owner->blist == NULL)
-				imwindow_blist_hide(imwindow);
+		if (win->blist_visible) {
+			if (win->owner->blist == NULL)
+				imwindow_blist_hide(win);
 			else {
-				imwindow_blist_draw(imwindow);
-				imwindow_blist_refresh(imwindow);
+				imwindow_blist_draw(win);
+				imwindow_blist_refresh(win);
 			}
 		}
 	}
@@ -371,90 +372,90 @@ int imwindow_bind_acct(struct imwindow *imwindow, u_int32_t refnum) {
 	return (0);
 }
 
-inline int imwindow_dump_buffer(struct imwindow *imwindow, char *file) {
-	return (swindow_dump_buffer(&imwindow->swindow, file));
+inline int imwindow_dump_buffer(struct imwindow *win, char *file) {
+	return (swindow_dump_buffer(&win->swindow, file));
 }
 
 /*
 ** Binds the next account in this window.
 */
 
-int imwindow_bind_next_acct(struct imwindow *imwindow) {
+int imwindow_bind_next_acct(struct imwindow *win) {
 	u_int32_t next_refnum;
 
-	if (pork_acct_next_refnum(imwindow->owner->refnum, &next_refnum) == -1)
+	if (pork_acct_next_refnum(win->owner->refnum, &next_refnum) == -1)
 		return (-1);
 
-	return (imwindow_bind_acct(imwindow, next_refnum));
+	return (imwindow_bind_acct(win, next_refnum));
 }
 
-inline void imwindow_scroll_up(struct imwindow *imwindow) {
-	swindow_scroll_by(&imwindow->swindow, -1);
+inline void imwindow_scroll_up(struct imwindow *win) {
+	swindow_scroll_by(&win->swindow, -1);
 }
 
-inline void imwindow_scroll_down(struct imwindow *imwindow) {
-	swindow_scroll_by(&imwindow->swindow, 1);
+inline void imwindow_scroll_down(struct imwindow *win) {
+	swindow_scroll_by(&win->swindow, 1);
 }
 
-inline void imwindow_scroll_by(struct imwindow *imwindow, int lines) {
-	swindow_scroll_by(&imwindow->swindow, lines);
+inline void imwindow_scroll_by(struct imwindow *win, int lines) {
+	swindow_scroll_by(&win->swindow, lines);
 }
 
-inline void imwindow_scroll_page_up(struct imwindow *imwindow) {
-	swindow_scroll_by(&imwindow->swindow, -imwindow->swindow.rows);
+inline void imwindow_scroll_page_up(struct imwindow *win) {
+	swindow_scroll_by(&win->swindow, -win->swindow.rows);
 }
 
-inline void imwindow_scroll_page_down(struct imwindow *imwindow) {
-	swindow_scroll_by(&imwindow->swindow, imwindow->swindow.rows);
+inline void imwindow_scroll_page_down(struct imwindow *win) {
+	swindow_scroll_by(&win->swindow, win->swindow.rows);
 }
 
-inline void imwindow_scroll_start(struct imwindow *imwindow) {
-	swindow_scroll_to_start(&imwindow->swindow);
+inline void imwindow_scroll_start(struct imwindow *win) {
+	swindow_scroll_to_start(&win->swindow);
 }
 
-inline void imwindow_scroll_end(struct imwindow *imwindow) {
-	swindow_scroll_to_end(&imwindow->swindow);
+inline void imwindow_scroll_end(struct imwindow *win) {
+	swindow_scroll_to_end(&win->swindow);
 }
 
-inline void imwindow_clear(struct imwindow *imwindow) {
-	swindow_clear(&imwindow->swindow);
+inline void imwindow_clear(struct imwindow *win) {
+	swindow_clear(&win->swindow);
 }
 
-inline void imwindow_erase(struct imwindow *imwindow) {
-	swindow_erase(&imwindow->swindow);
+inline void imwindow_erase(struct imwindow *win) {
+	swindow_erase(&win->swindow);
 }
 
-inline int imwindow_ignore(struct imwindow *imwindow) {
-	int ret = imwindow->ignore_activity;
+inline int imwindow_ignore(struct imwindow *win) {
+	int ret = win->ignore_activity;
 
-	imwindow->ignore_activity = 1;
+	win->ignore_activity = 1;
 	return (ret);
 }
 
-inline int imwindow_unignore(struct imwindow *imwindow) {
-	int ret = imwindow->ignore_activity;
+inline int imwindow_unignore(struct imwindow *win) {
+	int ret = win->ignore_activity;
 
-	imwindow->ignore_activity = 0;
+	win->ignore_activity = 0;
 	return (ret);
 }
 
-inline int imwindow_skip(struct imwindow *imwindow) {
-	int ret = imwindow->skip;
+inline int imwindow_skip(struct imwindow *win) {
+	int ret = win->skip;
 
-	imwindow->skip = 1;
+	win->skip = 1;
 	return (ret);
 }
 
-inline int imwindow_unskip(struct imwindow *imwindow) {
-	int ret = imwindow->skip;
+inline int imwindow_unskip(struct imwindow *win) {
+	int ret = win->skip;
 
-	imwindow->skip = 0;
+	win->skip = 0;
 	return (ret);
 }
 
-inline int imwindow_add(struct imwindow *imwindow,
+inline int imwindow_add(struct imwindow *win,
 						struct imsg *imsg,
 						u_int32_t type)
 {
-	return (swindow_add(&imwindow->swindow, imsg, type));
+	return (swindow_add(&win->swindow, imsg, type));
 }

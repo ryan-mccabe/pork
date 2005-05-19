@@ -33,6 +33,8 @@
 #include <pork_proto.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
+#include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_transfer.h>
@@ -164,9 +166,9 @@ static int format_status_typing(char opt, char *buf, size_t len, va_list ap) {
 				char *str;
 
 				if (imwindow->typing == 1)
-					str = opt_get_str(OPT_TEXT_TYPING_PAUSED);
+					str = opt_get_str(screen.global_prefs, OPT_TEXT_TYPING_PAUSED);
 				else
-					str = opt_get_str(OPT_TEXT_TYPING);
+					str = opt_get_str(screen.global_prefs, OPT_TEXT_TYPING);
 
 				if (xstrncpy(buf, str, len) == -1)
 					return (-1);
@@ -299,7 +301,9 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			if (imwindow->type == WIN_TYPE_CHAT &&
 				(imwindow->data == NULL || !acct->connected))
 			{
-				ret = xstrncpy(buf, opt_get_str(OPT_TEXT_NO_ROOM), len);
+				ret = xstrncpy(buf,
+						opt_get_str(screen.global_prefs, OPT_TEXT_NO_ROOM),
+						len);
 			}
 			break;
 
@@ -906,11 +910,11 @@ static int format_blist_buddy_label(char opt, char *buf, size_t len, va_list ap)
 			char *status_text;
 
 			if (buddy->status == STATUS_ACTIVE)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_ACTIVE);
+				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_ACTIVE);
 			else if (buddy->status == STATUS_AWAY)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_AWAY);
+				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_AWAY);
 			else if (buddy->status == STATUS_IDLE)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_IDLE);
+				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_IDLE);
 			else
 				status_text = "%p?%x";
 
@@ -965,15 +969,12 @@ static int format_blist_group_label(char opt, char *buf, size_t len, va_list ap)
 				struct slist_cell *cell = node->data;
 
 				if (cell != NULL && cell->collapsed) {
-					expand_str =
-						opt_get_str(OPT_TEXT_BLIST_GROUP_COLLAPSED);
+					expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
 				} else {
-					expand_str =
-						opt_get_str(OPT_TEXT_BLIST_GROUP_EXPANDED);
+					expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_EXPANDED);
 				}
 			} else {
-				expand_str =
-					opt_get_str(OPT_TEXT_BLIST_GROUP_COLLAPSED);
+				expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
 			}
 
 			ret = xstrncpy(buf, expand_str, len);
@@ -1259,7 +1260,7 @@ int fill_format_str(int type, char *buf, size_t len, ...) {
 	size_t i = 0;
 	int (*handler)(char, char *, size_t, va_list);
 
-	format = opt_get_str(type);
+	format = opt_get_str(screen.global_prefs, type);
 	if (format == NULL) {
 		debug("unknown format str: %d", type);
 		return (-1);

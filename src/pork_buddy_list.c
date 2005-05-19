@@ -29,6 +29,8 @@
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_status.h>
+#include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_format.h>
@@ -401,9 +403,9 @@ void blist_draw_border(struct blist *blist, int border_state) {
 	attr_t border_attr;
 
 	if (border_state == 0)
-		border_attr = opt_get_color(OPT_COLOR_BLIST_NOFOCUS);
+		border_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_NOFOCUS);
 	else
-		border_attr = opt_get_color(OPT_COLOR_BLIST_FOCUS);
+		border_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_FOCUS);
 
 	slist_clear_bot(&blist->slist);
 
@@ -416,7 +418,7 @@ inline void blist_draw_cursor(struct blist *blist, int status) {
 	attr_t curs_attr = 0;
 
 	if (status)
-		curs_attr = opt_get_color(OPT_COLOR_BLIST_SELECTOR);
+		curs_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_SELECTOR);
 
 	slist_draw_cursor(&blist->slist, curs_attr);
 }

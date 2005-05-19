@@ -67,7 +67,7 @@ int swindow_init(	struct swindow *swindow,
 					WINDOW *win,
 					u_int32_t rows,
 					u_int32_t cols,
-					pref_val_t *wopt);
+					struct pref_val *pref);
 
 int swindow_destroy(struct swindow *swindow);
 int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t type);
