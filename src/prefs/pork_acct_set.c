@@ -189,12 +189,13 @@ int acct_init_prefs(struct pork_acct *acct) {
 
 	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
 
-	if (xstrncat(buf, "/dl", sizeof(buf) == -1))
+	if (xstrncat(buf, "/dl", sizeof(buf)) == -1)
 		return (-1);
 	opt_set(prefs, ACCT_OPT_DOWNLOAD_DIR, buf);
 
 	buf[strlen(buf) - 3] = '\0';
-	if (xstrncat(buf, "/logs", sizeof(buf) == -1))
+
+	if (xstrncat(buf, "/logs", sizeof(buf)) == -1)
 		return (-1);
 	opt_set(prefs, ACCT_OPT_LOG_DIR, buf);
 
