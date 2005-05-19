@@ -81,7 +81,7 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 
 	if (opt_get_bool(win->prefs, WIN_OPT_PRIVATE_INPUT)) {
 		input = xmalloc(sizeof(*input));
-		input_init(input, cols);
+		input_init(input, win->prefs, cols);
 	} else
 		input = &screen.input;
 
@@ -122,7 +122,7 @@ int imwindow_set_priv_input(struct imwindow *win, int val) {
 	if (val == 1) {
 		struct pork_input *input = xmalloc(sizeof(*input));
 
-		input_init(input, win->swindow.cols);
+		input_init(input, win->prefs, win->swindow.cols);
 		win->input = input;
 	} else {
 		/*

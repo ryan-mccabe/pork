@@ -69,7 +69,7 @@ int screen_draw_input(void) {
 		wclrtoeol(screen.status_bar);
 
 		if (input_line == input->input_buf && input->prompt != NULL) {
-			wputnstr(screen.status_bar, input->prompt,
+			wputnstr(screen.status_bar, cur_window()->prefs, input->prompt,
 				min(input->width, input->prompt_len));
 			len -= input->prompt_len;
 		}

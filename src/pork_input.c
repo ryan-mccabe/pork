@@ -25,6 +25,7 @@
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_set.h>
+#include <pork_imwindow_set.h>
 #include <pork_cstr.h>
 #include <pork_input.h>
 
@@ -466,7 +467,10 @@ inline void input_history_clear(struct pork_input *input) {
 ** Initialize the input handler.
 */
 
-void input_init(struct pork_input *input, u_int32_t width) {
+void input_init(struct pork_input *input,
+				struct pref_val *prefs,
+				u_int32_t width)
+{
 	char *prompt;
 
 	memset(input, 0, sizeof(*input));
@@ -474,7 +478,7 @@ void input_init(struct pork_input *input, u_int32_t width) {
 	input->max_history_len = MAX_HISTORY_LEN;
 	input->dirty = 1;
 
-	prompt = opt_get_str(OPT_PROMPT);
+	prompt = opt_get_str(prefs, WIN_OPT_PROMPT);
 	if (prompt != NULL)
 		input_set_prompt(input, prompt);
 }

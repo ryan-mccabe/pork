@@ -24,8 +24,9 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
-#include <pork_set.h>
 #include <pork_swindow.h>
+#include <pork_set.h>
+#include <pork_imwindow_set.h>
 #include <pork_imsg.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
@@ -38,7 +39,7 @@ static u_int32_t imsg_wordwrapped_lines(struct swindow *swindow,
 	chtype *end = &ch[len - 1];
 	u_int32_t lines = 0;
 	int add = 0;
-	chtype cont_char = opt_get_char(OPT_WORDWRAP_CHAR);
+	chtype cont_char = opt_get_char(swindow->prefs, WIN_OPT_WORDWRAP_CHAR);
 
 	if (len <= swindow->cols)
 		return (1);
@@ -96,7 +97,7 @@ u_int32_t imsg_lines(struct swindow *swindow, struct imsg *imsg) {
 	if (imsg->len <= swindow->cols)
 		return (1);
 
-	if (!swindow->wordwrap)
+	if (!opt_get_bool(swindow->prefs, WIN_OPT_WORDWRAP))
 		return ((imsg->len / swindow->cols) + (imsg->len % swindow->cols != 0));
 
 	return (imsg_wordwrapped_lines(swindow, imsg));

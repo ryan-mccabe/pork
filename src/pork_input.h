@@ -19,6 +19,8 @@
 
 #define CTRL_KEY(x)		((x) & 0x1f)
 
+struct pref_val;
+
 struct pork_input {
 	u_int32_t width;
 	u_int16_t cur;
@@ -38,7 +40,7 @@ struct pork_input {
 char *input_partial(struct pork_input *input);
 void input_resize(struct pork_input *input, u_int32_t width);
 void input_destroy(struct pork_input *input);
-void input_init(struct pork_input *input, u_int32_t width);
+void input_init(struct pork_input *input, struct pref_val *, u_int32_t width);
 
 void input_delete(struct pork_input *input);
 void input_bkspace(struct pork_input *input);

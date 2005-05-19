@@ -29,6 +29,11 @@
 #include <pork_list.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
+#include <pork_set.h>
+#include <pork_imwindow.h>
+#include <pork_imwindow_set.h>
+#include <pork_screen.h>
+#include <pork_screen_io.h>
 #include <pork_slist.h>
 
 static int slist_find_cb(void *l, void *r) {
@@ -110,7 +115,8 @@ static void slist_scroll_screen_up(struct slist *slist) {
 
 	wmove(slist->win, cell->line, 1);
 	wclrtoeol(slist->win);
-	mvwputstr(slist->win, cell->line, SLIST_FIRST_COL(slist), cell->label);
+	mvwputstr(slist->win, cur_window()->prefs,
+		cell->line, SLIST_FIRST_COL(slist), cell->label);
 	slist->dirty = 1;
 }
 
@@ -125,7 +131,8 @@ static void slist_scroll_screen_down(struct slist *slist) {
 
 	wmove(slist->win, cell->line, 1);
 	wclrtoeol(slist->win);
-	mvwputstr(slist->win, cell->line, SLIST_FIRST_COL(slist), cell->label);
+	mvwputstr(slist->win, cur_window()->prefs,
+		cell->line, SLIST_FIRST_COL(slist), cell->label);
 	slist->dirty = 1;
 }
 
@@ -654,7 +661,8 @@ void slist_draw_line(struct slist *slist, struct slist_cell *cell) {
 		return;
 
 	wmove(slist->win, cell->line, SLIST_FIRST_COL(slist));
-	ret = mvwputnstr(slist->win, cell->line, slist->has_border, cell->label,
+	ret = mvwputnstr(slist->win, cur_window()->prefs,
+			cell->line, slist->has_border, cell->label,
 			SLIST_LAST_COL(slist) - SLIST_FIRST_COL(slist) + 1);
 
 	/*

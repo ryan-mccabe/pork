@@ -66,6 +66,6 @@ void status_draw(struct pork_acct *acct) {
 	fill_format_str(type, buf, sizeof(buf), win, acct);
 	format_apply_justification(buf, status_bar, array_elem(status_bar));
 
-	mvwputstr(screen.status_bar, 0, 0, status_bar);
+	mvwputstr(screen.status_bar, win->prefs, 0, 0, status_bar);
 	wnoutrefresh(screen.status_bar);
 }

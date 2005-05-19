@@ -512,6 +512,16 @@ XS(PORK_unalias) {
 	XSRETURN_IV(alias_remove(&screen.alias_hash, alias));
 }
 
+XS(PORK_get_cur_user) {
+	dXSARGS;
+
+	(void) cv;
+	(void) items;
+
+	XSRETURN_PV(cur_window()->owner->username);
+}
+
+#if 0
 XS(PORK_set_opt) {
 	char *var;
 	char *val;
@@ -530,23 +540,11 @@ XS(PORK_set_opt) {
 	if (var == NULL || var == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(-1);
-#if 0
 	opt = opt_find(var);
 	if (opt == -1)
 		XSRETURN_IV(-1);
 
 	XSRETURN_IV(opt_set(opt, val));
-#endif
-}
-
-XS(PORK_get_cur_user) {
-	dXSARGS;
-
-	(void) cv;
-	(void) items;
-
-	XSRETURN_PV(cur_window()->owner->username);
 }
 
 XS(PORK_get_opt) {
@@ -565,14 +563,13 @@ XS(PORK_get_opt) {
 	if (val == NULL)
 		XSRETURN_EMPTY;
 
-	XSRETURN_EMPTY;
-#if 0
 	if (opt_get_val(val, buf, sizeof(buf)) == -1)
 		XSRETURN_EMPTY;
 
 	XSRETURN_PV(buf);
-#endif
 }
+
+#endif
 
 /* XXX - fix */
 

@@ -36,6 +36,10 @@
 #include <pork_screen_io.h>
 #include <pork_screen.h>
 #include <pork_command.h>
+#include <pork_set.h>
+#include <pork_imwindow_set.h>
+#include <pork_acct_set.h>
+#include <pork_set_global.h>
 #include <pork_conf.h>
 
 static int pork_mkdir(const char *path) {
@@ -89,7 +93,7 @@ int read_conf(const char *path) {
 		if (*p == '#')
 			continue;
 
-		if (*p == opt_get_char(OPT_CMDCHARS))
+		if (*p == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
 			p++;
 
 		if (!blank_str(p))
@@ -186,7 +190,7 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 		return (0);
 	}
 
-	acct->report_idle = opt_get_bool(OPT_REPORT_IDLE);
+	acct->report_idle = opt_get_bool(acct->prefs, ACCT_OPT_REPORT_IDLE);
 	pref->privacy_mode = 1;
 
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
@@ -294,7 +298,7 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 int read_user_config(struct pork_acct *acct) {
 	char nname[NUSER_LEN];
 	char buf[PATH_MAX];
-	char *pork_dir = opt_get_str(OPT_PORK_DIR);
+	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
 
 	if (acct == NULL || pork_dir == NULL)
 		return (-1);
@@ -402,7 +406,7 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 		fprintf(fp, "username: %s\n", acct->username);
 	if (acct->profile != NULL)
 		fprintf(fp, "profile: %s\n", acct->profile);
-	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != NULL)
+	if (opt_get_bool(acct->prefs, ACCT_OPT_SAVE_PASSWD) && acct->passwd != NULL)
 		fprintf(fp, "password: %s\n", acct->passwd);
 
 	fchmod(fileno(fp), 0600);
@@ -422,7 +426,7 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 int save_user_config(struct pork_acct *acct) {
 	char nname[NUSER_LEN];
 	char buf[PATH_MAX];
-	char *pork_dir = opt_get_str(OPT_PORK_DIR);
+	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
 
 	if (acct == NULL || pork_dir == NULL) {
 		debug("acct=%p port_dir=%p", acct, pork_dir);
@@ -443,13 +447,14 @@ int save_user_config(struct pork_acct *acct) {
 }
 
 int read_global_config(void) {
-	struct passwd *pw;
-	char *pork_dir;
+//	struct passwd *pw;
+//	char *pork_dir;
 	char buf[PATH_MAX];
 
 	if (read_conf(SYSTEM_PORKRC) != 0)
 		screen_err_msg("Error reading the system-wide porkrc file");
 
+#if 0
 	pw = getpwuid(getuid());
 	if (pw == NULL) {
 		debug("getpwuid: %s", strerror(errno));
@@ -473,6 +478,7 @@ int read_global_config(void) {
 	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
 	if (read_conf(buf) != 0 && errno != ENOENT)
 		return (-1);
+#endif
 
 	return (0);
 }
@@ -504,6 +510,7 @@ static void write_bind_blist_line(void *data, void *filep) {
 }
 
 int save_global_config(void) {
+#if 0
 	char porkrc[PATH_MAX];
 	char *fn;
 	size_t len;
@@ -543,5 +550,6 @@ int save_global_config(void) {
 	}
 
 	free(fn);
+#endif
 	return (0);
 }

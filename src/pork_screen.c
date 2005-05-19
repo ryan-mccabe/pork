@@ -136,7 +136,7 @@ static void screen_window_list_remove(dlist_t *node) {
 */
 
 int screen_init(u_int32_t rows, u_int32_t cols) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	struct pork_acct *acct;
 
 	memset(&screen, 0, sizeof(screen));
@@ -146,7 +146,6 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 
 	init_global_prefs(&screen);
 	bind_init(&screen.binds);
-	input_init(&screen.input, cols);
 
 	if (status_init() == -1)
 		return (-1);
@@ -165,13 +164,14 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 
 	rows = max(1, (int) rows - STATUS_ROWS);
 
-	imwindow = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "status");
-	if (imwindow == NULL)
+	win = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "status");
+	if (win == NULL)
 		return (-1);
+	input_init(&screen.input, win->prefs, cols);
 
-	opt_set(imwindow->prefs, WIN_OPT_SHOW_BLIST, "1");
-	screen_add_window(imwindow);
-	screen.status_win = imwindow;
+	opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
+	screen_add_window(win);
+	screen.status_win = win;
 	return (0);
 }
 

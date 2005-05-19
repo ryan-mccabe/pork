@@ -621,7 +621,7 @@ USER_COMMAND(cmd_win_set) {
 	char *variable;
 	char *value;
 	int opt;
-	const struct pref_val *prefs = cur_window()->prefs;
+	struct pref_val *prefs = cur_window()->prefs;
 
 	variable = strsep(&args, " ");
 	if (variable == NULL || blank_str(variable)) {
@@ -629,7 +629,7 @@ USER_COMMAND(cmd_win_set) {
 		return;
 	}
 
-	opt = opt_find(prefs, variable);
+	opt = opt_find(prefs->set, variable);
 	strtoupper(variable);
 	if (opt == -1) {
 		screen_err_msg("Unknown variable: %s", variable);
@@ -2645,7 +2645,7 @@ USER_COMMAND(cmd_set) {
 	char *variable;
 	char *value;
 	int opt;
-	const struct pref_val *pref = screen.global_prefs;
+	struct pref_val *pref = screen.global_prefs;
 
 	variable = strsep(&args, " ");
 	if (variable == NULL || blank_str(variable)) {
@@ -2654,7 +2654,7 @@ USER_COMMAND(cmd_set) {
 	}
 
 	strtoupper(variable);
-	opt = opt_find(pref, variable);
+	opt = opt_find(pref->set, variable);
 	if (opt == -1) {
 		screen_err_msg("Unknown variable: %s", variable);
 		return;

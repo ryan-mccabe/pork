@@ -187,17 +187,17 @@ chtype *cstrndup(chtype *ch, size_t len) {
 ** to the screen at the current cursor position.
 */
 
-inline size_t wputstr(WINDOW *win, chtype *ch) {
+inline size_t wputstr(WINDOW *win, struct pref_val *prefs, chtype *ch) {
 	size_t i = 0;
 	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(win->prefs, WIN_OPT_BEEP_MAX);
+	u_int32_t beeps_max = opt_get_int(prefs, WIN_OPT_BEEP_MAX);
 
 	while (ch[i] != 0) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
 			if (c == 0x07 &&
-				opt_get_bool(win->prefs, WIN_OPT_BEEP) &&
+				opt_get_bool(prefs, WIN_OPT_BEEP) &&
 				beeps < beeps_max)
 			{
 				beep();
@@ -219,10 +219,12 @@ inline size_t wputstr(WINDOW *win, chtype *ch) {
 ** to the screen at the position (x, y).
 */
 
-inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
+inline size_t mvwputstr(WINDOW *win,
+						struct pref_val *prefs,
+						int y, int x, chtype *ch)
+{
 	wmove(win, y, x);
-
-	return (wputstr(win, ch));
+	return (wputstr(win, prefs, ch));
 }
 
 /*
@@ -230,17 +232,21 @@ inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 ** to the screen at the current cursor position.
 */
 
-inline size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
+inline size_t wputnstr(	WINDOW *win,
+						struct pref_val *prefs,
+						chtype *ch,
+						size_t n)
+{
 	size_t i;
 	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(win->prefs, WIN_OPT_BEEP_MAX);
+	u_int32_t beeps_max = opt_get_int(prefs, WIN_OPT_BEEP_MAX);
 
 	for (i = 0 ; i < n && ch[i] != 0 ; i++) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
 			if (c == 0x07 &&
-				opt_get_bool(win->prefs, WIN_OPT_BEEP)
+				opt_get_bool(prefs, WIN_OPT_BEEP)
 				&& beeps < beeps_max)
 			{
 				beep();
@@ -275,8 +281,10 @@ inline size_t wputncstr(WINDOW *win, char *str, size_t n) {
 ** to the screen at position (x, y).
 */
 
-inline size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n) {
+inline size_t mvwputnstr(	WINDOW *win,
+							struct pref_val *prefs,
+							int y, int x, chtype *ch, size_t n)
+{
 	wmove(win, y, x);
-
-	return (wputnstr(win, ch, n));
+	return (wputnstr(win, prefs, ch, n));
 }

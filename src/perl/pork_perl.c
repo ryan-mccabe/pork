@@ -65,7 +65,6 @@ void xs_init(init_args) {
 	newXS("PORK::echo", PORK_echo, file);
 	newXS("PORK::err_msg", PORK_err_msg, file);
 	newXS("PORK::get_cur_user", PORK_get_cur_user, file);
-	newXS("PORK::get_opt", PORK_get_opt, file);
 	newXS("PORK::load", PORK_load, file);
 	newXS("PORK::load_perl", PORK_load_perl, file);
 	newXS("PORK::prompt_user", PORK_prompt_user, file);
@@ -74,7 +73,8 @@ void xs_init(init_args) {
 	newXS("PORK::run_cmd", PORK_run_cmd, file);
 	newXS("PORK::save", PORK_save, file);
 	newXS("PORK::cur_user", PORK_cur_user, file);
-	newXS("PORK::set_opt", PORK_set_opt, file);
+//	newXS("PORK::get_opt", PORK_get_opt, file);
+//	newXS("PORK::set_opt", PORK_set_opt, file);
 	newXS("PORK::status_msg", PORK_status_msg, file);
 	newXS("PORK::unbind", PORK_unbind, file);
 	newXS("PORK::unalias", PORK_unalias, file);
@@ -85,7 +85,7 @@ void xs_init(init_args) {
 	newXS("PORK::win_erase", PORK_win_erase, file);
 	newXS("PORK::win_find_name", PORK_win_find_name, file);
 	newXS("PORK::win_find_target", PORK_win_find_target, file);
-	newXS("PORK::win_get_opt", PORK_win_get_opt, file);
+//	newXS("PORK::win_get_opt", PORK_win_get_opt, file);
 	newXS("PORK::win_next", PORK_win_next, file);
 	newXS("PORK::win_prev", PORK_win_prev, file);
 	newXS("PORK::win_rename", PORK_win_rename, file);
@@ -97,7 +97,7 @@ void xs_init(init_args) {
 	newXS("PORK::win_scroll_page_up", PORK_win_scroll_page_up, file);
 	newXS("PORK::win_scroll_start", PORK_win_scroll_start, file);
 	newXS("PORK::win_scroll_up", PORK_win_scroll_up, file);
-	newXS("PORK::win_set_opt", PORK_win_set_opt, file);
+//	newXS("PORK::win_set_opt", PORK_win_set_opt, file);
 	newXS("PORK::win_swap", PORK_win_swap, file);
 	newXS("PORK::win_target", PORK_win_target, file);
 
