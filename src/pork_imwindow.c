@@ -70,7 +70,9 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 	win->owner = owner;
 	win->owner->ref_count++;
 
-	imwindow_init_prefs(win);
+	if (imwindow_init_prefs(win) == -1)
+		imwindow_destroy(win);
+
 	swindow_init(&win->swindow, swin, rows, cols, win->prefs);
 
 	/*

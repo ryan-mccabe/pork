@@ -22,7 +22,6 @@ struct swindow {
 	u_int32_t rows;
 	u_int32_t cols;
 
-	u_int32_t scrollbuf_max;
 	u_int32_t scrollbuf_len;
 	u_int32_t scrollbuf_lines;
 
@@ -37,6 +36,10 @@ struct swindow {
 	u_int32_t top_hidden;
 	u_int32_t bottom_hidden;
 
+	u_int32_t visible:1;
+	u_int32_t dirty:1;
+	u_int32_t activity:1;
+
 	/* pointers to the head and tail of the message list */
 	dlist_t *scrollbuf;
 	dlist_t *scrollbuf_end;
@@ -45,22 +48,11 @@ struct swindow {
 	dlist_t *scrollbuf_top;
 	dlist_t *scrollbuf_bot;
 
-	/* window-specific preferences */
-	u_int32_t activity_type;
-	u_int32_t log_type;
-
-	char *logfile;
 	int log_fd;
+	char *logfile;
 
-	char wordwrap_char;
-	u_int32_t visible:1;
-	u_int32_t dirty:1;
-	u_int32_t activity:1;
-	u_int32_t beep_on_output:1;
-	u_int32_t scroll_on_input:1;
-	u_int32_t scroll_on_output:1;
-	u_int32_t logged:1;
-	u_int32_t wordwrap:1;
+	/* window-specific preferences */
+	struct pref_val *prefs;
 };
 
 int swindow_init(	struct swindow *swindow,

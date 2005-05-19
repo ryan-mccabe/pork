@@ -49,7 +49,9 @@ static int swindow_print_msg_wr(struct swindow *swindow,
 	u_int32_t lines_printed = 0;
 	chtype *end = &ch[len - 1];
 	int add = 0;
-	chtype cont_char = (chtype) swindow->wordwrap_char;
+	chtype cont_char;
+
+	cont_char = (chtype) opt_get_int(swindow->prefs, WIN_OPT_WORDWRAP_CHAR);
 
 	if (swindow->cols == 1)
 		cont_char = 0;
@@ -106,7 +108,7 @@ static int swindow_print_msg(	struct swindow *swindow,
 {
 	chtype *msg;
 
-	if (swindow->wordwrap)
+	if (opt_get_bool(swindow->prefs, WIN_OPT_WORDWRAP))
 		return (swindow_print_msg_wr(swindow, imsg, y, x, firstline, lastline));
 
 	if (lastline < firstline)
@@ -140,21 +142,12 @@ int swindow_init(	struct swindow *swindow,
 	swindow->bottom_blank = rows;
 	swindow->visible = 0;
 	swindow->dirty = 1;
+	swindow->prefs = pref;
 
-	swindow->scrollbuf_max = opt_get_int(pref, WIN_OPT_SCROLLBUF_LEN);
-	swindow->scroll_on_input = opt_get_bool(pref, WIN_OPT_SCROLL_ON_INPUT);
-	swindow->scroll_on_output = opt_get_bool(pref, WIN_OPT_SCROLL_ON_OUTPUT);
-	swindow->wordwrap = opt_get_bool(pref, WIN_OPT_WORDWRAP);
-	swindow->wordwrap_char = opt_get_char(pref, WIN_OPT_WORDWRAP_CHAR);
-	swindow->logged = opt_get_bool(pref, WIN_OPT_LOG);
-	swindow->logfile = opt_get_str(pref, WIN_OPT_LOGFILE);
-	swindow->activity_type = opt_get_int(pref, WIN_OPT_ACTIVITY_TYPES);
-	swindow->log_type = opt_get_int(pref, WIN_OPT_LOG_TYPES);
+	if (opt_get_int(pref, WIN_OPT_SCROLLBUF_LEN < rows))
+		SET_INT(pref->val[WIN_OPT_SCROLLBUF_LEN], rows);
 
-	if (swindow->scrollbuf_max < rows)
-		swindow->scrollbuf_max = rows;
-
-	if (swindow->logged)
+	if (opt_get_bool(pref, WIN_OPT_LOG))
 		swindow_set_log(swindow);
 
 	return (0);
@@ -176,11 +169,13 @@ static inline void swindow_scroll(struct swindow *swindow, int n) {
 
 /*
 ** Prune the scroll buffer so that the number of total
-** messages is not greater than swindow->scrollbuf_max.
+** messages is not greater than the maximum number of scrollbuf
+** messages.
 */
 
 void swindow_prune(struct swindow *swindow) {
-	int num = swindow->scrollbuf_len - swindow->scrollbuf_max;
+	u_int32_t scrollbufmax = opt_get_int(swindow->prefs, WIN_OPT_SCROLLBUF_LEN);
+	int num = swindow->scrollbuf_len - scrollbufmax;
 	dlist_t *cur = swindow->scrollbuf_end;
 	u_int32_t serial_top;
 	u_int32_t serial_bot;
@@ -318,8 +313,8 @@ void swindow_resize(struct swindow *swindow,
 	swindow->rows = new_row;
 	swindow->cols = new_col;
 
-	if (swindow->scrollbuf_max < swindow->rows)
-		swindow->scrollbuf_max = swindow->rows;
+	if (opt_get_int(swindow->prefs, WIN_OPT_SCROLLBUF_LEN) < swindow->rows)
+		SET_INT(swindow->prefs->val[WIN_OPT_SCROLLBUF_LEN], swindow->rows);
 
 	swindow_recalculate(swindow, old_rows, old_cols);
 	swindow_redraw(swindow);
@@ -412,6 +407,11 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 	u_int32_t msg_line_start = 1;
 	dlist_t *old_head = swindow->scrollbuf;
 	int y_pos;
+	u_int32_t scrollbuf_max;
+	u_int32_t log_type = opt_get_int(swindow->prefs, WIN_OPT_LOG_TYPES);
+	u_int32_t activity_types;
+
+	activity_types = opt_get_int(swindow->prefs, WIN_OPT_ACTIVITY_TYPES);
 
 	/*
 	** If the window is scrolled up, and the scroll on
@@ -421,12 +421,12 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 
 	if ((swindow->scrollbuf_bot != swindow->scrollbuf ||
 		swindow->bottom_hidden != 0) &&
-		swindow->scroll_on_output)
+		opt_get_bool(swindow->prefs, WIN_OPT_SCROLL_ON_OUTPUT))
 	{
 		swindow_scroll_to_end(swindow);
 	}
 
-	if (swindow->logged && (swindow->log_type & msgtype)) {
+	if (opt_get_bool(swindow->prefs, WIN_OPT_LOG) && (log_type & msgtype)) {
 		struct iovec wvec[2];
 		char *plaintext;
 
@@ -466,7 +466,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 
 	if (old_head != swindow->scrollbuf_bot) {
 		swindow->held += imsg->lines;
-		if (swindow->activity_type & msgtype)
+		if (activity_types & msgtype)
 			swindow->activity = 1;
 		return (0);
 	}
@@ -507,14 +507,15 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 	swindow_print_msg(swindow, imsg, y_pos, 0, msg_line_start, -1);
 	swindow->dirty = 1;
 
-	if (!swindow->visible && (swindow->activity_type & msgtype))
+	if (!swindow->visible && (activity_types & msgtype))
 		swindow->activity = 1;
 
 	/*
 	** If there's a maximum scroll buffer length, enforce it.
 	*/
 
-	if (swindow->scrollbuf_len > swindow->scrollbuf_max)
+	scrollbuf_max = opt_get_int(swindow->prefs, WIN_OPT_SCROLLBUF_LEN);
+	if (swindow->scrollbuf_len > scrollbuf_max)
 		swindow_prune(swindow);
 
 	return (0);
@@ -530,7 +531,7 @@ inline int swindow_input(struct swindow *swindow) {
 
 	if ((swindow->scrollbuf_bot != swindow->scrollbuf ||
 		swindow->bottom_hidden != 0) &&
-		swindow->scroll_on_input)
+		opt_get_bool(swindow->prefs, WIN_OPT_SCROLL_ON_INPUT))
 	{
 		swindow_scroll_to_end(swindow);
 	}
@@ -763,7 +764,7 @@ inline void swindow_set_wordwrap(struct swindow *swindow, u_int32_t value) {
 	** Allow for updating after the continued char changed but the
 	** wordwrap enabled setting didn't.
 	*/
-	swindow->wordwrap = value;
+	SET_BOOL(swindow->prefs->val[WIN_OPT_WORDWRAP], value);
 	swindow_recalculate(swindow, swindow->rows, swindow->cols);
 	wclear(swindow->win);
 	swindow_redraw(swindow);
@@ -811,7 +812,7 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 */
 
 void swindow_set_logfile(struct swindow *swindow, char *logfile) {
-	swindow->logfile = logfile;
+	opt_set(swindow->prefs, WIN_OPT_LOGFILE, logfile);
 
 	/*
 	** If the window is currently being logged, close
@@ -819,7 +820,7 @@ void swindow_set_logfile(struct swindow *swindow, char *logfile) {
 	** one.
 	*/
 
-	if (swindow->logged) {
+	if (opt_get_bool(swindow->prefs, WIN_OPT_LOG)) {
 		swindow_end_log(swindow);
 		swindow_set_log(swindow);
 	}
@@ -843,7 +844,7 @@ int swindow_set_log(struct swindow *swindow) {
 
 	fd = open(swindow->logfile, O_CREAT | O_APPEND | O_WRONLY, 0600);
 	if (fd == -1) {
-		swindow->logged = 0;
+		SET_BOOL(swindow->prefs->val[WIN_OPT_LOG], 0);
 		screen_err_msg("Unable to open %s for writing: %s",
 			swindow->logfile, strerror(errno));
 		return (-1);
@@ -857,7 +858,7 @@ int swindow_set_log(struct swindow *swindow) {
 	write(fd, timebuf, len);
 
 	swindow->log_fd = fd;
-	swindow->logged = 1;
+	opt_set(swindow->prefs, WIN_OPT_LOG, "1");
 
 	return (0);
 }
@@ -883,7 +884,7 @@ void swindow_end_log(struct swindow *swindow) {
 	write(swindow->log_fd, timebuf, len);
 
 	close(swindow->log_fd);
-	swindow->logged = 0;
+	opt_set(swindow->prefs, WIN_OPT_LOG, "0");
 }
 
 /*
@@ -950,7 +951,7 @@ void swindow_erase(struct swindow *swindow) {
 }
 
 int swindow_destroy(struct swindow *swindow) {
-	if (swindow->logged)
+	if (opt_get_bool(swindow->prefs, WIN_OPT_LOG))
 		swindow_end_log(swindow);
 
 	dlist_destroy(swindow->scrollbuf, NULL, swindow_free);

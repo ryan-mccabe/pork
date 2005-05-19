@@ -11,6 +11,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <ncurses.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -23,6 +24,8 @@
 #include <pork_list.h>
 #include <pork_set.h>
 #include <pork_set_global.h>
+#include <pork_input.h>
+#include <pork_screen.h>
 #include <pork_html.h>
 
 /*
