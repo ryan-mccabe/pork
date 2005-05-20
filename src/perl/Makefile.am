@@ -18,6 +18,7 @@ libporkperl_a_SOURCES  = \
 		pork_perl_input.c \
 		pork_perl_stub.c \
 		pork_perl_timer.c \
+		pork_perl_transfer.c \
 		pork_perl_win.c
 else
 libporkperl_a_SOURCES  = pork_perl_stub.c
