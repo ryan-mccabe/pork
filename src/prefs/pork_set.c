@@ -72,7 +72,7 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
 	return (0);
 }
 
-void opt_print_var(struct pref_val *pref, int i, const char *text) {
+static void opt_print_var(struct pref_val *pref, int i, const char *text) {
 	switch (pref_type(pref, i)) {
 		case OPT_TYPE_BOOL:
 			screen_nocolor_msg("%s %s %s", pref_name(pref, i),
@@ -121,7 +121,7 @@ void opt_print_var(struct pref_val *pref, int i, const char *text) {
 ** Print the values of all the pref variables.
 */
 
-void opt_print(struct pref_val *pref) {
+static void opt_print(struct pref_val *pref) {
 	size_t i;
 
 	for (i = 0 ; i < pref->set->num_opts ; i++)

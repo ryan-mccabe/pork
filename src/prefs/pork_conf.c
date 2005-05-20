@@ -100,7 +100,7 @@ int read_conf(const char *path) {
 
 	fp = fopen(path, "r");
 	if (fp == NULL) {
-		if (errno != -ENOENT)
+		if (errno != ENOENT)
 			debug("fopen: %s: %s", path, strerror(errno));
 		return (-1);
 	}
@@ -126,7 +126,7 @@ int read_conf(const char *path) {
 		if (*p == '#')
 			continue;
 
-		if (*p == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
+		while (*p == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
 			p++;
 
 		if (!blank_str(p))

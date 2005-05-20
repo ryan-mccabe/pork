@@ -35,78 +35,60 @@
 #include <pork_screen_io.h>
 
 static const struct pork_pref acct_pref_list[] = {
-	{	"AUTO_RECONNECT",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"AUTO_REJOIN",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"AUTOSEND_AWAY",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"CONNECT_TIMEOUT",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"DOWNLOAD_DIR",
-		OPT_TYPE_STR,
-		opt_set_str,
-		NULL
-	},{	"DUMP_MSGS_TO_STATUS",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"IDLE_AFTER",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"LOG_DIR",
-		OPT_TYPE_STR,
-		opt_set_str,
-		NULL
-	},{	"LOGIN_ON_STARTUP",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"PORK_DIR",
-		OPT_TYPE_STR,
-		opt_set_str,
-		NULL
-	},{	"RECONNECT_INTERVAL",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"RECONNECT_MAX_INTERVAL",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"RECONNECT_TRIES",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"REPORT_IDLE",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"SAVE_PASSWD",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"SEND_REMOVES_AWAY",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"TRANSFER_PORT_MAX",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"TRANSFER_PORT_MIN",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
+	{	.name = "AUTO_RECONNECT",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "AUTO_REJOIN",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "AUTOSEND_AWAY",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "CONNECT_TIMEOUT",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "DOWNLOAD_DIR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "DUMP_MSGS_TO_STATUS",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "IDLE_AFTER",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "LOG_DIR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "LOGIN_ON_STARTUP",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "PORK_DIR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "RECONNECT_INTERVAL",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "RECONNECT_MAX_INTERVAL",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "RECONNECT_TRIES",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "REPORT_IDLE",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "SAVE_PASSWD",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "SEND_REMOVES_AWAY",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "TRANSFER_PORT_MAX",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "TRANSFER_PORT_MIN",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
 	}
 };
 
@@ -118,43 +100,24 @@ static const struct pref_set acct_pref_set = {
 
 static pref_val_t acct_default_pref_vals[] = {
 	{	.pref_val.i = DEFAULT_ACCT_AUTO_RECONNECT,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_AUTO_REJOIN,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_AUTOSEND_AWAY,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_CONNECT_TIMEOUT,
-		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_ACCT_DOWNLOAD_DIR,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_DUMP_MSGS_TO_STATUS,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_IDLE_AFTER,
-		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_ACCT_LOG_DIR,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_LOGIN_ON_STARTUP,
-		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_ACCT_PORK_DIR,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_INTERVAL,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_MAX_INTERVAL,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_TRIES,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_REPORT_IDLE,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_SAVE_PASSWD,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_SAVE_PASSWD,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_ACCT_SEND_REMOVES_AWAY,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_TRANSFER_PORT_MAX,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_ACCT_TRANSFER_PORT_MIN,
-		.dynamic = 0
 	}
 };
 

@@ -56,8 +56,6 @@ int opt_set_str(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 int opt_set_var(struct pref_val *pref, char *args);
 
 void opt_destroy(struct pref_val *pref);
-void opt_print_var(struct pref_val *pref, int var, const char *text);
-void opt_print(struct pref_val *pref);
 void opt_write(struct pref_val *pref, FILE *fp);
 
 int opt_tristate(char *args);

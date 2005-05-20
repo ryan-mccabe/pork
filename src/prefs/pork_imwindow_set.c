@@ -175,82 +175,74 @@ static void optdestroy(struct imwindow *imwindow) {
 */
 
 static const struct pork_pref win_pref_list[] = {
-	{	"ACTIVITY_TYPES",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"BEEP",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
+	{	.name = "ACTIVITY_TYPES",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "BEEP",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
 	},{ "BEEP_MAX",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL,
-	},{	"BEEP_ON_OUTPUT",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL
-	},{	"HISTORY_LEN",
-		OPT_TYPE_INT,
-		opt_set_int,
-		optchanged_histlen
-	},{	"LOG",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_log
-	},{	"LOG_TYPES",
-		OPT_TYPE_INT,
-		opt_set_int,
-		NULL
-	},{	"LOGFILE",
-		OPT_TYPE_STR,
-		opt_set_str,
-		optchanged_logfile
-	},{	"PRIVATE_INPUT",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_priv_input
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "BEEP_ON_OUTPUT",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "HISTORY_LEN",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+		.updated = optchanged_histlen
+	},{	.name = "LOG",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_log
+	},{	.name = "LOG_TYPES",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "LOGFILE",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+		.updated = optchanged_logfile
+	},{	.name = "PRIVATE_INPUT",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_priv_input
 	},{ "PROMPT",
-		OPT_TYPE_STR,
-		opt_set_str,
-		optchanged_prompt,
-	},{	"SCROLL_ON_INPUT",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_scroll_on_input
-	},{	"SCROLL_ON_OUTPUT",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_scroll_on_output
-	},{	"SCROLLBUF_LEN",
-		OPT_TYPE_INT,
-		opt_set_int,
-		optchanged_scrollbuf_len
-	},{	"SHOW_BLIST",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_show_blist
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+		.updated = optchanged_prompt,
+	},{	.name = "SCROLL_ON_INPUT",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_scroll_on_input
+	},{	.name = "SCROLL_ON_OUTPUT",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_scroll_on_output
+	},{	.name = "SCROLLBUF_LEN",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+		.updated = optchanged_scrollbuf_len
+	},{	.name = "SHOW_BLIST",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_show_blist
 	},{ "SHOW_BUDDY_AWAY",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL,
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
 	},{ "SHOW_BUDDY_IDLE",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL,
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
 	},{ "SHOW_BUDDY_SIGNON",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		NULL,
-	},{	"WORDWRAP",
-		OPT_TYPE_BOOL,
-		opt_set_bool,
-		optchanged_wordwrap
-	},{	"WORDWRAP_CHAR",
-		OPT_TYPE_CHAR,
-		opt_set_char,
-		optchanged_wordwrap
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "WORDWRAP",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+		.updated = optchanged_wordwrap
+	},{	.name = "WORDWRAP_CHAR",
+		.type = OPT_TYPE_CHAR,
+		.set = opt_set_char,
+		.updated = optchanged_wordwrap
 	}
 };
 
@@ -262,43 +254,24 @@ static const struct pref_set win_pref_set = {
 
 static pref_val_t win_default_pref_vals[] = {
 	{	.pref_val.i = DEFAULT_WIN_ACTIVITY_TYPES,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_BEEP,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_WIN_BEEP_MAX,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_BEEP_ON_OUTPUT,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_WIN_HISTORY_LEN,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_LOG,
-		.dynamic = 0
 	},{	.pref_val.i = DEFAULT_WIN_LOG_TYPES,
-		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_WIN_LOGFILE,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_PRIVATE_INPUT,
-		.dynamic = 0
 	},{	.pref_val.s = DEFAULT_WIN_PROMPT,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SCROLL_ON_INPUT,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SCROLL_ON_OUTPUT,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SCROLLBUF_LEN,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BLIST,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_AWAY,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_IDLE,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_SIGNON,
-		.dynamic = 0
 	},{	.pref_val.b = DEFAULT_WIN_WORDWRAP,
-		.dynamic = 0
 	},{	.pref_val.c = DEFAULT_WIN_WORDWRAP_CHAR,
-		.dynamic = 0
 	}
 };
 
