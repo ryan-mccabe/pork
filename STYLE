@@ -357,9 +357,13 @@ I break this rule myself in a few places, but in general, I try to follow it.
 SAFETY (SECURITY)
 --------------------------------------------------------------------------------
 
-In this program, never use sprintf.  Always use snprintf instead.
-Never use str(n?)cpy, use xstrncpy instead.
-Never use str(n?)cat, use xstrncat instead.
+In this program, never use sprintf.  Always use snprintf instead. And
+check its return value. If it's less than 0 or greater than or equal
+to the size of the space it's writing to, there's an error.
+
+Never use str(n?)cpy, use xstrncpy instead. And check its return value.
+Never use str(n?)cat, use xstrncat instead. And check its return value.
+
 No exceptions.
 
 Don't improperly use format strings in functions that take a variable number
