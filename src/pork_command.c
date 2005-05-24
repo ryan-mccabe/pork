@@ -32,6 +32,7 @@
 #include <pork_set_global.h>
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
+#include <pork_imwindow_set.h>
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
@@ -196,14 +197,21 @@ USER_COMMAND(cmd_input_prev_word) {
 }
 
 USER_COMMAND(cmd_input_prompt) {
-	if (args == NULL) {
+	if (args == NULL || blank_str(args) ||
+		!strcasecmp(args, "off") || !strcasecmp(args, "false"))
+	{
 		input_set_prompt(cur_window()->input, NULL);
-		screen_cmd_output("Input prompt cleared");
-	} else {
-		if (input_set_prompt(cur_window()->input, args) == -1)
-			screen_err_msg("The requested prompt is too long for the screen");
+		screen_cmd_output("Input prompt set to off");
+	} else if (	args != NULL &&
+				(!strcasecmp(args, "on") || !strcasecmp(args, "true")))
+	{
+		char *prompt;
+
+		prompt = opt_get_str(cur_window()->prefs, WIN_OPT_PROMPT_STR);
+		if (prompt != NULL)
+			input_set_prompt(cur_window()->input, prompt);
 		else {
-			screen_cmd_output("Input prompt set to %s", args);
+			screen_err_msg("No prompt format has been specified for this input");
 		}
 	}
 }
@@ -618,7 +626,43 @@ USER_COMMAND(cmd_win_renumber) {
 }
 
 USER_COMMAND(cmd_win_set) {
-	opt_set_var(cur_window()->prefs, args);
+	struct imwindow *win;
+	struct pref_val *pref;
+
+	if (args == NULL || blank_str(args)) {
+		win = cur_window();
+		pref = win->prefs;
+	} else if (!strncasecmp(args, "-default", 8)) {
+		args += 8;
+		while (args[0] == ' ')
+			args++;
+
+		win = NULL;
+		pref = imwindow_get_default_prefs();
+	} else if (!strncasecmp(args, "-refnum", 7)) {
+		u_int32_t refnum;
+		char *refnum_str;
+
+		args += 7;
+		refnum_str = strsep(&args, " ");
+		if (refnum_str == NULL || str_to_uint(args, &refnum) != 0) {
+			screen_err_msg("Invalid window refnum: %s", args);
+			return;
+		}
+
+		win = imwindow_find_refnum(refnum);
+		if (win == NULL) {
+			screen_err_msg("No window with refnum %u exists", refnum);
+			return;
+		}
+
+		pref = win->prefs;		
+	} else {
+		win = cur_window();
+		pref = win->prefs;
+	}
+
+	opt_set_var(pref, args, win);
 }
 
 USER_COMMAND(cmd_win_skip) {
@@ -1615,7 +1659,43 @@ USER_COMMAND(cmd_acct_save) {
 }
 
 USER_COMMAND(cmd_acct_set) {
-	opt_set_var(cur_window()->owner->prefs, args);
+	struct pork_acct *acct;
+	struct pref_val *pref;
+
+	if (args == NULL || blank_str(args)) {
+		acct = cur_window()->owner;
+		pref = acct->prefs;
+	} else if (!strncasecmp(args, "-default", 8)) {
+		args += 8;
+		while (args[0] == ' ')
+			args++;
+
+		acct = NULL;
+		pref = acct_get_default_prefs();
+	} else if (!strncasecmp(args, "-refnum", 7)) {
+		u_int32_t refnum;
+		char *refnum_str;
+
+		args += 7;
+		refnum_str = strsep(&args, " ");
+		if (refnum_str == NULL || str_to_uint(args, &refnum) != 0) {
+			screen_err_msg("Invalid account refnum: %s", args);
+			return;
+		}
+
+		acct = pork_acct_get_data(refnum);
+		if (acct == NULL) {
+			screen_err_msg("No account with refnum %u exists", refnum);
+			return;
+		}
+
+		pref = acct->prefs;		
+	} else {
+		acct = cur_window()->owner;
+		pref = acct->prefs;
+	}
+
+	opt_set_var(pref, args, acct);
 }
 
 /*

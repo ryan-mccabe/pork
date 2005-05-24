@@ -81,7 +81,7 @@ int swindow_dump_buffer(struct swindow *swindow, char *file);
 int swindow_set_log(struct swindow *swindow);
 void swindow_end_log(struct swindow *swindow);
 void swindow_set_logfile(struct swindow *swindow, char *logfile);
-void swindow_set_wordwrap(struct swindow *swindow, u_int32_t value);
+void swindow_set_wordwrap(struct swindow *swindow);
 void swindow_prune(struct swindow *swindow);
 
 void swindow_scroll_to_end(struct swindow *swindow);

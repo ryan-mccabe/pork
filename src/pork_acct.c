@@ -63,6 +63,7 @@ static void pork_acct_free(struct pork_acct *acct) {
 	}
 
 	opt_destroy(acct->prefs);
+	free(acct->prefs->val);
 	free(acct->prefs);
 
 	buddy_destroy(acct);

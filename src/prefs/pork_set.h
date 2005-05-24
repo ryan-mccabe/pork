@@ -53,13 +53,13 @@ int opt_set_int(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 int opt_set_color(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 int opt_set_str(struct pref_val *pref, u_int32_t opt, char *args, va_list);
 #define opt_set_format opt_set_str
-int opt_set_var(struct pref_val *pref, char *args);
 
 void opt_destroy(struct pref_val *pref);
 void opt_write(struct pref_val *pref, FILE *fp);
 
 int opt_tristate(char *args);
 int opt_set(struct pref_val *pref, u_int32_t opt, char *args, ...);
+int opt_set_var(struct pref_val *pref, char *args, ...);
 int opt_find(const struct pref_set *pref, const char *name);
 int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len);
 

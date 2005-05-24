@@ -146,8 +146,11 @@ int acct_init_prefs(struct pork_acct *acct) {
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
-	prefs = xmalloc(sizeof(acct_defaults));
-	memcpy(prefs, &acct_defaults, sizeof(acct_defaults));
+	prefs = xmalloc(sizeof(*prefs));
+	prefs->set = &acct_pref_set;
+	prefs->val = xmalloc(sizeof(acct_default_pref_vals));
+	memcpy(prefs->val, acct_default_pref_vals, sizeof(acct_default_pref_vals));
+
 	acct->prefs = prefs;
 
 	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
@@ -163,4 +166,8 @@ int acct_init_prefs(struct pork_acct *acct) {
 	opt_set(prefs, ACCT_OPT_LOG_DIR, buf);
 
 	return (0);
+}
+
+inline struct pref_val *acct_get_default_prefs(void) {
+	return (&acct_defaults);
 }

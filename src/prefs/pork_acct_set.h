@@ -11,6 +11,7 @@
 #define __PORK_ACCT_SET_H
 
 int acct_init_prefs(struct pork_acct *acct);
+struct pref_val *acct_get_default_prefs(void);
 
 enum {
 	ACCT_OPT_AUTO_RECONNECT,

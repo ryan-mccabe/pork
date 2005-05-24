@@ -760,12 +760,11 @@ int swindow_print_matching(	struct swindow *swindow,
 	return (0);
 }
 
-inline void swindow_set_wordwrap(struct swindow *swindow, u_int32_t value) {
+inline void swindow_set_wordwrap(struct swindow *swindow) {
 	/*
 	** Allow for updating after the continued char changed but the
 	** wordwrap enabled setting didn't.
 	*/
-	SET_BOOL(swindow->prefs->val[WIN_OPT_WORDWRAP], value);
 	swindow_recalculate(swindow, swindow->rows, swindow->cols);
 	wclear(swindow->win);
 	swindow_redraw(swindow);

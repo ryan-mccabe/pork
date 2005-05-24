@@ -230,6 +230,7 @@ void imwindow_destroy(struct imwindow *win) {
 		win->owner->ref_count--;
 
 	opt_destroy(win->prefs);
+	free(win->prefs->val);
 	free(win->prefs);
 	free(win->name);
 	free(win->target);

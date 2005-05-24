@@ -13,6 +13,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
@@ -31,22 +32,6 @@
 #include <pork_misc.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
-
-static void scrollbuf_len_update(struct pref_val *pref, va_list ap) {
-#if 0
-	u_int32_t scrollbuf_len;
-
-	scrollbuf_len = opt_get_int(pref, OPT_SCROLLBUF_LEN);
-	if (scrollbuf_len < cur_window()->swindow.rows)
-		SET_INT(pref->val[OPT_SCROLLBUF_LEN], cur_window()->swindow.rows);
-#endif
-}
-
-static void opt_changed_prompt(struct pref_val *pref, va_list ap __notused) {
-#if 0
-	input_set_prompt(&screen.input, opt_get_str(pref, OPT_PROMPT));
-#endif
-}
 
 static void optchanged_histlen(struct pref_val *pref, va_list ap) {
 #if 0
@@ -94,39 +79,6 @@ static void optchanged_priv_input(struct pref_val *pref, va_list ap) {
 static void optchanged_prompt(struct pref_val *pref, va_list ap) {
 }
 
-static void optchanged_scrollbuf_len(struct pref_val *pref, va_list ap) {
-#if 0
-	u_int32_t new_len;
-
-	new_len = optget_int(imwindow->opts, WIN_OPT_SCROLLBUF_LEN);
-	if (new_len < imwindow->swindow.rows) {
-		imwindow->opts[WIN_OPT_SCROLLBUF_LEN].i = imwindow->swindow.rows;
-		imwindow->swindow.scrollbuf_max = imwindow->swindow.rows;
-	} else
-		imwindow->swindow.scrollbuf_max = new_len;
-
-	swindow_prune(&imwindow->swindow);
-#endif
-}
-
-static void optchanged_scroll_on_output(struct pref_val *pref, va_list ap) {
-#if 0
-	u_int32_t new_val;
-
-	new_val = optget_bool(imwindow->opts, WIN_OPT_SCROLL_ON_OUTPUT);
-	imwindow->swindow.scroll_on_output = new_val;
-#endif
-}
-
-static void optchanged_scroll_on_input(struct pref_val *pref, va_list ap) {
-#if 0
-	u_int32_t new_val;
-
-	new_val = optget_bool(imwindow->opts, WIN_OPT_SCROLL_ON_INPUT);
-	imwindow->swindow.scroll_on_input = new_val;
-#endif
-}
-
 static void optchanged_show_blist(struct pref_val *pref, va_list ap) {
 #if 0
 	u_int32_t new_val;
@@ -148,31 +100,12 @@ static void optchanged_show_blist(struct pref_val *pref, va_list ap) {
 }
 
 static void optchanged_wordwrap(struct pref_val *pref, va_list ap) {
-#if 0
-	swindow_set_wordwrap(&imwindow->swindow,
-		optget_bool(imwindow->opts, WIN_OPT_WORDWRAP));
-#endif
+	struct imwindow *win;
+
+	win = va_arg(ap, struct imwindow *);
+	if (win != NULL)
+		swindow_set_wordwrap(&win->swindow);
 }
-
-void optinit(struct imwindow *imwindow, const char *target) {
-#if 0
-
-	wopt[WIN_OPT_LOGFILE].s = xstrdup(buf);
-#endif
-}
-
-static void optdestroy(struct imwindow *imwindow) {
-#if 0
-	free(imwindow->opts[WIN_OPT_LOGFILE].s);
-#endif
-}
-
-/*
-** Name:		The name of the window specific option.
-** Type:		The type of the option (boolean, string, int, char)
-** Set func:	The function used to set the option.
-** Change func:	The function to be called when the option changes.
-*/
 
 static const struct pork_pref win_pref_list[] = {
 	{	.name = "ACTIVITY_TYPES",
@@ -181,7 +114,7 @@ static const struct pork_pref win_pref_list[] = {
 	},{	.name = "BEEP",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-	},{ "BEEP_MAX",
+	},{	.name = "BEEP_MAX",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
 	},{	.name = "BEEP_ON_OUTPUT",
@@ -206,33 +139,30 @@ static const struct pork_pref win_pref_list[] = {
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 		.updated = optchanged_priv_input
-	},{ "PROMPT",
+	},{	.name = "PROMPT_STR",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
 		.updated = optchanged_prompt,
 	},{	.name = "SCROLL_ON_INPUT",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-		.updated = optchanged_scroll_on_input
 	},{	.name = "SCROLL_ON_OUTPUT",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-		.updated = optchanged_scroll_on_output
 	},{	.name = "SCROLLBUF_LEN",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
-		.updated = optchanged_scrollbuf_len
 	},{	.name = "SHOW_BLIST",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 		.updated = optchanged_show_blist
-	},{ "SHOW_BUDDY_AWAY",
+	},{	.name = "SHOW_BUDDY_AWAY",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-	},{ "SHOW_BUDDY_IDLE",
+	},{	.name = "SHOW_BUDDY_IDLE",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-	},{ "SHOW_BUDDY_SIGNON",
+	},{	.name ="SHOW_BUDDY_SIGNON",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 	},{	.name = "WORDWRAP",
@@ -254,37 +184,39 @@ static const struct pref_set win_pref_set = {
 
 static pref_val_t win_default_pref_vals[] = {
 	{	.pref_val.i = DEFAULT_WIN_ACTIVITY_TYPES,
-	},{	.pref_val.b = DEFAULT_WIN_BEEP,
-	},{	.pref_val.i = DEFAULT_WIN_BEEP_MAX,
-	},{	.pref_val.b = DEFAULT_WIN_BEEP_ON_OUTPUT,
-	},{	.pref_val.i = DEFAULT_WIN_HISTORY_LEN,
-	},{	.pref_val.b = DEFAULT_WIN_LOG,
-	},{	.pref_val.i = DEFAULT_WIN_LOG_TYPES,
-	},{	.pref_val.s = DEFAULT_WIN_LOGFILE,
-	},{	.pref_val.b = DEFAULT_WIN_PRIVATE_INPUT,
-	},{	.pref_val.s = DEFAULT_WIN_PROMPT,
-	},{	.pref_val.b = DEFAULT_WIN_SCROLL_ON_INPUT,
-	},{	.pref_val.b = DEFAULT_WIN_SCROLL_ON_OUTPUT,
-	},{	.pref_val.b = DEFAULT_WIN_SCROLLBUF_LEN,
-	},{	.pref_val.b = DEFAULT_WIN_SHOW_BLIST,
-	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_AWAY,
-	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_IDLE,
-	},{	.pref_val.b = DEFAULT_WIN_SHOW_BUDDY_SIGNON,
-	},{	.pref_val.b = DEFAULT_WIN_WORDWRAP,
-	},{	.pref_val.c = DEFAULT_WIN_WORDWRAP_CHAR,
+	},{ .pref_val.b = DEFAULT_WIN_BEEP,
+	},{ .pref_val.i = DEFAULT_WIN_BEEP_MAX,
+	},{ .pref_val.b = DEFAULT_WIN_BEEP_ON_OUTPUT,
+	},{ .pref_val.i = DEFAULT_WIN_HISTORY_LEN,
+	},{ .pref_val.b = DEFAULT_WIN_LOG,
+	},{ .pref_val.i = DEFAULT_WIN_LOG_TYPES,
+	},{ .pref_val.s = DEFAULT_WIN_LOGFILE,
+	},{ .pref_val.b = DEFAULT_WIN_PRIVATE_INPUT,
+	},{ .pref_val.s = DEFAULT_WIN_PROMPT,
+	},{ .pref_val.b = DEFAULT_WIN_SCROLL_ON_INPUT,
+	},{ .pref_val.b = DEFAULT_WIN_SCROLL_ON_OUTPUT,
+	},{ .pref_val.b = DEFAULT_WIN_SCROLLBUF_LEN,
+	},{ .pref_val.b = DEFAULT_WIN_SHOW_BLIST,
+	},{ .pref_val.b = DEFAULT_WIN_SHOW_BUDDY_AWAY,
+	},{ .pref_val.b = DEFAULT_WIN_SHOW_BUDDY_IDLE,
+	},{ .pref_val.b = DEFAULT_WIN_SHOW_BUDDY_SIGNON,
+	},{ .pref_val.b = DEFAULT_WIN_WORDWRAP,
+	},{ .pref_val.c = DEFAULT_WIN_WORDWRAP_CHAR,
 	}
 };
 
 static struct pref_val win_defaults = {
 	.set = &win_pref_set,
-	.val = win_default_pref_vals
+	.val = win_default_pref_vals,
 };
 
 int imwindow_init_prefs(struct imwindow *win) {
 	struct pref_val *pref;
 
-	pref = xmalloc(sizeof(win_defaults));
-	memcpy(pref, &win_defaults, sizeof(win_defaults));
+	pref = xmalloc(sizeof(*pref));
+	pref->set = &win_pref_set;
+	pref->val = xmalloc(sizeof(win_default_pref_vals));
+	memcpy(pref->val, win_default_pref_vals, sizeof(win_default_pref_vals));
 
 	if (win->target) {
 		char buf[1024];
@@ -308,4 +240,8 @@ int imwindow_init_prefs(struct imwindow *win) {
 
 	win->prefs = pref;
 	return (0);
+}
+
+inline struct pref_val *imwindow_get_default_prefs(void) {
+	return (&win_defaults);
 }

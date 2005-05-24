@@ -11,7 +11,9 @@
 #define __PORK_IMWINDOW_SET_H
 
 struct imwindow;
+
 int imwindow_init_prefs(struct imwindow *win);
+struct pref_val *imwindow_get_default_prefs(void);
 
 enum {
 	WIN_OPT_ACTIVITY_TYPES = 0,
@@ -23,7 +25,7 @@ enum {
 	WIN_OPT_LOG_TYPES,
 	WIN_OPT_LOGFILE,
 	WIN_OPT_PRIVATE_INPUT,
-	WIN_OPT_PROMPT,
+	WIN_OPT_PROMPT_STR,
 	WIN_OPT_SCROLL_ON_INPUT,
 	WIN_OPT_SCROLL_ON_OUTPUT,
 	WIN_OPT_SCROLLBUF_LEN,

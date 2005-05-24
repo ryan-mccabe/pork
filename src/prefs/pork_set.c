@@ -334,8 +334,8 @@ int opt_set_color(struct pref_val *pref, u_int32_t opt, char *args, va_list ap)
 }
 
 int opt_set(struct pref_val *pref, u_int32_t opt, char *args, ...) {
-	int ret;
 	va_list ap;
+	int ret;
 
 	va_start(ap, args);
 	ret = pref->set->prefs[opt].set(pref, opt, args, ap);
@@ -353,39 +353,45 @@ void opt_destroy(struct pref_val *pref) {
 	}
 }
 
-int opt_set_var(struct pref_val *pref, char *args) {
-    char *var;
-    char *value;
-    int opt;
+int opt_set_var(struct pref_val *pref, char *args, ...) {
+	char *var;
+	char *value;
+	int opt;
+	int ret;
+	va_list ap;
 
-    var = strsep(&args, " ");
-    if (var == NULL || blank_str(var)) {
-        opt_print(pref);
-        return (-1);
-    }
-
-    strtoupper(var);
-    opt = opt_find(pref->set, var);
-    if (opt == -1) {
-		if (pref->set->name == NULL)
-	        screen_err_msg("Unknown variable: %s", var);
-		else
-	        screen_err_msg("Unknown %s variable: %s", pref->set->name, var);
-
-        return (-1);
-    }
-
-    value = args;
-    if (value == NULL || blank_str(value)) {
-        opt_print_var(pref, opt, "is set to");
-        return (0);
-    }
-
-    if (opt_set(pref, opt, value) == -1) {
-        screen_nocolor_msg("Bad argument for %s: %s", var, value);
+	var = strsep(&args, " ");
+	if (var == NULL || blank_str(var)) {
+		opt_print(pref);
 		return (-1);
-    } else
-        opt_print_var(pref, opt, "set to");
+	}
+
+	strtoupper(var);
+	opt = opt_find(pref->set, var);
+	if (opt == -1) {
+		if (pref->set->name == NULL)
+			screen_err_msg("Unknown variable: %s", var);
+		else
+			screen_err_msg("Unknown %s variable: %s", pref->set->name, var);
+
+		return (-1);
+	}
+
+	value = args;
+	if (value == NULL || blank_str(value)) {
+		opt_print_var(pref, opt, "is set to");
+		return (0);
+	}
+
+	va_start(ap, args);
+	ret = pref->set->prefs[opt].set(pref, opt, args, ap);
+	va_end(ap);
+
+	if (ret == -1) {
+		screen_nocolor_msg("Bad argument for %s: %s", var, value);
+		return (-1);
+	} else
+		opt_print_var(pref, opt, "set to");
 
 	return (0);
 }

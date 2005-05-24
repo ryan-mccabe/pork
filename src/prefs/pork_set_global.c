@@ -262,7 +262,7 @@ static struct pork_pref global_pref_list[] = {
 	},{	.name = "OUTGOING_MSG_FONT_SIZE",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
-	},{ "RECURSIVE_EVENTS",
+	},{	.name = "RECURSIVE_EVENTS",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 	},{	.name = "TEXT_BLIST_GROUP_COLLAPSED",

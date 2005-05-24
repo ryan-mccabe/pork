@@ -478,7 +478,7 @@ void input_init(struct pork_input *input,
 	input->max_history_len = MAX_HISTORY_LEN;
 	input->dirty = 1;
 
-	prompt = opt_get_str(prefs, WIN_OPT_PROMPT);
+	prompt = opt_get_str(prefs, WIN_OPT_PROMPT_STR);
 	if (prompt != NULL)
 		input_set_prompt(input, prompt);
 }
