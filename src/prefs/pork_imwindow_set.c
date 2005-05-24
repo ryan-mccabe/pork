@@ -215,8 +215,8 @@ int imwindow_init_prefs(struct imwindow *win) {
 
 	pref = xmalloc(sizeof(*pref));
 	pref->set = &win_pref_set;
-	pref->val = xmalloc(sizeof(win_default_pref_vals));
-	memcpy(pref->val, win_default_pref_vals, sizeof(win_default_pref_vals));
+	opt_copy_pref_val(pref, win_default_pref_vals,
+		sizeof(win_default_pref_vals));
 
 	if (win->target) {
 		char buf[1024];

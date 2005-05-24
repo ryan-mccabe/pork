@@ -30,6 +30,20 @@
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
+void opt_copy_pref_val(struct pref_val *pref, pref_val_t *val, size_t n) {
+	u_int32_t i;
+	u_int32_t elements;
+
+	pref->val = xmalloc(n);
+	memcpy(pref->val, val, n);
+
+	elements = n / sizeof(val[0]);
+	for (i = 0 ; i < elements ; i++) {
+		if (pref->val[i].dynamic)
+			pref->val[i].pref_val.s = xstrdup(pref->val[i].pref_val.s);
+	}
+}
+
 int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
 	int i;
 	int ret = -1;

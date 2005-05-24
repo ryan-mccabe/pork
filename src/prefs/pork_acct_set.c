@@ -148,8 +148,8 @@ int acct_init_prefs(struct pork_acct *acct) {
 
 	prefs = xmalloc(sizeof(*prefs));
 	prefs->set = &acct_pref_set;
-	prefs->val = xmalloc(sizeof(acct_default_pref_vals));
-	memcpy(prefs->val, acct_default_pref_vals, sizeof(acct_default_pref_vals));
+	opt_copy_pref_val(prefs, acct_default_pref_vals,
+		sizeof(acct_default_pref_vals));
 
 	acct->prefs = prefs;
 
