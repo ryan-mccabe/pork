@@ -58,5 +58,6 @@ inline int str_to_uint(const char *str, u_int32_t *val);
 inline int str_to_int(const char *str, int *val);
 
 int file_get_size(FILE *fp, size_t *result);
+int create_full_path(char *path);
 
 #endif

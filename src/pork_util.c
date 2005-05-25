@@ -331,3 +331,30 @@ int file_get_size(FILE *fp, size_t *result) {
 	*result = st.st_size;
 	return (0);
 }
+
+int create_full_path(char *path) {
+	char *p;
+	char buf[8192];
+
+	if (xstrncpy(buf, path, sizeof(buf)) == -1)
+		return (-1);
+
+	p = strrchr(buf, '/');
+	if (p != NULL && p[1] != '\0')
+		*p = '\0';
+
+	p = buf;
+	if (p[0] == '/')
+		p++;
+	while ((p = strchr(p, '/')) != NULL) {
+		*p = '\0';
+		if (mkdir(buf, 0700) != 0 && errno != EEXIST)
+			return (-1);
+		*p++ = '/';
+	}
+
+	if (mkdir(buf, 0700) != 0 && errno != EEXIST)
+		return (-1);
+
+	return (0);
+}

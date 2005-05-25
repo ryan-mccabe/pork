@@ -1,5 +1,5 @@
 /*
-** pork_set_global.c - global /SET command implementation.
+** pork_set_global.c - global /set command implementation.
 ** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify

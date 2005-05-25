@@ -42,57 +42,6 @@
 #include <pork_set_global.h>
 #include <pork_conf.h>
 
-static int pork_mkdir(const char *path) {
-	struct stat st;
-
-	if (stat(path, &st) != 0) {
-		if (mkdir(path, 0700) != 0) {
-			char *temp = xstrdup(path);
-			char *p;
-			char *next;
-			int ret = -1;
-
-			next = temp;
-			if (next[0] == '/')
-				next++;
-
-			while ((p = strchr(next, '/')) != NULL && p[1] != '\0') {
-				*p = '\0';
-				if (stat(temp, &st) == 0) {
-					if (!S_ISDIR(st.st_mode)) {
-						screen_err_msg("Error: %s is not a directory", temp);
-						free(temp);
-						return (-1);
-					}
-				}
-
-				ret = mkdir(temp, 0700);
-				if (ret != 0 && errno != EEXIST) {
-					screen_err_msg("Error: mkdir: %s: %s", temp, strerror(errno));
-					free(temp);
-					return (-1);
-				}
-				*p = '/';
-				next = &p[1];
-			}
-
-			free(temp);
-
-			if (ret != 0) {
-				screen_err_msg("Error: mkdir %s: %s", path, strerror(errno));
-				return (-1);
-			}
-		}
-	} else {
-		if (!S_ISDIR(st.st_mode)) {
-			screen_err_msg("Error: %s is not a directory", path);
-			return (-1);
-		}
-	}
-
-	return (0);
-}
-
 int read_conf(const char *path) {
 	FILE *fp;
 	char buf[4096];
@@ -331,16 +280,8 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 int read_user_config(struct pork_acct *acct) {
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
-	char *log_dir = opt_get_str(acct->prefs, ACCT_OPT_LOG_DIR);
 
 	if (acct == NULL || pork_dir == NULL)
-		return (-1);
-
-	/* XXX - only after successful login. */
-	if (pork_mkdir(pork_dir) != 0)
-		return (-1);
-
-	if (pork_mkdir(log_dir) != 0)
 		return (-1);
 
 	snprintf(buf, sizeof(buf), "%s/buddy_list", pork_dir);
@@ -369,6 +310,7 @@ static int save_buddy_list(struct pork_acct *acct, const char *filename) {
 	fn = xmalloc(len);
 	snprintf(fn, len, "%s-TEMP", filename);
 
+	create_full_path(fn);
 	fp = fopen(fn, "w");
 	if (fp == NULL) {
 		screen_err_msg("Can't open buddy list file for writing: %s",
@@ -425,6 +367,7 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 	fn = xmalloc(len);
 	snprintf(fn, len, "%s-TEMP", filename);
 
+	create_full_path(fn);
 	fp = fopen(fn, "w");
 	if (fp == NULL) {
 		debug("fopen: %s: %s", fn, strerror(errno));

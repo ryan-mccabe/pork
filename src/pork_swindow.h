@@ -39,6 +39,7 @@ struct swindow {
 	u_int32_t visible:1;
 	u_int32_t dirty:1;
 	u_int32_t activity:1;
+	u_int32_t logged:1;
 
 	/* pointers to the head and tail of the message list */
 	dlist_t *scrollbuf;
@@ -59,7 +60,7 @@ int swindow_init(	struct swindow *swindow,
 					WINDOW *win,
 					u_int32_t rows,
 					u_int32_t cols,
-					struct pref_val *pref);
+					struct pref_val *);
 
 int swindow_destroy(struct swindow *swindow);
 int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t type);
@@ -80,7 +81,7 @@ int swindow_print_matching(	struct swindow *swindow,
 int swindow_dump_buffer(struct swindow *swindow, char *file);
 int swindow_set_log(struct swindow *swindow);
 void swindow_end_log(struct swindow *swindow);
-void swindow_set_logfile(struct swindow *swindow, char *logfile);
+void swindow_set_logfile(struct swindow *swindow);
 void swindow_set_wordwrap(struct swindow *swindow);
 void swindow_prune(struct swindow *swindow);
 

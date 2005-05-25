@@ -110,6 +110,7 @@ USER_COMMAND(cmd_input_next_word);
 USER_COMMAND(cmd_input_right);
 USER_COMMAND(cmd_input_remove);
 USER_COMMAND(cmd_input_send);
+USER_COMMAND(cmd_input_set);
 USER_COMMAND(cmd_input_start);
 
 USER_COMMAND(cmd_history);

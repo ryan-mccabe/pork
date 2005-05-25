@@ -26,7 +26,6 @@ struct pork_input {
 	u_int16_t cur;
 	u_int16_t len;
 	u_int16_t begin_completion;
-	u_int16_t max_history_len;
 	u_int16_t history_len;
 	u_int16_t prompt_len;
 	u_int16_t dirty:1;
@@ -35,12 +34,13 @@ struct pork_input {
 	dlist_t *history_cur;
 	dlist_t *history_end;
 	char input_buf[INPUT_BUFFER_LEN];
+	struct pref_val *prefs;
 };
 
 char *input_partial(struct pork_input *input);
 void input_resize(struct pork_input *input, u_int32_t width);
 void input_destroy(struct pork_input *input);
-void input_init(struct pork_input *input, struct pref_val *, u_int32_t width);
+void input_init(struct pork_input *input, u_int32_t width);
 
 void input_delete(struct pork_input *input);
 void input_bkspace(struct pork_input *input);

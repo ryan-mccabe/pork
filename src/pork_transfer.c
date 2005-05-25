@@ -338,11 +338,13 @@ static int transfer_find_filename(struct file_transfer *xfer, char *filename) {
 		fname_orig = filename;
 	}
 
+	create_full_path(buf);
 	fd = open(buf, O_WRONLY | O_EXCL | O_CREAT, 0600);
 	while (fd == -1 && errno == EEXIST && tries < 300) {
 		if (xstrncat(buf, "_", sizeof(buf)) == -1)
 			return (-EEXIST);
 
+		create_full_path(buf);
 		fd = open(buf, O_WRONLY | O_EXCL | O_CREAT, 0600);
 		tries++;
 	}

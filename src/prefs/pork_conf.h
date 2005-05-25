@@ -12,6 +12,7 @@
 
 struct pork_acct;
 
+int pork_mkdir(const char *path);
 int read_conf(const char *path);
 int read_global_config(void);
 int save_global_config(void);

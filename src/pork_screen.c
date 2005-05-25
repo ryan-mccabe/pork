@@ -167,7 +167,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	win = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "status");
 	if (win == NULL)
 		return (-1);
-	input_init(&screen.input, win->prefs, cols);
+	input_init(&screen.input, cols);
 
 	opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
 	screen_add_window(win);

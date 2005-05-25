@@ -33,6 +33,7 @@
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
 #include <pork_imwindow_set.h>
+#include <pork_input_set.h>
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
@@ -141,6 +142,7 @@ static struct command input_command[] = {
 	{ "remove",					cmd_input_remove			},
 	{ "right",					cmd_input_right				},
 	{ "send",					cmd_input_send				},
+	{ "set",					cmd_input_set				},
 	{ "start",					cmd_input_start				},
 };
 
@@ -207,7 +209,7 @@ USER_COMMAND(cmd_input_prompt) {
 	{
 		char *prompt;
 
-		prompt = opt_get_str(cur_window()->prefs, WIN_OPT_PROMPT_STR);
+		prompt = opt_get_str(cur_window()->input->prefs, INPUT_OPT_PROMPT_STR);
 		if (prompt != NULL)
 			input_set_prompt(cur_window()->input, prompt);
 		else {
@@ -277,6 +279,28 @@ out:
 	}
 
 	recursion = 0;
+}
+
+USER_COMMAND(cmd_input_set) {
+	struct pork_input *input;
+	struct pref_val *pref;
+
+	if (args == NULL || blank_str(args)) {
+		input = cur_window()->input;
+		pref = input->prefs;
+	} else if (!strncasecmp(args, "-default", 8)) {
+		args += 8;
+		while (args[0] == ' ')
+			args++;
+
+		input = NULL;
+		pref = input_get_default_prefs();
+	} else {
+		input = cur_window()->input;
+		pref = input->prefs;
+	}
+
+	opt_set_var(pref, args, input);
 }
 
 USER_COMMAND(cmd_input_start) {

@@ -9,6 +9,7 @@ libporkprefs_a_SOURCES = \
 	pork_acct_set.c \
 	pork_conf.c \
 	pork_imwindow_set.c \
+	pork_input_set.c \
 	pork_set.c \
 	pork_set_global.c
 
@@ -16,5 +17,6 @@ noinst_HEADERS = \
 	pork_acct_set.h \
 	pork_conf.h \
 	pork_imwindow_set.h \
+	pork_input_set.h \
 	pork_set.h \
 	pork_set_global.h

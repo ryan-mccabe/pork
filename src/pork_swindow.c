@@ -782,6 +782,7 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 	if (swindow->scrollbuf_end == NULL)
 		return (-1);
 
+	create_full_path(file);
 	fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0600);
 	if (fd == -1)
 		return (-1);
@@ -811,18 +812,13 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 ** Set the window to log to "logfile"
 */
 
-void swindow_set_logfile(struct swindow *swindow, char *logfile) {
-	opt_set(swindow->prefs, WIN_OPT_LOGFILE, logfile);
-
-	/*
-	** If the window is currently being logged, close
-	** the log having the old filename, and open a new
-	** one.
-	*/
+void swindow_set_logfile(struct swindow *swindow) {
+	char *logfile = opt_get_str(swindow->prefs, WIN_OPT_LOGFILE);
 
 	if (opt_get_bool(swindow->prefs, WIN_OPT_LOG)) {
 		swindow_end_log(swindow);
-		swindow_set_log(swindow);
+		if (logfile != NULL)
+			swindow_set_log(swindow);
 	}
 }
 
@@ -836,18 +832,20 @@ int swindow_set_log(struct swindow *swindow) {
 	struct tm *tm;
 	char timebuf[128];
 	u_int32_t len;
+	char *logfile;
 
-	if (swindow->logfile == NULL) {
+	logfile = opt_get_str(swindow->prefs, WIN_OPT_LOGFILE);
+	if (logfile == NULL) {
 		screen_err_msg("No logfile has been specified for this window");
-		return (-1);
+		goto out_err;
 	}
 
-	fd = open(swindow->logfile, O_CREAT | O_APPEND | O_WRONLY, 0600);
+	create_full_path(logfile);
+	fd = open(logfile, O_CREAT | O_APPEND | O_WRONLY, 0600);
 	if (fd == -1) {
-		SET_BOOL(swindow->prefs->val[WIN_OPT_LOG], 0);
 		screen_err_msg("Unable to open %s for writing: %s",
-			swindow->logfile, strerror(errno));
-		return (-1);
+			logfile, strerror(errno));
+		goto out_err;
 	}
 
 	cur_time = time(NULL);
@@ -858,9 +856,13 @@ int swindow_set_log(struct swindow *swindow) {
 	write(fd, timebuf, len);
 
 	swindow->log_fd = fd;
-	opt_set(swindow->prefs, WIN_OPT_LOG, "1");
-
+	swindow->logged = 1;
 	return (0);
+
+out_err:
+	swindow->logged = 0;
+	SET_BOOL(swindow->prefs->val[WIN_OPT_LOG], 0);
+	return (-1);
 }
 
 /*
@@ -884,7 +886,8 @@ void swindow_end_log(struct swindow *swindow) {
 	write(swindow->log_fd, timebuf, len);
 
 	close(swindow->log_fd);
-	opt_set(swindow->prefs, WIN_OPT_LOG, "0");
+	swindow->logged = 0;
+	swindow->log_fd = -1;
 }
 
 /*
