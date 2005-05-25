@@ -9,9 +9,11 @@ libirc_a_SOURCES =		\
 	pork_irc_cmd.c		\
 	pork_irc_dcc.c		\
 	pork_irc_input.c	\
-	pork_irc_output.c
+	pork_irc_output.c	\
+	pork_irc_set.c
 
 noinst_HEADERS = \
 	pork_irc.h \
 	pork_irc_cmd.h \
-	pork_irc_dcc.h
+	pork_irc_dcc.h \
+	pork_irc_set.h

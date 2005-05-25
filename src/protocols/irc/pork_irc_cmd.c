@@ -46,6 +46,9 @@
 static USER_COMMAND(irc_cmd_save) {
 }
 
+static USER_COMMAND(irc_cmd_set) {
+}
+
 static USER_COMMAND(irc_cmd_ctcp) {
 	struct pork_acct *acct = cur_window()->owner;
 	char *dest;

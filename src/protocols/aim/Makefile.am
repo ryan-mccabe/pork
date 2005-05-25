@@ -45,7 +45,8 @@ libaim_a_SOURCES = \
 	libfaim/util.c \
 	pork_aim.c \
 	pork_aim_cmd.c \
-	pork_aim_proto.c
+	pork_aim_proto.c \
+	pork_aim_set.c
 
 noinst_HEADERS = \
 	libfaim/aim.h \
@@ -55,4 +56,5 @@ noinst_HEADERS = \
 	libfaim/md5.h \
 	pork_aim.h \
 	pork_aim_cmd.h \
-	pork_aim_proto.h
+	pork_aim_proto.h \
+	pork_aim_set.h
