@@ -66,6 +66,7 @@ pork_SOURCES = \
 	pork_cstr.c			\
 	pork_events.c		\
 	pork_format.c		\
+	pork_format_global.c\
 	pork_help.c			\
 	pork_html.c			\
 	pork_imwindow.c		\

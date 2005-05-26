@@ -12,7 +12,16 @@
 
 #define FORMAT_VARIABLE '$'
 
-int fill_format_str(int type, char *buf, size_t len, ...);
+extern int (*const global_format_handler[])(char, char *, size_t, va_list);
+
+int fill_format_string(	int type,
+						char *buf,
+						size_t len,
+						struct pref_val *prefs,
+						int (*handler)(char, char *, size_t, va_list), ...);
+
 void format_apply_justification(char *buf, chtype *ch, size_t len);
+
+#define fill_format_str(type, buf, len, args...) fill_format_string((type), (buf), (len), screen.global_prefs, global_format_handler[(type) - OPT_FORMAT_OFFSET], ##args)
 
 #endif
