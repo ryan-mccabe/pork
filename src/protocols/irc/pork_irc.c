@@ -48,7 +48,7 @@
 static void irc_event(int sock, u_int32_t cond, void *data) {
 	if (cond & IO_COND_READ) {
 		if (irc_input_dispatch(data) == -1) {
-			irc_session_t *session = data;
+			struct irc_session *session = data;
 			struct pork_acct *acct = session->data;
 
 			pork_sock_err(acct, sock);
@@ -64,7 +64,7 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 
 static void irc_connected(int sock, u_int32_t cond, void *data) {
 	int ret;
-	irc_session_t *session = data;
+	struct irc_session *session = data;
 
 	pork_io_del(data);
 
@@ -87,7 +87,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 }
 
 static int irc_init(struct pork_acct *acct) {
-	irc_session_t *session = xcalloc(1, sizeof(*session));
+	struct irc_session *session = xcalloc(1, sizeof(*session));
 	char *ircname;
 
 	ircname = getenv("IRCNAME");
@@ -95,7 +95,7 @@ static int irc_init(struct pork_acct *acct) {
 		acct->profile = xstrdup(ircname);
 	else {
 		if (acct->profile == NULL)
-			acct->profile = xstrdup(DEFAULT_IRC_PROFILE);
+			acct->profile = xstrdup("XXX FIXME");
 	}
 
 	irc_callback_init(session);
@@ -109,7 +109,7 @@ static int irc_init(struct pork_acct *acct) {
 }
 
 static int irc_free(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 	u_int32_t i;
 
 	for (i = 0 ; i < session->num_servers ; i++)
@@ -130,16 +130,16 @@ static int irc_free(struct pork_acct *acct) {
 	return (0);
 }
 
-static inline int irc_is_chan_type(irc_session_t *session, char c) {
+static inline int irc_is_chan_type(struct irc_session *session, char c) {
 	return (strchr(session->chantypes, c) != NULL);
 }
 
-static inline int irc_is_chan_prefix(irc_session_t *session, char c) {
+static inline int irc_is_chan_prefix(struct irc_session *session, char c) {
 	return (session->prefix_codes != NULL && strchr(session->prefix_codes, c) != NULL);
 }
 
 static int irc_update(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 	time_t time_now;
 
 	if (session == NULL)
@@ -164,7 +164,7 @@ static int irc_write_config(struct pork_acct *acct) {
 
 static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 	char *server;
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 
 	while ((server = strsep(&str, " ")) != NULL &&
 			session->num_servers < array_elem(session->servers))
@@ -176,7 +176,7 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 }
 
 static int irc_do_connect(struct pork_acct *acct, char *args) {
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 	int sock;
 	int ret;
 
@@ -202,7 +202,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 }
 
 static int irc_connect_abort(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 
 	close(session->sock);
 	pork_io_del(session);
@@ -212,7 +212,7 @@ static int irc_connect_abort(struct pork_acct *acct) {
 static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	int sock;
 	int ret;
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 	u_int32_t server_num;
 
 	server_num = (acct->reconnect_tries - 1) % session->num_servers;
@@ -260,7 +260,7 @@ static int chat_find_compare_cb(void *l, void *r) {
 
 static struct chatroom *irc_find_chat(struct pork_acct *acct, char *chat) {
 	dlist_t *node;
-	irc_session_t *session = acct->data;
+	struct irc_session *session = acct->data;
 
 	while (irc_is_chan_prefix(session, *chat))
 		chat++;
@@ -315,7 +315,7 @@ static int irc_chan_get_name(	const char *str,
 }
 
 static int irc_change_nick(struct pork_acct *acct, char *nick) {
-	irc_session_t *irc = acct->data;
+	struct irc_session *irc = acct->data;
 
 	if (irc->nick_len) {
 		if (strlen(nick) > irc->nick_len) {
@@ -402,7 +402,7 @@ static int irc_quit(struct pork_acct *acct, char *reason) {
 }
 
 static int irc_is_chat(struct pork_acct *acct, char *str) {
-	irc_session_t *irc = acct->data;
+	struct irc_session *irc = acct->data;
 
 	if (irc->chantypes != NULL)
 		return (irc_is_chan_type(irc, *str));
@@ -727,7 +727,7 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 	return (0);
 }
 
-int irc_chanmode_has_arg(irc_session_t *session, char mode) {
+int irc_chanmode_has_arg(struct irc_session *session, char mode) {
 	char *p;
 
 	if (session->chanmodes == NULL) {

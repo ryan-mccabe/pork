@@ -13,10 +13,6 @@
 #define IRC_OUT_BUFLEN		2048
 #define IRC_IN_BUFLEN		8192
 
-#define DEFAULT_IRC_PROFILE "i <3 pork"
-#define DEFAULT_IRC_QUITMSG	"i <3 pork (http://dev.ojnk.net)"
-#define DEFAULT_IRC_PORT	"6667"
-
 #include <pork_queue.h>
 
 #define IRC_CHAN_OP			0x01
@@ -30,7 +26,7 @@ enum {
 	MODE_MINUS = '-'
 };
 
-typedef struct {
+struct irc_session {
 	int sock;
 	pork_queue_t *inq;
 	pork_queue_t *outq;
@@ -60,8 +56,9 @@ typedef struct {
 	time_t last_update;
 	size_t input_offset;
 	char input_buf[IRC_IN_BUFLEN];
+	struct pref_val *prefs;
 	void *data;
-} irc_session_t;
+};
 
 struct irc_chan_data {
 	char mode_str[128];
@@ -97,37 +94,37 @@ struct callback_handler {
 
 int irc_proto_init(struct pork_proto *proto);
 
-int irc_flush_outq(irc_session_t *session);
+int irc_flush_outq(struct irc_session *session);
 int irc_connect(struct pork_acct *a, const char *server, int *sock);
 
-int irc_send_raw(irc_session_t *session, char *str);
-int irc_send_pong(irc_session_t *session, char *dest);
-int irc_send_join(irc_session_t *session, char *channel, char *key);
-int irc_send_login(irc_session_t *session);
-int irc_send_privmsg(irc_session_t *session, char *dest, char *msg);
-int irc_send_mode(irc_session_t *session, char *mode_str);
-int irc_send_ctcp(irc_session_t *session, char *dest, char *msg);
-int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg);
-int irc_send_names(irc_session_t *session, char *chan);
-int irc_send_who(irc_session_t *session, char *dest);
-int irc_send_whois(irc_session_t *session, char *dest);
-int irc_send_whowas(irc_session_t *session, char *dest);
-int irc_send_nick(irc_session_t *session, char *nick);
-int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *reason);
-int irc_send_part(irc_session_t *session, char *chan);
-int irc_send_ping(irc_session_t *session, char *str);
-int irc_send_quit(irc_session_t *session, char *reason);
-int irc_send_topic(irc_session_t *session, char *chan, char *topic);
-int irc_send_notice(irc_session_t *session, char *dest, char *msg);
-int irc_kick(irc_session_t *session, char *chan, char *user, char *msg);
-int irc_set_away(irc_session_t *session, char *msg);
-int irc_send_action(irc_session_t *session, char *dest, char *msg);
+int irc_send_raw(struct irc_session *session, char *str);
+int irc_send_pong(struct irc_session *session, char *dest);
+int irc_send_join(struct irc_session *session, char *channel, char *key);
+int irc_send_login(struct irc_session *session);
+int irc_send_privmsg(struct irc_session *session, char *dest, char *msg);
+int irc_send_mode(struct irc_session *session, char *mode_str);
+int irc_send_ctcp(struct irc_session *session, char *dest, char *msg);
+int irc_send_ctcp_reply(struct irc_session *session, char *dest, char *msg);
+int irc_send_names(struct irc_session *session, char *chan);
+int irc_send_who(struct irc_session *session, char *dest);
+int irc_send_whois(struct irc_session *session, char *dest);
+int irc_send_whowas(struct irc_session *session, char *dest);
+int irc_send_nick(struct irc_session *session, char *nick);
+int irc_send_kick(struct irc_session *session, char *chan, char *nick, char *reason);
+int irc_send_part(struct irc_session *session, char *chan);
+int irc_send_ping(struct irc_session *session, char *str);
+int irc_send_quit(struct irc_session *session, char *reason);
+int irc_send_topic(struct irc_session *session, char *chan, char *topic);
+int irc_send_notice(struct irc_session *session, char *dest, char *msg);
+int irc_kick(struct irc_session *session, char *chan, char *user, char *msg);
+int irc_set_away(struct irc_session *session, char *msg);
+int irc_send_action(struct irc_session *session, char *dest, char *msg);
 int irc_chan_free(struct pork_acct *acct, void *data);
-int irc_send_invite(irc_session_t *session, char *channel, char *user);
+int irc_send_invite(struct irc_session *session, char *channel, char *user);
 
 char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
-int irc_chanmode_has_arg(irc_session_t *session, char mode);
-int irc_input_dispatch(irc_session_t *session);
+int irc_chanmode_has_arg(struct irc_session *session, char mode);
+int irc_input_dispatch(struct irc_session *session);
 char *irc_text_filter(char *str);
 
 inline int irc_mode(struct pork_acct *acct, char *str);
@@ -136,10 +133,10 @@ inline int irc_whowas(struct pork_acct *acct, char *dest);
 inline int irc_who(struct pork_acct *acct, char *str);;
 int irc_quote(struct pork_acct *acct, char *str);
 
-int irc_callback_init(irc_session_t *session);
-int irc_callback_clear(irc_session_t *session);
-int irc_callback_add_defaults(irc_session_t *session);
-int irc_callback_add(	irc_session_t *session,
+int irc_callback_init(struct irc_session *session);
+int irc_callback_clear(struct irc_session *session);
+int irc_callback_add_defaults(struct irc_session *session);
+int irc_callback_add(	struct irc_session *session,
 						char *str,
 						int (*handler)(struct pork_acct *, struct irc_input *));
 #endif

@@ -42,7 +42,7 @@ static int irc_send_server(int sock, char *cmd, size_t len) {
 	return (sock_write(sock, cmd, len));
 }
 
-static int irc_send(irc_session_t *session, char *command, size_t len) {
+static int irc_send(struct irc_session *session, char *command, size_t len) {
 	int ret;
 
 	if (session->sock < 0) {
@@ -70,7 +70,7 @@ static int irc_send(irc_session_t *session, char *command, size_t len) {
 	return (ret);
 }
 
-int irc_flush_outq(irc_session_t *session) {
+int irc_flush_outq(struct irc_session *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
@@ -115,7 +115,7 @@ int irc_connect(struct pork_acct *acct,
 			*passwd++ = '\0';
 		}
 	} else
-		port = DEFAULT_IRC_PORT;
+		port = "6667"; /* XXX FIXME */
 
 	if (get_port(port, &port_num) != 0) {
 		screen_err_msg("Error: %s: Invalid IRC server port: %s",
@@ -156,7 +156,7 @@ int irc_connect(struct pork_acct *acct,
 	return (nb_connect(&ss, &local, port_num, sock));
 }
 
-int irc_send_raw(irc_session_t *session, char *str) {
+int irc_send_raw(struct irc_session *session, char *str) {
 	int ret;
 	char *buf;
 	size_t len;
@@ -170,7 +170,7 @@ int irc_send_raw(irc_session_t *session, char *str) {
 	return (ret);
 }
 
-int irc_send_mode(irc_session_t *session, char *mode_str) {
+int irc_send_mode(struct irc_session *session, char *mode_str) {
 	int ret;
 	char buf[IRC_OUT_BUFLEN];
 
@@ -181,7 +181,7 @@ int irc_send_mode(irc_session_t *session, char *mode_str) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_pong(irc_session_t *session, char *dest) {
+int irc_send_pong(struct irc_session *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -192,7 +192,7 @@ int irc_send_pong(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_set_away(irc_session_t *session, char *msg) {
+int irc_set_away(struct irc_session *session, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -207,7 +207,7 @@ int irc_set_away(irc_session_t *session, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_invite(irc_session_t *session, char *channel, char *user) {
+int irc_send_invite(struct irc_session *session, char *channel, char *user) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -218,7 +218,7 @@ int irc_send_invite(irc_session_t *session, char *channel, char *user) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_join(irc_session_t *session, char *channel, char *key) {
+int irc_send_join(struct irc_session *session, char *channel, char *key) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -233,7 +233,7 @@ int irc_send_join(irc_session_t *session, char *channel, char *key) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_login(irc_session_t *session) {
+int irc_send_login(struct irc_session *session) {
 	char buf[IRC_OUT_BUFLEN];
 	struct pork_acct *acct = session->data;
 	int ret;
@@ -264,7 +264,7 @@ int irc_send_login(irc_session_t *session) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_privmsg(irc_session_t *session, char *dest, char *msg) {
+int irc_send_privmsg(struct irc_session *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -275,7 +275,7 @@ int irc_send_privmsg(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_ctcp(irc_session_t *session, char *dest, char *msg) {
+int irc_send_ctcp(struct irc_session *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -289,7 +289,7 @@ int irc_send_ctcp(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_ping(irc_session_t *session, char *str) {
+int irc_send_ping(struct irc_session *session, char *str) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 	struct timeval tv;
@@ -303,7 +303,7 @@ int irc_send_ping(irc_session_t *session, char *str) {
 	return (irc_send_ctcp(session, str, buf));
 }
 
-int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg) {
+int irc_send_ctcp_reply(struct irc_session *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -314,7 +314,7 @@ int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_names(irc_session_t *session, char *chan) {
+int irc_send_names(struct irc_session *session, char *chan) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -329,7 +329,7 @@ int irc_send_names(irc_session_t *session, char *chan) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_who(irc_session_t *session, char *dest) {
+int irc_send_who(struct irc_session *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -344,7 +344,7 @@ int irc_send_who(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_whois(irc_session_t *session, char *dest) {
+int irc_send_whois(struct irc_session *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 	struct pork_acct *acct = session->data;
@@ -359,7 +359,7 @@ int irc_send_whois(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_whowas(irc_session_t *session, char *dest) {
+int irc_send_whowas(struct irc_session *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 	struct pork_acct *acct = session->data;
@@ -374,7 +374,7 @@ int irc_send_whowas(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_nick(irc_session_t *session, char *nick) {
+int irc_send_nick(struct irc_session *session, char *nick) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -388,7 +388,7 @@ int irc_send_nick(irc_session_t *session, char *nick) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_part(irc_session_t *session, char *chan) {
+int irc_send_part(struct irc_session *session, char *chan) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -402,12 +402,12 @@ int irc_send_part(irc_session_t *session, char *chan) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_quit(irc_session_t *session, char *reason) {
+int irc_send_quit(struct irc_session *session, char *reason) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
 	if (reason == NULL)
-		reason = DEFAULT_IRC_QUITMSG;
+		reason = "XXX FIXME";
 
 	ret = snprintf(buf, sizeof(buf), "QUIT :%s\r\n", reason);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
@@ -417,7 +417,7 @@ int irc_send_quit(irc_session_t *session, char *reason) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_notice(irc_session_t *session, char *dest, char *msg) {
+int irc_send_notice(struct irc_session *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -428,7 +428,7 @@ int irc_send_notice(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *msg) {
+int irc_send_kick(struct irc_session *session, char *chan, char *nick, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -439,7 +439,7 @@ int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_topic(irc_session_t *session, char *chan, char *topic) {
+int irc_send_topic(struct irc_session *session, char *chan, char *topic) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -454,7 +454,7 @@ int irc_send_topic(irc_session_t *session, char *chan, char *topic) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_action(irc_session_t *session, char *dest, char *msg) {
+int irc_send_action(struct irc_session *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 

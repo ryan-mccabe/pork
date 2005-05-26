@@ -90,7 +90,7 @@ static struct irc_input *irc_tokenize(char *buf) {
 	return (in);
 }
 
-static int irc_get_chanmode(irc_session_t *session,
+static int irc_get_chanmode(struct irc_session *session,
 								struct irc_chan_data *data,
 								char *buf,
 								size_t len)
@@ -147,7 +147,7 @@ static void irc_callback_cleanup(void *p __notused, void *data) {
 	free(cb);
 }
 
-int irc_callback_init(irc_session_t *session) {
+int irc_callback_init(struct irc_session *session) {
 	int ret;
 
 	ret = hash_init(&session->callbacks, 5,
@@ -156,12 +156,12 @@ int irc_callback_init(irc_session_t *session) {
 	return (ret);
 }
 
-int irc_callback_clear(irc_session_t *session) {
+int irc_callback_clear(struct irc_session *session) {
 	hash_destroy(&session->callbacks);
 	return (0);
 }
 
-int irc_callback_add(	irc_session_t *session,
+int irc_callback_add(	struct irc_session *session,
 						char *cmd,
 						int (*handler)(struct pork_acct *, struct irc_input *))
 {
@@ -350,7 +350,7 @@ static int irc_handler_print_arg(struct pork_acct *acct, struct irc_input *in) {
 	return (0);
 }
 
-static int irc_callback_run(irc_session_t *session,
+static int irc_callback_run(struct irc_session *session,
 							struct irc_input *in,
 							char *set)
 {
@@ -415,7 +415,7 @@ static ssize_t irc_read_data(int sock, char *buf, size_t len) {
 ** Returns -1 if the connection died, 0 otherwise.
 */
 
-int irc_input_dispatch(irc_session_t *session) {
+int irc_input_dispatch(struct irc_session *session) {
 	int ret;
 	char *p;
 	char *cur;
@@ -1410,7 +1410,7 @@ static int irc_handler_333(struct pork_acct *acct, struct irc_input *in) {
 
 static int irc_handler_005(struct pork_acct *acct, struct irc_input *in) {
 	u_int32_t i;
-	irc_session_t *irc = acct->data;
+	struct irc_session *irc = acct->data;
 
 	irc_handler_print_tok(acct, in);
 
@@ -1991,7 +1991,7 @@ static int irc_handler_dcc_reply(struct pork_acct *acct, struct irc_input *in) {
 	return (ret);
 }
 
-int irc_callback_add_defaults(irc_session_t *session) {
+int irc_callback_add_defaults(struct irc_session *session) {
 	irc_callback_add(session, "004", irc_handler_print_tok);
 	irc_callback_add(session, "252", irc_handler_print_num);
 	irc_callback_add(session, "254", irc_handler_print_num);

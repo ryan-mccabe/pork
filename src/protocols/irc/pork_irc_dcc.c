@@ -176,7 +176,7 @@ int irc_file_accept(struct file_transfer *xfer) {
 int irc_file_send(struct file_transfer *xfer) {
 	char buf[4096];
 	struct dcc *dcc;
-	irc_session_t *session = xfer->acct->data;
+	struct irc_session *session = xfer->acct->data;
 
 	if (transfer_bind_listen_sock(xfer, session->sock) == -1) {
 		screen_err_msg("Unable to bind a listening socket -- aborting transfer");
