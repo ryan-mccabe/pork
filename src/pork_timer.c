@@ -133,6 +133,27 @@ int timer_run(dlist_t **timer_list) {
 	return (triggered);
 }
 
+int timer_del_owner(dlist_t **timer_list, struct pork_acct *acct) {
+	dlist_t *cur = *timer_list;
+	int removed = 0;
+
+	while (cur != NULL) {
+		dlist_t *next = cur->next;
+		struct timer_entry *timer = cur->data;
+
+		if (acct == timer->acct) {
+			*timer_list = dlist_remove(*timer_list, cur);
+			free(timer->command);
+			free(timer);
+			++removed;
+		}
+
+		cur = next;
+	}
+
+	return (removed);
+}
+
 inline void timer_destroy(dlist_t **timer_list) {
 	dlist_destroy(*timer_list, NULL, timer_destroy_cb);
 	*timer_list = NULL;

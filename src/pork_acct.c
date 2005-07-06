@@ -62,6 +62,8 @@ static void pork_acct_free(struct pork_acct *acct) {
 		free(acct->blist);
 	}
 
+	timer_del_owner(&screen.timer_list, acct);
+
 	opt_destroy(acct->prefs);
 	free(acct->prefs->val);
 	free(acct->prefs);
