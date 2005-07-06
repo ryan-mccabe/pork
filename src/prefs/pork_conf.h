@@ -13,11 +13,13 @@
 struct pork_acct;
 
 int pork_mkdir(const char *path);
-int read_conf(const char *path);
 int read_global_config(void);
 int save_global_config(void);
 
 int read_user_config(struct pork_acct *acct);
 int save_user_config(struct pork_acct *acct);
+
+int read_conf(struct pork_acct *acct, const char *path);
+int write_global_conf(char *path);
 
 #endif

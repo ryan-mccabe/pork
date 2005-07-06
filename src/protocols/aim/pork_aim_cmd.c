@@ -29,7 +29,6 @@
 #include <pork_html.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
-#include <pork_acct.h>
 #include <pork_command.h>
 #include <pork_conf.h>
 #include <pork_imwindow.h>
@@ -56,15 +55,14 @@ static USER_COMMAND(aim_cmd_passwd) {
 
 static USER_COMMAND(aim_cmd_search) {
 	if (args != NULL)
-		aim_search(cur_window()->owner, args);
+		aim_search(acct, args);
 }
 
 static USER_COMMAND(aim_cmd_save) {
+
 }
 
 static USER_COMMAND(aim_cmd_idle_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args != NULL && !blank_str(args)) {
 		u_int32_t mode;
 
@@ -81,7 +79,6 @@ static USER_COMMAND(aim_cmd_idle_mode) {
 }
 
 static USER_COMMAND(aim_cmd_privacy_mode) {
-	struct pork_acct *acct = cur_window()->owner;
 	int mode = -1;
 
 	if (args != NULL)

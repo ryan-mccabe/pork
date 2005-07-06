@@ -42,7 +42,7 @@ static struct pork_pref global_pref_list[] = {
 	{	.name = "BANNER",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
-	},{	.name "CMDCHARS",
+	},{	.name = "CMDCHARS",
 		.type = OPT_TYPE_CHAR,
 		.set = opt_set_char,
 	},{	.name = "COLOR_BLIST_FOCUS",

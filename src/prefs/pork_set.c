@@ -116,7 +116,7 @@ static void opt_print_var(struct pref_val *pref, int i, const char *text) {
 				screen_nocolor_msg("%s %s '%c'",
 					pref_name(pref, i), text, opt_get_char(pref, i));
 			} else {
-				screen_nocolor_msg("%s %s 0x%x", pref_name(pref, i),
+				screen_nocolor_msg("%s %s 0x%x",
 					pref_name(pref, i), text, opt_get_char(pref, i));
 			}
 			break;

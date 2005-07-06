@@ -20,7 +20,7 @@ static void freetlv(aim_tlv_t **oldtlv)
 
 	if (!oldtlv || !*oldtlv)
 		return;
-	
+
 	free((*oldtlv)->value);
 	free(*oldtlv);
 	*oldtlv = NULL;
@@ -48,7 +48,7 @@ static void freetlv(aim_tlv_t **oldtlv)
 faim_internal aim_tlvlist_t *aim_tlvlist_read(aim_bstream_t *bs)
 {
 	aim_tlvlist_t *list = NULL, *cur;
-	
+
 	while (aim_bstream_empty(bs) > 0) {
 		fu16_t type, length;
 
@@ -316,7 +316,7 @@ faim_internal void aim_tlvlist_free(aim_tlvlist_t **list)
 
 	for (cur = *list; cur; ) {
 		aim_tlvlist_t *tmp;
-		
+
 		freetlv(&cur->tlv);
 
 		tmp = cur->next;
@@ -463,6 +463,19 @@ faim_internal int aim_tlvlist_add_32(aim_tlvlist_t **list, const fu16_t type, co
 }
 
 /**
+ * Add a string to a TLV chain.
+ *
+ * @param list Destination chain.
+ * @param type TLV type to add.
+ * @param value Value to add.
+ * @return The size of the value added.
+ */
+faim_internal int aim_tlvlist_add_str(aim_tlvlist_t **list, const fu16_t type, const char *value)
+{
+	return aim_tlvlist_add_raw(list, type, strlen(value), (fu8_t *)value);
+}
+
+/**
  * Adds a block of capability blocks to a TLV chain. The bitfield
  * passed in should be a bitwise %OR of any of the %AIM_CAPS constants:
  *
@@ -528,7 +541,7 @@ faim_internal int aim_tlvlist_add_chatroom(aim_tlvlist_t **list, fu16_t type, fu
 	aim_bstream_t bs;
 
 	len = 2 + 1 + strlen(roomname) + 2;
-	
+
 	if (!(buf = malloc(len)))
 		return 0;
 
@@ -536,7 +549,7 @@ faim_internal int aim_tlvlist_add_chatroom(aim_tlvlist_t **list, fu16_t type, fu
 
 	aimbs_put16(&bs, exchange);
 	aimbs_put8(&bs, strlen(roomname));
-	aimbs_putraw(&bs, roomname, strlen(roomname));
+	aimbs_putstr(&bs, roomname);
 	aimbs_put16(&bs, instance);
 
 	len = aim_tlvlist_add_raw(list, type, aim_bstream_curpos(&bs), buf);
@@ -630,6 +643,21 @@ faim_internal int aim_tlvlist_replace_raw(aim_tlvlist_t **list, const fu16_t typ
 		cur->tlv->value = NULL;
 
 	return cur->tlv->length;
+}
+
+/**
+ * Substitute a TLV of a given type with a new TLV of the same type.  If 
+ * you attempt to replace a TLV that does not exist, this function will 
+ * just add a new TLV as if you called aim_tlvlist_add_str().
+ *
+ * @param list Desination chain (%NULL pointer if empty).
+ * @param type TLV type.
+ * @param str String to add.
+ * @return The length of the TLV.
+ */
+faim_internal int aim_tlvlist_replace_str(aim_tlvlist_t **list, const fu16_t type, const char *str)
+{
+	return aim_tlvlist_replace_raw(list, type, strlen(str), str);
 }
 
 /**

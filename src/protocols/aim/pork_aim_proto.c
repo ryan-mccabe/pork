@@ -257,7 +257,8 @@ static int aim_chat_send(	struct pork_acct *acct,
 	}
 
 	ret = aim_chat_send_im(&priv->aim_session, a_chat->conn,
-			AIM_CHATFLAGS_NOREFLECT, msg_html, msg_len, "us-ascii", "en");
+			AIM_CHATFLAGS_NOREFLECT, (fu8_t *) msg_html,
+			msg_len, "us-ascii", "en");
 
 	return (ret);
 }
@@ -392,17 +393,17 @@ static int aim_connect(struct pork_acct *acct, char *args) {
 }
 
 static int aim_read_config(struct pork_acct *acct) {
-	return (read_user_config(acct));
+	//return (read_user_config(acct));
 }
 
 static int aim_write_config(struct pork_acct *acct) {
-	return (save_user_config(acct));
+	//return (save_user_config(acct));
 }
 
 static int aim_file_recv_data(struct file_transfer *xfer, char *buf, size_t len) {
 	struct aim_oft_info *oft_info = xfer->data;
 
-	oft_info->fh.recvcsum = aim_oft_checksum_chunk(buf, len,
+	oft_info->fh.recvcsum = aim_oft_checksum_chunk((fu8_t *) buf, len,
 								oft_info->fh.recvcsum);
 
 	if (xfer->bytes_sent + xfer->start_offset >= xfer->file_len)
@@ -641,7 +642,8 @@ static int aim_set_back(struct pork_acct *acct) {
 	struct aim_priv *priv = acct->data;
 	int ret;
 
-	ret = aim_locate_setprofile(&priv->aim_session, NULL, NULL, 0, NULL, "", 0);
+	ret = aim_locate_setprofile(&priv->aim_session,
+			NULL, NULL, 0, NULL, (fu8_t *) "", 0);
 	return (ret);
 }
 
@@ -661,7 +663,7 @@ static int aim_set_away(struct pork_acct *acct, char *away_msg) {
 	}
 
 	ret = aim_locate_setprofile(&priv->aim_session,
-			NULL, NULL, 0, "us-ascii", msg_html, len);
+			NULL, NULL, 0, "us-ascii", (fu8_t *) msg_html, len);
 
 	return (ret);
 }
@@ -689,7 +691,7 @@ static int aim_set_profile(struct pork_acct *acct, char *profile) {
 
 	if (profile == NULL) {
 		ret = aim_locate_setprofile(&priv->aim_session,
-				NULL, "", 0, NULL, NULL, 0);
+				NULL, (fu8_t *) "", 0, NULL, NULL, 0);
 
 		return (ret);
 	}
@@ -704,7 +706,7 @@ static int aim_set_profile(struct pork_acct *acct, char *profile) {
 	}
 
 	ret = aim_locate_setprofile(&priv->aim_session, "us-ascii",
-			profile_html, len, NULL, NULL, 0);
+			(fu8_t *) profile_html, len, NULL, NULL, 0);
 
 	return (ret);
 }

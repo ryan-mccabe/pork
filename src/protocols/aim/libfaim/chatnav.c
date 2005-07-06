@@ -54,7 +54,7 @@ faim_export int aim_chatnav_createroom(aim_session_t *sess, aim_conn_t *conn, co
 	 * the value of the room name in create requests is ignored.
 	 */
 	aimbs_put8(&fr->data, strlen(ck));
-	aimbs_putraw(&fr->data, ck, strlen(ck));
+	aimbs_putstr(&fr->data, ck);
 
 	/* 
 	 * instance
@@ -67,9 +67,9 @@ faim_export int aim_chatnav_createroom(aim_session_t *sess, aim_conn_t *conn, co
 	/* detail level */
 	aimbs_put8(&fr->data, 0x01);
 
-	aim_tlvlist_add_raw(&tl, 0x00d3, strlen(name), name);
-	aim_tlvlist_add_raw(&tl, 0x00d6, strlen(charset), charset);
-	aim_tlvlist_add_raw(&tl, 0x00d7, strlen(lang), lang);
+	aim_tlvlist_add_str(&tl, 0x00d3, name);
+	aim_tlvlist_add_str(&tl, 0x00d6, charset);
+	aim_tlvlist_add_str(&tl, 0x00d7, lang);
 
 	/* tlvcount */
 	aimbs_put16(&fr->data, aim_tlvlist_count(&tl));

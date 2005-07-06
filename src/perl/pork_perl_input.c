@@ -56,7 +56,7 @@ XS(PORK_input_send) {
 		XSRETURN_IV(-1);
 
 	INPUT_WIN_REFNUM(1, IV(-1));
-	cmd_input_send(args);
+	cmd_input_send(cur_window()->owner, args);
 	XSRETURN_IV(0);
 }
 

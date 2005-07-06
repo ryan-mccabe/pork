@@ -70,7 +70,7 @@ XS(PORK_run_cmd) {
 		if (command_str == NULL)
 			continue;
 
-		run_command(command_str);
+		run_command(cur_window()->owner, command_str);
 	}
 
 	XSRETURN_IV(0);
@@ -86,7 +86,7 @@ XS(PORK_connect) {
 	if (items != 0)
 		username = SvPV(ST(0), notused);
 
-	cmd_connect(username);
+	cmd_connect(cur_window()->owner, username);
 	XSRETURN_IV(0);
 }
 
@@ -202,7 +202,7 @@ XS(PORK_load) {
 		if (file == NULL)
 			XSRETURN_IV(-1);
 
-		if (read_conf(file) != 0)
+		if (read_conf(cur_window()->owner, file) != 0)
 			XSRETURN_IV(-1);
 
 		args++;
@@ -290,7 +290,8 @@ XS(PORK_save) {
 	(void) cv;
 	(void) items;
 
-	XSRETURN_IV(save_global_config());
+	XSRETURN_IV(-1);
+//	XSRETURN_IV(save_global_config());
 }
 
 XS(PORK_bind) {

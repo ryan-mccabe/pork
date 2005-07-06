@@ -63,7 +63,8 @@ static int swindow_print_msg_wr(struct swindow *swindow,
 		if (p >= end) {
 			++lines;
 			if (lines <= lastline) {
-				mvwputstr(swindow->win, swindow->prefs, y + lines_printed, add, ch);
+				mvwputstr(swindow->win, swindow->prefs,
+					y + lines_printed, add, ch);
 				++lines_printed;
 			}
 			break;

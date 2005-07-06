@@ -64,7 +64,7 @@ static void print_binding(void *data, void *nothing);
 static void print_alias(void *data, void *nothing);
 static int cmd_compare(const void *l, const void *r);
 static void print_timer(void *data, void *nothing);
-static int run_one_command(char *str, u_int32_t set);
+static int run_one_command(struct pork_acct *, char *str, u_int32_t set);
 
 /*
 ** Note that the "struct command" arrays are arranged in alphabetical
@@ -240,7 +240,6 @@ USER_COMMAND(cmd_input_right) {
 USER_COMMAND(cmd_input_send) {
 	struct imwindow *imwindow = cur_window();
 	struct pork_input *input = imwindow->input;
-	struct pork_acct *acct = imwindow->owner;
 	static int recursion;
 
 	/*
@@ -271,9 +270,9 @@ USER_COMMAND(cmd_input_send) {
 		}
 
 		if (input_str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
-			run_command(&input_str[1]);
+			run_command(acct, &input_str[1]);
 		else
-			cmd_send(input_str);
+			cmd_send(acct, input_str);
 out:
 		free(input_str);
 	}
@@ -373,7 +372,6 @@ static struct command file_command[] = {
 };
 
 USER_COMMAND(cmd_file_cancel) {
-	struct pork_acct *acct = cur_window()->owner;
 	u_int32_t refnum;
 	struct file_transfer *xfer;
 	char *refnum_str;
@@ -416,8 +414,6 @@ USER_COMMAND(cmd_file_cancel) {
 }
 
 USER_COMMAND(cmd_file_list) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (acct->transfer_list != NULL) {
 		dlist_t *cur = acct->transfer_list;
 
@@ -441,7 +437,6 @@ USER_COMMAND(cmd_file_list) {
 USER_COMMAND(cmd_file_get) {
 	char *refnum_str;
 	u_int32_t refnum;
-	struct pork_acct *acct = cur_window()->owner;
 	struct file_transfer *xfer;
 
 	if (args == NULL || blank_str(args))
@@ -488,7 +483,7 @@ USER_COMMAND(cmd_file_send) {
 		return;
 	}
 
-	transfer_send(cur_window()->owner, dest, args);
+	transfer_send(acct, dest, args);
 }
 
 /*
@@ -842,7 +837,6 @@ USER_COMMAND(cmd_buddy_add) {
 	char *group_name;
 	struct bgroup *group;
 	struct buddy *buddy;
-	struct pork_acct *acct = cur_window()->owner;
 
 	screen_name = strsep(&args, " ");
 	if (screen_name == NULL || blank_str(screen_name)) {
@@ -873,8 +867,6 @@ USER_COMMAND(cmd_buddy_add) {
 }
 
 USER_COMMAND(cmd_buddy_block) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -885,8 +877,6 @@ USER_COMMAND(cmd_buddy_block) {
 }
 
 USER_COMMAND(cmd_buddy_permit) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -897,8 +887,6 @@ USER_COMMAND(cmd_buddy_permit) {
 }
 
 USER_COMMAND(cmd_buddy_add_group) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -909,7 +897,6 @@ USER_COMMAND(cmd_buddy_alias) {
 	struct buddy *buddy;
 	char *buddy_name;
 	char *alias;
-	struct pork_acct *acct = cur_window()->owner;
 	struct imwindow *win;
 
 	buddy_name = strsep(&args, " ");
@@ -941,7 +928,6 @@ USER_COMMAND(cmd_buddy_alias) {
 
 USER_COMMAND(cmd_buddy_awaymsg) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
 
 	if (acct->proto->get_away_msg == NULL)
 		return;
@@ -957,16 +943,15 @@ USER_COMMAND(cmd_buddy_awaymsg) {
 }
 
 USER_COMMAND(cmd_buddy_clear_block) {
-	buddy_clear_block(cur_window()->owner);
+	buddy_clear_block(acct);
 }
 
 USER_COMMAND(cmd_buddy_clear_permit) {
-	buddy_clear_permit(cur_window()->owner);
+	buddy_clear_permit(acct);
 }
 
 USER_COMMAND(cmd_buddy_list) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
 	struct buddy_pref *pref = acct->buddy_pref;
 	dlist_t *gcur;
 
@@ -1032,7 +1017,6 @@ USER_COMMAND(cmd_buddy_list) {
 }
 
 USER_COMMAND(cmd_buddy_list_permit) {
-	struct pork_acct *acct = cur_window()->owner;
 	struct buddy_pref *pref = acct->buddy_pref;
 	dlist_t *cur;
 
@@ -1051,7 +1035,6 @@ USER_COMMAND(cmd_buddy_list_permit) {
 }
 
 USER_COMMAND(cmd_buddy_list_block) {
-	struct pork_acct *acct = cur_window()->owner;
 	struct buddy_pref *pref = acct->buddy_pref;
 	dlist_t *cur;
 
@@ -1070,13 +1053,12 @@ USER_COMMAND(cmd_buddy_list_block) {
 }
 
 USER_COMMAND(cmd_buddy_profile) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
 	if (acct->proto->get_profile == NULL)
 		return;
 
 	if (args == NULL || blank_str(args)) {
+		struct imwindow *win = cur_window();
+
 		if (win->type == WIN_TYPE_PRIVMSG)
 			args = win->target;
 		else
@@ -1087,8 +1069,6 @@ USER_COMMAND(cmd_buddy_profile) {
 }
 
 USER_COMMAND(cmd_buddy_remove_permit) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -1101,8 +1081,6 @@ USER_COMMAND(cmd_buddy_remove_permit) {
 }
 
 USER_COMMAND(cmd_buddy_unblock) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -1115,8 +1093,6 @@ USER_COMMAND(cmd_buddy_unblock) {
 }
 
 USER_COMMAND(cmd_buddy_remove) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -1129,8 +1105,6 @@ USER_COMMAND(cmd_buddy_remove) {
 }
 
 USER_COMMAND(cmd_buddy_remove_group) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL || blank_str(args))
 		return;
 
@@ -1144,7 +1118,6 @@ USER_COMMAND(cmd_buddy_remove_group) {
 }
 
 USER_COMMAND(cmd_buddy_seen) {
-	struct pork_acct *acct = cur_window()->owner;
 	struct buddy *buddy;
 
 	if (args == NULL || blank_str(args))
@@ -1185,13 +1158,12 @@ USER_COMMAND(cmd_buddy_seen) {
 }
 
 USER_COMMAND(cmd_buddy_warn) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
 	if (acct->proto->warn == NULL)
 		return;
 
 	if (args == NULL || blank_str(args)) {
+		struct imwindow *win = cur_window();
+
 		if (win->type == WIN_TYPE_PRIVMSG)
 			args = win->target;
 		else
@@ -1202,13 +1174,12 @@ USER_COMMAND(cmd_buddy_warn) {
 }
 
 USER_COMMAND(cmd_buddy_warn_anon) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
 	if (acct->proto->warn_anon == NULL)
 		return;
 
 	if (args == NULL || blank_str(args)) {
+		struct imwindow *win = cur_window();
+
 		if (win->type == WIN_TYPE_PRIVMSG)
 			args = win->target;
 		else
@@ -1251,45 +1222,44 @@ static struct command blist_command[] = {
 USER_COMMAND(cmd_blist_add_block) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_block(buddy->nname);
+	cmd_buddy_block(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_add_permit) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_permit(buddy->nname);
+	cmd_buddy_permit(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_away) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_awaymsg(buddy->nname);
+	cmd_buddy_awaymsg(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_collapse) {
 	struct slist_cell *cell;
-	struct pork_acct *acct = cur_window()->owner;
 	struct blist *blist = acct->blist;
 
 	if (args == NULL)
@@ -1314,20 +1284,20 @@ USER_COMMAND(cmd_blist_collapse) {
 }
 
 USER_COMMAND(cmd_blist_down) {
-	blist_cursor_down(cur_window()->owner->blist);
+	blist_cursor_down(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_end) {
-	blist_cursor_end(cur_window()->owner->blist);
+	blist_cursor_end(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_goto) {
 	if (args != NULL)
-		cmd_query(args);
+		cmd_query(acct, args);
 	else {
 		struct slist_cell *cell;
 		struct buddy *buddy;
-		struct blist *blist = cur_window()->owner->blist;
+		struct blist *blist = acct->blist;
 
 		cell = blist_get_cursor(blist);
 		if (cell == NULL)
@@ -1337,7 +1307,7 @@ USER_COMMAND(cmd_blist_goto) {
 			return;
 
 		buddy = cell->data;
-		cmd_query(buddy->nname);
+		cmd_query(acct, buddy->nname);
 	}
 }
 
@@ -1346,24 +1316,24 @@ USER_COMMAND(cmd_blist_hide) {
 }
 
 USER_COMMAND(cmd_blist_pgdown) {
-	blist_cursor_pgdown(cur_window()->owner->blist);
+	blist_cursor_pgdown(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_pgup) {
-	blist_cursor_pgup(cur_window()->owner->blist);
+	blist_cursor_pgup(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_profile) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_profile(buddy->nname);
+	cmd_buddy_profile(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_refresh) {
@@ -1373,56 +1343,56 @@ USER_COMMAND(cmd_blist_refresh) {
 USER_COMMAND(cmd_blist_remove) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_remove(buddy->nname);
+	cmd_buddy_remove(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_remove_block) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_unblock(buddy->nname);
+	cmd_buddy_unblock(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_remove_permit) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_remove_permit(buddy->nname);
+	cmd_buddy_remove_permit(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_select) {
 	struct slist_cell *cell;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL)
 		return;
 
 	if (cell->type == TYPE_LIST_CELL)
-		cmd_blist_collapse(NULL);
+		cmd_blist_collapse(acct, NULL);
 	else {
 		struct buddy *buddy = cell->data;
 
-		cmd_blist_goto(buddy->nname);
+		cmd_blist_goto(acct, buddy->nname);
 	}
 }
 
@@ -1431,7 +1401,7 @@ USER_COMMAND(cmd_blist_show) {
 }
 
 USER_COMMAND(cmd_blist_start) {
-	blist_cursor_start(cur_window()->owner->blist);
+	blist_cursor_start(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_toggle) {
@@ -1439,38 +1409,38 @@ USER_COMMAND(cmd_blist_toggle) {
 }
 
 USER_COMMAND(cmd_blist_up) {
-	blist_cursor_up(cur_window()->owner->blist);
+	blist_cursor_up(acct->blist);
 }
 
 USER_COMMAND(cmd_blist_warn) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_warn(buddy->nname);
+	cmd_buddy_warn(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_warn_anon) {
 	struct slist_cell *cell;
 	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	cell = blist_get_cursor(blist);
 	if (cell == NULL || cell->type == TYPE_LIST_CELL)
 		return;
 
 	buddy = cell->data;
-	cmd_buddy_warn_anon(buddy->nname);
+	cmd_buddy_warn_anon(acct, buddy->nname);
 }
 
 USER_COMMAND(cmd_blist_width) {
 	u_int32_t new_len;
-	struct blist *blist = cur_window()->owner->blist;
+	struct blist *blist = acct->blist;
 
 	if (args == NULL)
 		return;
@@ -1524,7 +1494,7 @@ USER_COMMAND(cmd_timer_add) {
 	if (args == NULL || blank_str(args))
 		return;
 
-	timer_add(&screen.timer_list, args, interval, times);
+	timer_add(&screen.timer_list, args, acct, interval, times);
 }
 
 USER_COMMAND(cmd_timer_del) {
@@ -1585,7 +1555,7 @@ static struct command event_command[] = {
 USER_COMMAND(cmd_event_add) {
 	char *event_type;
 	u_int32_t refnum;
-	struct event *events = cur_window()->owner->events;
+	struct event *events = acct->events;
 
 	if (args == NULL || *args == '\0') {
 		event_list(events, NULL);
@@ -1623,7 +1593,7 @@ USER_COMMAND(cmd_event_del) {
 	if (event_type == NULL)
 		return;
 
-	ret = event_del_type(cur_window()->owner->events, event_type, args);
+	ret = event_del_type(acct->events, event_type, args);
 	if (ret == 0) {
 		if (args == NULL) {
 			screen_cmd_output("Successfully removed handler %s for %s",
@@ -1650,18 +1620,18 @@ USER_COMMAND(cmd_event_del_refnum) {
 		return;
 	}
 
-	if (event_del_refnum(cur_window()->owner->events, refnum) != 0)
+	if (event_del_refnum(acct->events, refnum) != 0)
 		screen_err_msg("Error deleting event refnum %s", args);
 	else
 		screen_cmd_output("Event refnum %s was removed", args);
 }
 
 USER_COMMAND(cmd_event_list) {
-	event_list(cur_window()->owner->events, args);
+	event_list(acct->events, args);
 }
 
 USER_COMMAND(cmd_event_purge) {
-	event_purge(cur_window()->owner->events);
+	event_purge(acct->events);
 }
 
 /*
@@ -1679,15 +1649,13 @@ USER_COMMAND(cmd_acct_list) {
 }
 
 USER_COMMAND(cmd_acct_save) {
-	pork_acct_save(cur_window()->owner);
+	pork_acct_save(acct);
 }
 
 USER_COMMAND(cmd_acct_set) {
-	struct pork_acct *acct;
 	struct pref_val *pref;
 
 	if (args == NULL || blank_str(args)) {
-		acct = cur_window()->owner;
 		pref = acct->prefs;
 	} else if (!strncasecmp(args, "-default", 8)) {
 		args += 8;
@@ -1714,10 +1682,8 @@ USER_COMMAND(cmd_acct_set) {
 		}
 
 		pref = acct->prefs;		
-	} else {
-		acct = cur_window()->owner;
+	} else
 		pref = acct->prefs;
-	}
 
 	opt_set_var(pref, args, acct);
 }
@@ -1742,7 +1708,6 @@ static struct command chat_command[] = {
 
 USER_COMMAND(cmd_chat_ban) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
 	struct chatroom *chat;
 	char *arg1;
 	char *arg2;
@@ -1769,7 +1734,6 @@ USER_COMMAND(cmd_chat_ban) {
 
 USER_COMMAND(cmd_chat_ignore) {
 	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
 	char *chat_name;
 	char *user_name;
 
@@ -1796,7 +1760,6 @@ USER_COMMAND(cmd_chat_ignore) {
 
 USER_COMMAND(cmd_chat_invite) {
 	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
 	char *chat_name;
 	char *user_name;
 	char *invite_msg;
@@ -1824,12 +1787,11 @@ USER_COMMAND(cmd_chat_invite) {
 }
 
 USER_COMMAND(cmd_chat_join) {
-	chat_join(cur_window()->owner, args);
+	chat_join(acct, args);
 }
 
 USER_COMMAND(cmd_chat_kick) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
 	struct chatroom *chat;
 	char *arg1;
 	char *arg2;
@@ -1873,15 +1835,14 @@ USER_COMMAND(cmd_chat_leave) {
 		name = chat->title;
 	}
 
-	chat_leave(win->owner, name, 1);
+	chat_leave(acct, name, 1);
 }
 
 USER_COMMAND(cmd_chat_list) {
-	chat_list(cur_window()->owner);
+	chat_list(acct);
 }
 
 USER_COMMAND(cmd_chat_send) {
-	struct pork_acct *acct = cur_window()->owner;
 	struct imwindow *win;
 	char *chat_name;
 
@@ -1905,7 +1866,6 @@ USER_COMMAND(cmd_chat_send) {
 
 USER_COMMAND(cmd_chat_topic) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
 	char *topic = NULL;
 	struct chatroom *chat = NULL;
 
@@ -1939,7 +1899,6 @@ USER_COMMAND(cmd_chat_topic) {
 
 USER_COMMAND(cmd_chat_unignore) {
 	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
 	char *chat_name;
 	char *user_name;
 
@@ -1966,7 +1925,6 @@ USER_COMMAND(cmd_chat_unignore) {
 
 USER_COMMAND(cmd_chat_who) {
 	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
 
 	if (args == NULL || blank_str(args)) {
 		struct chatroom *chat;
@@ -2046,7 +2004,6 @@ USER_COMMAND(cmd_alias) {
 }
 
 USER_COMMAND(cmd_auto) {
-	struct pork_acct *acct = cur_window()->owner;
 	char *target;
 
 	if (args == NULL || !acct->connected)
@@ -2060,8 +2017,6 @@ USER_COMMAND(cmd_auto) {
 }
 
 USER_COMMAND(cmd_away) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args == NULL)
 		pork_set_back(acct);
 	else
@@ -2169,7 +2124,6 @@ USER_COMMAND(cmd_echo) {
 }
 
 USER_COMMAND(cmd_disconnect) {
-	struct pork_acct *acct = cur_window()->owner;
 	u_int32_t dest;
 	dlist_t *node;
 
@@ -2266,7 +2220,7 @@ USER_COMMAND(cmd_idle) {
 		}
 	}
 
-	pork_set_idle_time(cur_window()->owner, idle_secs);
+	pork_set_idle_time(acct, idle_secs);
 }
 
 USER_COMMAND(cmd_laddr) {
@@ -2337,7 +2291,7 @@ USER_COMMAND(cmd_load) {
 	quiet = screen_set_quiet(1);
 
 	expand_path(args, buf, sizeof(buf));
-	if (read_conf(buf) != 0)
+	if (read_conf(acct, buf) != 0)
 		screen_err_msg("Error reading %s: %s", buf, strerror(errno));
 
 	screen_set_quiet(quiet);
@@ -2366,18 +2320,17 @@ USER_COMMAND(cmd_me) {
 		return;
 
 	if (win->type == WIN_TYPE_PRIVMSG)
-		pork_action_send(win->owner, cur_window()->target, args);
+		pork_action_send(acct, cur_window()->target, args);
 	else if (win->type == WIN_TYPE_CHAT) {
 		struct chatroom *chat;
 
 		chat = win->data;
 		if (chat != NULL)
-			chat_send_action(win->owner, win->data, chat->title, args);
+			chat_send_action(acct, win->data, chat->title, args);
 	}
 }
 
 USER_COMMAND(cmd_msg) {
-	struct pork_acct *acct = cur_window()->owner;
 	char *target;
 	struct chatroom *chat;
 
@@ -2401,14 +2354,14 @@ USER_COMMAND(cmd_query) {
 	if (args != NULL && !blank_str(args)) {
 		struct imwindow *conv_window;
 
-		screen_make_query_window(imwindow->owner, args, &conv_window);
+		screen_make_query_window(acct, args, &conv_window);
 		screen_goto_window(conv_window->refnum);
 	} else
 		screen_close_window(imwindow);
 }
 
 USER_COMMAND(cmd_quit) {
-	if (!event_generate(cur_window()->owner->events, EVENT_QUIT, args))
+	if (!event_generate(acct->events, EVENT_QUIT, args))
 		pork_exit(0, args, NULL);
 }
 
@@ -2417,15 +2370,16 @@ USER_COMMAND(cmd_refresh) {
 }
 
 USER_COMMAND(cmd_save) {
+#if 0
 	if (save_global_config() == 0)
 		screen_cmd_output("Your configuration has been saved");
 	else
 		screen_err_msg("There was an error saving your configuration");
+#endif
 }
 
 USER_COMMAND(cmd_send) {
 	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
 
 	if (args == NULL || !acct->connected)
 		return;
@@ -2495,11 +2449,10 @@ USER_COMMAND(cmd_nick) {
 	if (args == NULL || blank_str(args))
 		return;
 
-	pork_change_nick(cur_window()->owner, args);
+	pork_change_nick(acct, args);
 }
 
 USER_COMMAND(cmd_notice) {
-	struct pork_acct *acct = cur_window()->owner;
 	char *target;
 	struct chatroom *chat;
 
@@ -2598,8 +2551,6 @@ USER_COMMAND(cmd_perl) {
 */
 
 USER_COMMAND(cmd_perl_dump) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	/*
 	** If events are ever made per-account this will have to change.
 	*/
@@ -2623,111 +2574,106 @@ USER_COMMAND(cmd_perl_load) {
 }
 
 USER_COMMAND(cmd_ping) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
 	if (acct->proto->ping != NULL)
 		acct->proto->ping(acct, args);
 }
 
 USER_COMMAND(cmd_profile) {
-	pork_set_profile(cur_window()->owner, args);
+	pork_set_profile(acct, args);
 }
 
 USER_COMMAND(cmd_event) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_EVENT);
+		run_one_command(acct, args, CMDSET_EVENT);
 	else
-		run_one_command("list", CMDSET_EVENT);
+		run_one_command(acct, "list", CMDSET_EVENT);
 }
 
 USER_COMMAND(cmd_acct) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_ACCT);
+		run_one_command(acct, args, CMDSET_ACCT);
 	else
-		run_one_command("list", CMDSET_ACCT);
+		run_one_command(acct, "list", CMDSET_ACCT);
 }
 
 USER_COMMAND(cmd_chat) {
-	if (!cur_window()->owner->connected)
+	if (!acct->connected)
 		return;
 
 	if (args != NULL)
-		run_one_command(args, CMDSET_CHAT);
+		run_one_command(acct, args, CMDSET_CHAT);
 	else
-		run_one_command("list", CMDSET_CHAT);
+		run_one_command(acct, "list", CMDSET_CHAT);
 }
 
 USER_COMMAND(cmd_win) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_WIN);
+		run_one_command(acct, args, CMDSET_WIN);
 	else
-		run_one_command("list", CMDSET_WIN);
+		run_one_command(acct, "list", CMDSET_WIN);
 }
 
 USER_COMMAND(cmd_file) {
-	if (!cur_window()->owner->can_connect)
+	if (!acct->can_connect)
 		return;
 
 	if (args != NULL)
-		run_one_command(args, CMDSET_FILE);
+		run_one_command(acct, args, CMDSET_FILE);
 	else
-		run_one_command("list", CMDSET_FILE);
+		run_one_command(acct, "list", CMDSET_FILE);
 }
 
 USER_COMMAND(cmd_buddy) {
-	if (!cur_window()->owner->connected)
+	if (!acct->connected)
 		return;
 
 	if (args != NULL)
-		run_one_command(args, CMDSET_BUDDY);
+		run_one_command(acct, args, CMDSET_BUDDY);
 	else
-		run_one_command("list", CMDSET_BUDDY);
+		run_one_command(acct, "list", CMDSET_BUDDY);
 }
 
 USER_COMMAND(cmd_blist) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (!acct->connected || acct->blist == NULL)
 		return;
 
 	if (args != NULL)
-		run_one_command(args, CMDSET_BLIST);
+		run_one_command(acct, args, CMDSET_BLIST);
 }
 
 USER_COMMAND(cmd_input) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_INPUT);
+		run_one_command(acct, args, CMDSET_INPUT);
 }
 
 USER_COMMAND(cmd_history) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_HISTORY);
+		run_one_command(acct, args, CMDSET_HISTORY);
 	else
-		run_one_command("list", CMDSET_HISTORY);
+		run_one_command(acct, "list", CMDSET_HISTORY);
 }
 
 USER_COMMAND(cmd_scroll) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_SCROLL);
+		run_one_command(acct, args, CMDSET_SCROLL);
 }
 
 USER_COMMAND(cmd_timer) {
 	if (args != NULL)
-		run_one_command(args, CMDSET_TIMER);
+		run_one_command(acct, args, CMDSET_TIMER);
 	else
-		run_one_command("list", CMDSET_TIMER);
+		run_one_command(acct, "list", CMDSET_TIMER);
 }
 
 USER_COMMAND(cmd_set) {
 	opt_set_var(screen.global_prefs, args);
 }
 
-inline int run_command(char *str) {
-	return (run_one_command(str, CMDSET_MAIN));
+inline int run_command(struct pork_acct *acct, char *str) {
+	return (run_one_command(acct, str, CMDSET_MAIN));
 }
 
-int run_mcommand(char *str) {
+int run_mcommand(struct pork_acct *acct, char *str) {
 	int i = 0;
 	char *copystr = xstrdup(str);
 	char *cmdstr = copystr;
@@ -2735,7 +2681,7 @@ int run_mcommand(char *str) {
 
 	curcmd = strsep(&cmdstr, ";");
 	if (curcmd == NULL)
-		i = run_one_command(cmdstr, CMDSET_MAIN);
+		i = run_one_command(acct, cmdstr, CMDSET_MAIN);
 	else {
 		while (curcmd != NULL && i != -1) {
 			char cmdchars = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
@@ -2746,7 +2692,7 @@ int run_mcommand(char *str) {
 			while (*curcmd == cmdchars)
 				curcmd++;
 
-			i = run_one_command(curcmd, CMDSET_MAIN);
+			i = run_one_command(acct, curcmd, CMDSET_MAIN);
 			curcmd = strsep(&cmdstr, ";");
 		}
 	}
@@ -2755,7 +2701,7 @@ int run_mcommand(char *str) {
 	return (i);
 }
 
-static int run_one_command(char *str, u_int32_t set) {
+static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 	char *cmd_str;
 	struct command *cmd;
 
@@ -2778,16 +2724,15 @@ static int run_one_command(char *str, u_int32_t set) {
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
-		struct pork_proto *proto;
-
-		if (set == CMDSET_MAIN && (proto = proto_get_name(cmd_str)) != NULL) {
+		if (set == CMDSET_MAIN && proto_get_name(cmd_str) != NULL) {
 			cmd_str = strsep(&str, " \t");
 
-			cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
+			cmd = bsearch(cmd_str, acct->proto->cmd, acct->proto->num_cmds,
 					sizeof(struct command), cmd_compare);
 
 			if (cmd == NULL) {
-				screen_err_msg("Unknown %s command: %s (%s)", proto->name, cmd_str, str);
+				screen_err_msg("Unknown %s command: %s (%s)",
+					acct->proto->name, cmd_str, str);
 				return (-1);
 			}
 		} else {
@@ -2797,7 +2742,7 @@ static int run_one_command(char *str, u_int32_t set) {
 		}
 	}
 
-	cmd->cmd(str);
+	cmd->cmd(acct, str);
 	return (0);
 }
 
@@ -2882,7 +2827,7 @@ USER_COMMAND(cmd_input_find_next_cmd) {
 		}
 
 		if (word_begin == 0) {
-			struct pork_proto *proto = cur_window()->owner->proto;
+			struct pork_proto *proto = acct->proto;
 
 			if (!strncasecmp(proto->name, &input_buf[1], end_word)) {
 				elements = proto->num_cmds;

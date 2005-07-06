@@ -50,7 +50,6 @@ static USER_COMMAND(irc_cmd_set) {
 }
 
 static USER_COMMAND(irc_cmd_ctcp) {
-	struct pork_acct *acct = cur_window()->owner;
 	char *dest;
 
 	dest = strsep(&args, " ");
@@ -61,23 +60,17 @@ static USER_COMMAND(irc_cmd_ctcp) {
 }
 
 static USER_COMMAND(irc_cmd_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args != NULL)
 		irc_mode(acct, args);
 }
 
 static USER_COMMAND(irc_cmd_quote) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args != NULL)
 		irc_quote(acct, args);
 }
 
 static USER_COMMAND(irc_cmd_who) {
 	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
 	if (args != NULL)
 		irc_who(acct, args);
 
@@ -91,8 +84,6 @@ static USER_COMMAND(irc_cmd_who) {
 }
 
 static USER_COMMAND(irc_cmd_whowas) {
-	struct pork_acct *acct = cur_window()->owner;
-
 	if (args != NULL)
 		irc_whowas(acct, args);
 }

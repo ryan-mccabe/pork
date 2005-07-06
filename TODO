@@ -1,3 +1,5 @@
+-> delete timers owned by deleted accounts at cleanup
+
 As of 0.99
 
 ------------------

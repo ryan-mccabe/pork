@@ -54,6 +54,16 @@ else
 fi
 
 withval=""
+aim="yes"
+AC_ARG_WITH(aim,
+[  --with-aim  		  Include Oscar AIM support])
+if test "$withval" = "no"; then
+	aim="no"
+else
+	AC_DEFINE(AIM_SUPPORT, 1, [Define to enable AIM support])
+fi
+
+withval=""
 AC_ARG_WITH(efence,
 [  --with-efence=PREFIX	Use electric fence])
 if test "$withval" = "yes"; then
@@ -339,6 +349,7 @@ AC_SUBST(PERL_LIBS)
 
 AM_CONDITIONAL(COMPILE_PERL, test "$perl" = "yes")
 AM_CONDITIONAL(IRC_SUPPORT, test "$irc" = "yes")
+AM_CONDITIONAL(AIM_SUPPORT, test "$aim" = "yes")
 
 AC_OUTPUT([
 	Makefile
@@ -348,6 +359,7 @@ AC_OUTPUT([
 	src/prefs/Makefile
 	src/protocols/Makefile
 	src/protocols/aim/Makefile
+	src/protocols/aim/libfaim/Makefile
 	src/protocols/irc/Makefile
 	doc/Makefile
 	doc/help/Makefile

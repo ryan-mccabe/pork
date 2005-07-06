@@ -10,7 +10,9 @@
 #ifndef __PORK_COMMAND_H
 #define __PORK_COMMAND_H
 
-#define USER_COMMAND(x)	void x (char *args __notused)
+struct pork_acct;
+
+#define USER_COMMAND(x)	void x (struct pork_acct *acct __notused, char *args __notused)
 
 enum {
 	CMDSET_MAIN,
@@ -30,10 +32,10 @@ enum {
 
 struct command {
 	char *name;
-	void (*cmd)(char *);
+	void (*cmd)(struct pork_acct *, char *);
 };
 
-int run_mcommand(char *str);
-inline int run_command(char *str);
+int run_mcommand(struct pork_acct *acct, char *str);
+inline int run_command(struct pork_acct *acct, char *str);
 
 #endif

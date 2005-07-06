@@ -10,8 +10,11 @@
 #ifndef __PORK_TIMER_H
 #define __PORK_TIMER_H
 
+struct pork_acct;
+
 struct timer_entry {
 	char *command;
+	struct pork_acct *acct;
 	u_int32_t refnum;
 	time_t interval;
 	time_t last_run;
@@ -24,6 +27,7 @@ int timer_del_refnum(dlist_t **timer_list, u_int32_t refnum);
 int timer_del(dlist_t **timer_list, char *command);
 u_int32_t timer_add(dlist_t **timer_list,
 					char *command,
+					struct pork_acct *acct,
 					time_t interval,
 					u_int32_t count);
 

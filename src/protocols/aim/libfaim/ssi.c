@@ -396,7 +396,7 @@ faim_export char *aim_ssi_getalias(struct aim_ssi_item *list, const char *gn, co
 		aim_tlv_t *tlv = aim_tlv_gettlv(cur->data, 0x0131, 1);
 		if (tlv && tlv->length) {
 			char *alias = (char *)malloc((tlv->length+1)*sizeof(char));
-			strncpy(alias, tlv->value, tlv->length);
+			strncpy(alias, (char *)tlv->value, tlv->length);
 			alias[tlv->length] = 0;
 			return alias;
 		}
@@ -421,7 +421,7 @@ faim_export char *aim_ssi_getcomment(struct aim_ssi_item *list, const char *gn, 
 		aim_tlv_t *tlv = aim_tlv_gettlv(cur->data, 0x013c, 1);
 		if (tlv && tlv->length) {
 			char *alias = (char *)malloc((tlv->length+1)*sizeof(char));
-			strncpy(alias, tlv->value, tlv->length);
+			strncpy(alias, (char *)tlv->value, tlv->length);
 			alias[tlv->length] = 0;
 			return alias;
 		}
@@ -660,8 +660,30 @@ faim_export int aim_ssi_cleanlist(aim_session_t *sess)
 			else if (cur->type == AIM_SSI_TYPE_DENY)
 				aim_ssi_deldeny(sess, NULL);
 		} else if ((cur->type == AIM_SSI_TYPE_BUDDY) && ((cur->gid == 0x0000) || (!aim_ssi_itemlist_find(sess->ssi.local, cur->gid, 0x0000)))) {
-			aim_ssi_addbuddy(sess, cur->name, "orphans", NULL, NULL, NULL, 0);
+			char *alias = aim_ssi_getalias(sess->ssi.local, NULL, cur->name);
+			aim_ssi_addbuddy(sess, cur->name, "orphans", alias, NULL, NULL, 0);
 			aim_ssi_delbuddy(sess, cur->name, NULL);
+			free(alias);
+		}
+		cur = next;
+	}
+
+	/* Make sure there aren't any duplicate buddies in a group, or duplicate permits or denies */
+	cur = sess->ssi.local;
+	while (cur) {
+		next = cur->next;
+		if ((cur->type == AIM_SSI_TYPE_BUDDY) || (cur->type == AIM_SSI_TYPE_PERMIT) || (cur->type == AIM_SSI_TYPE_DENY))
+		{
+			struct aim_ssi_item *cur2, *next2;
+			cur2 = next;
+			while (cur2) {
+				next2 = cur2->next;
+				if ((cur->type == cur2->type) && (cur->gid == cur2->gid) && (!strcmp(cur->name, cur2->name))) {
+					aim_ssi_itemlist_del(&sess->ssi.local, cur2);
+					next = next2;
+				}
+				cur2 = next2;
+			}
 		}
 		cur = next;
 	}
@@ -681,6 +703,9 @@ faim_export int aim_ssi_cleanlist(aim_session_t *sess)
 	/* Check if the master group is empty */
 	if ((cur = aim_ssi_itemlist_find(sess->ssi.local, 0x0000, 0x0000)) && (!cur->data))
 		aim_ssi_itemlist_del(&sess->ssi.local, cur);
+
+	/* If we've made any changes then sync our list with the server's */
+	aim_ssi_sync(sess);
 
 	return 0;
 }
@@ -722,11 +747,11 @@ faim_export int aim_ssi_addbuddy(aim_session_t *sess, const char *name, const ch
 	if (needauth)
 		aim_tlvlist_add_noval(&data, 0x0066);
 	if (alias)
-		aim_tlvlist_add_raw(&data, 0x0131, strlen(alias), alias);
+		aim_tlvlist_add_str(&data, 0x0131, alias);
 	if (smsnum)
-		aim_tlvlist_add_raw(&data, 0x013a, strlen(smsnum), smsnum);
+		aim_tlvlist_add_str(&data, 0x013a, smsnum);
 	if (comment)
-		aim_tlvlist_add_raw(&data, 0x013c, strlen(comment), comment);
+		aim_tlvlist_add_str(&data, 0x013c, comment);
 
 	/* Add that bad boy */
 	aim_ssi_itemlist_add(&sess->ssi.local, name, parent->gid, 0xFFFF, AIM_SSI_TYPE_BUDDY, data);
@@ -895,8 +920,10 @@ faim_export int aim_ssi_deldeny(aim_session_t *sess, const char *name)
  */
 faim_export int aim_ssi_movebuddy(aim_session_t *sess, const char *oldgn, const char *newgn, const char *sn)
 {
-	aim_ssi_addbuddy(sess, sn, newgn, aim_ssi_getalias(sess->ssi.local, oldgn, sn), NULL, NULL, aim_ssi_waitingforauth(sess->ssi.local, oldgn, sn));
+	char *alias = aim_ssi_getalias(sess->ssi.local, oldgn, sn);
+	aim_ssi_addbuddy(sess, sn, newgn, alias, NULL, NULL, aim_ssi_waitingforauth(sess->ssi.local, oldgn, sn));
 	aim_ssi_delbuddy(sess, sn, oldgn);
+	free(alias);
 	return 0;
 }
 
@@ -922,7 +949,7 @@ faim_export int aim_ssi_aliasbuddy(aim_session_t *sess, const char *gn, const ch
 
 	/* Either add or remove the 0x0131 TLV from the TLV chain */
 	if ((alias != NULL) && (strlen(alias) > 0))
-		aim_tlvlist_replace_raw(&tmp->data, 0x0131, strlen(alias), alias);
+		aim_tlvlist_replace_str(&tmp->data, 0x0131, alias);
 	else
 		aim_tlvlist_remove(&tmp->data, 0x0131);
 
@@ -954,7 +981,7 @@ faim_export int aim_ssi_editcomment(aim_session_t *sess, const char *gn, const c
 
 	/* Either add or remove the 0x0131 TLV from the TLV chain */
 	if ((comment != NULL) && (strlen(comment) > 0))
-		aim_tlvlist_replace_raw(&tmp->data, 0x013c, strlen(comment), comment);
+		aim_tlvlist_replace_str(&tmp->data, 0x013c, comment);
 	else
 		aim_tlvlist_remove(&tmp->data, 0x013c);
 
@@ -1331,7 +1358,7 @@ faim_export int aim_ssi_addmoddel(aim_session_t *sess)
 	for (cur=sess->ssi.pending; cur; cur=cur->next) {
 		aimbs_put16(&fr->data, cur->item->name ? strlen(cur->item->name) : 0);
 		if (cur->item->name)
-			aimbs_putraw(&fr->data, cur->item->name, strlen(cur->item->name));
+			aimbs_putstr(&fr->data, cur->item->name);
 		aimbs_put16(&fr->data, cur->item->gid);
 		aimbs_put16(&fr->data, cur->item->bid);
 		aimbs_put16(&fr->data, cur->item->type);
@@ -1678,12 +1705,12 @@ faim_export int aim_ssi_sendauth(aim_session_t *sess, char *sn, char *msg)
 
 	/* Screen name */
 	aimbs_put8(&fr->data, strlen(sn));
-	aimbs_putraw(&fr->data, sn, strlen(sn));
+	aimbs_putstr(&fr->data, sn);
 
 	/* Message (null terminated) */
 	aimbs_put16(&fr->data, msg ? strlen(msg) : 0);
 	if (msg) {
-		aimbs_putraw(&fr->data, msg, strlen(msg));
+		aimbs_putstr(&fr->data, msg);
 		aimbs_put8(&fr->data, 0x00);
 	}
 
@@ -1753,12 +1780,12 @@ faim_export int aim_ssi_sendauthrequest(aim_session_t *sess, char *sn, char *msg
 
 	/* Screen name */
 	aimbs_put8(&fr->data, strlen(sn));
-	aimbs_putraw(&fr->data, sn, strlen(sn));
+	aimbs_putstr(&fr->data, sn);
 
 	/* Message (null terminated) */
 	aimbs_put16(&fr->data, msg ? strlen(msg) : 0);
 	if (msg) {
-		aimbs_putraw(&fr->data, msg, strlen(msg));
+		aimbs_putstr(&fr->data, msg);
 		aimbs_put8(&fr->data, 0x00);
 	}
 
@@ -1831,7 +1858,7 @@ faim_export int aim_ssi_sendauthreply(aim_session_t *sess, char *sn, fu8_t reply
 
 	/* Screen name */
 	aimbs_put8(&fr->data, strlen(sn));
-	aimbs_putraw(&fr->data, sn, strlen(sn));
+	aimbs_putstr(&fr->data, sn);
 
 	/* Grant or deny */
 	aimbs_put8(&fr->data, reply);
@@ -1839,7 +1866,7 @@ faim_export int aim_ssi_sendauthreply(aim_session_t *sess, char *sn, fu8_t reply
 	/* Message (null terminated) */
 	aimbs_put16(&fr->data, msg ? (strlen(msg)+1) : 0);
 	if (msg) {
-		aimbs_putraw(&fr->data, msg, strlen(msg));
+		aimbs_putstr(&fr->data, msg);
 		aimbs_put8(&fr->data, 0x00);
 	}
 

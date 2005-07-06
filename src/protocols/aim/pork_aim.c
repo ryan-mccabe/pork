@@ -995,7 +995,7 @@ static int parse_im_chan1(	aim_session_t *session __notused,
 
 		*msg = '\0';
 	} else
-		buf = xstrdup(args->msg);
+		buf = xstrdup((char *) args->msg);
 
 	if (!strncasecmp(buf, "/me ", 3)) {
 		ret = pork_recv_action(acct, acct->username,
@@ -1181,7 +1181,7 @@ static FAIM_CB(aim_recv_locrights) {
 		profile_html = text_to_html(acct->profile);
 		profile_len = strlen(profile_html);
 
-		aim_locate_setprofile(session, "us-ascii", profile_html,
+		aim_locate_setprofile(session, "us-ascii", (fu8_t *) profile_html,
 			profile_len, NULL, NULL, 0);
 	}
 
@@ -1193,7 +1193,7 @@ static FAIM_CB(aim_recv_locrights) {
 		away_len = strlen(away_html);
 
 		aim_locate_setprofile(session, NULL, NULL, 0,
-			"us-ascii", away_html, away_len);
+			"us-ascii", (fu8_t *) away_html, away_len);
 	}
 
 	if (acct->marked_idle)

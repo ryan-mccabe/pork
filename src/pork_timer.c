@@ -47,6 +47,7 @@ static void timer_destroy_cb(void *param __notused, void *data) {
 
 u_int32_t timer_add(dlist_t **timer_list,
 					char *command,
+					struct pork_acct *acct,
 					time_t interval,
 					u_int32_t times)
 {
@@ -57,6 +58,7 @@ u_int32_t timer_add(dlist_t **timer_list,
 	timer->refnum = last_refnum++;
 	timer->interval = interval;
 	timer->times = times;
+	timer->acct = acct;
 
 	*timer_list = dlist_add_head(*timer_list, timer);
 
@@ -111,8 +113,7 @@ int timer_run(dlist_t **timer_list) {
 			char *command = xstrdup(timer->command);
 
 			triggered++;
-
-			run_mcommand(command);
+			run_mcommand(timer->acct, command);
 			free(command);
 
 			if (timer->times != 1) {

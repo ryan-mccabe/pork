@@ -93,7 +93,7 @@ static void bind_hash_remove(void *param __notused, void *data) {
 ** the key for which no binding was found.
 */
 
-int bind_exec(struct key_binds *bind_set, int key) {
+int bind_exec(struct pork_acct *acct, struct key_binds *bind_set, int key) {
 	struct binding *binding;
 
 	binding = bind_find(bind_set, key);
@@ -102,7 +102,7 @@ int bind_exec(struct key_binds *bind_set, int key) {
 			bind_set->failure(key);
 	} else {
 		if (bind_set->success != NULL)
-			bind_set->success(binding);
+			bind_set->success(acct, binding);
 	}
 
 	return (0);
@@ -171,7 +171,8 @@ inline void bind_destroy(struct binds *binds) {
 }
 
 inline void bind_set_handlers(	struct key_binds *bind_set,
-								void (*success)(struct binding *binding),
+								void (*success)(struct pork_acct *acct,
+												struct binding *binding),
 								void (*failure)(int key))
 {
 	bind_set->success = success;
@@ -223,7 +224,7 @@ int bind_get_keycode(char *keystr) {
 	}
 
 	if (!strncasecmp(keystr, "META", 4)) {
-		int meta_num = 1;
+		u_int32_t meta_num = 1;
 
 		keystr += 4;
 

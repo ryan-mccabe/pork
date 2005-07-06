@@ -42,9 +42,35 @@
 #include <pork_set_global.h>
 #include <pork_conf.h>
 
-int read_conf(const char *path) {
+static void write_alias_line(void *data, void *filep) {
+	struct alias *alias = data;
+	FILE *fp = filep;
+
+	fprintf(fp, "alias %s %s%s\n",
+		alias->alias, alias->orig, (alias->args ? alias->args : ""));
+}
+
+static void write_bind_line(void *data, void *filep) {
+	struct binding *binding = data;
+	FILE *fp = filep;
+	char key_name[32];
+
+	bind_get_keyname(binding->key, key_name, sizeof(key_name));
+	fprintf(fp, "bind %s %s\n", key_name, binding->binding);
+}
+
+static void write_bind_blist_line(void *data, void *filep) {
+	struct binding *binding = data;
+	FILE *fp = filep;
+	char key_name[32];
+
+	bind_get_keyname(binding->key, key_name, sizeof(key_name));
+	fprintf(fp, "bind -buddy %s %s\n", key_name, binding->binding);
+}
+
+int read_conf(struct pork_acct *acct, const char *path) {
 	FILE *fp;
-	char buf[4096];
+	char buf[8192];
 	u_int32_t line = 0;
 
 	fp = fopen(path, "r");
@@ -79,10 +105,53 @@ int read_conf(const char *path) {
 			p++;
 
 		if (!blank_str(p))
-			run_command(p);
+			run_command(acct, p);
 	}
 
 	fclose(fp);
+	return (0);
+}
+
+int write_global_conf(char *path) {
+	char porkrc[PATH_MAX];
+	FILE *fp;
+	int ret;
+
+	if (path == NULL)
+		return (-1);
+
+	ret = snprintf(porkrc, sizeof(porkrc), "%s-TEMP", path);
+	if (ret < 0 || (size_t) ret > sizeof(porkrc))
+		return (-1);
+
+	fp = fopen(porkrc, "w");
+	if (fp == NULL) {
+		debug("fopen: %s: %s", porkrc, strerror(errno));
+		return (-1);
+	}
+
+	opt_write(screen.global_prefs, fp);
+	fprintf(fp, "\n");
+
+	hash_iterate(&screen.alias_hash, write_alias_line, fp);
+	fprintf(fp, "\n");
+	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
+	fprintf(fp, "\n");
+	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
+
+	if (fchmod(fileno(fp), 0600) != 0) {
+		debug("fchmod: %s: %s", porkrc, strerror(errno));
+		fclose(fp);
+		unlink(porkrc);
+		return (-1);
+	}
+
+	if (rename(porkrc, path) != 0) {
+		debug("rename: %s => %s: %s", path, porkrc, strerror(errno));
+		unlink(porkrc);
+		return (-1);
+	}
+
 	return (0);
 }
 
@@ -153,130 +222,6 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 	return (0);
 }
 
-static int read_buddy_list(struct pork_acct *acct, const char *filename) {
-	FILE *fp;
-	char buf[1024];
-	u_int32_t line = 0;
-	struct bgroup *cur_group = NULL;
-	struct buddy *cur_buddy = NULL;
-	struct buddy_pref *pref = acct->buddy_pref;
-
-	fp = fopen(filename, "r");
-	if (fp == NULL) {
-		if (errno != ENOENT) {
-			screen_err_msg("Can't open buddy list: %s: %s",
-				filename, strerror(errno));
-			return (-1);
-		}
-
-		return (0);
-	}
-
-	acct->report_idle = opt_get_bool(acct->prefs, ACCT_OPT_REPORT_IDLE);
-	pref->privacy_mode = 1;
-
-	while (fgets(buf, sizeof(buf), fp) != NULL) {
-		char *p;
-		char type;
-
-		++line;
-		p = strchr(buf, '\n');
-		if (p == NULL) {
-			screen_err_msg("Invalid buddy list data at line %u", line);
-			fclose(fp);
-			return (-1);
-		}
-
-		*p = '\0';
-		p = buf;
-
-		type = *p++;
-
-		while (*p == ' ' || *p == '\t')
-			p++;
-
-		if (type == 'g') {
-			cur_buddy = NULL;
-			cur_group = group_add(acct, p);
-		} else if (type == 'b') {
-			char *alias;
-			struct buddy *buddy;
-
-			if (cur_group == NULL) {
-				screen_err_msg("Invalid buddy list data at line %u", line);
-				fclose(fp);
-				return (-1);
-			}
-
-			alias = strchr(p, ':');
-			if (alias != NULL)
-				*alias++ = '\0';
-
-			buddy = buddy_add(acct, p, cur_group, 0);
-			if (alias != NULL)
-				buddy_alias(acct, buddy, alias, 0);
-
-			cur_buddy = buddy;
-		} else if (type == 'l') {
-			u_int32_t last_seen;
-
-			if (str_to_uint(p, &last_seen) != 0 || cur_buddy == NULL) {
-				screen_err_msg("Invalid buddy list data at line %u", line);
-				fclose(fp);
-				return (-1);
-			}
-
-			cur_buddy->last_seen = last_seen;
-		} else if (type == 'p') {
-			buddy_add_permit(acct, p, 0);
-
-			cur_buddy = NULL;
-			cur_group = NULL;
-		} else if (type == 'd') {
-			buddy_add_block(acct, p, 0);
-
-			cur_buddy = NULL;
-			cur_group = NULL;
-		} else if (type == 'm') {
-			u_int32_t privacy_mode;
-
-			if (str_to_uint(p, &privacy_mode) != 0 || privacy_mode > 5) {
-				screen_err_msg(
-					"%s: Invalid value for permit/deny mode at line %u",
-					p, line);
-				fclose(fp);
-				return (-1);
-			}
-
-			pref->privacy_mode = privacy_mode;
-
-			cur_buddy = NULL;
-			cur_group = NULL;
-		} else if (type == 'i') {
-			u_int32_t report_idle_val;
-
-			if (str_to_uint(p, &report_idle_val) != 0 || report_idle_val > 1) {
-				screen_err_msg(
-					"Invalid value for report idle mode at line %u", line);
-				fclose(fp);
-				return (-1);
-			}
-
-			acct->report_idle = report_idle_val;
-
-			cur_buddy = NULL;
-			cur_group = NULL;
-		} else {
-			screen_err_msg("Invalid buddy list data at line %u", line);
-			fclose(fp);
-			return (-1);
-		}
-	}
-
-	fclose(fp);
-	return (0);
-}
-
 int read_user_config(struct pork_acct *acct) {
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
@@ -284,12 +229,8 @@ int read_user_config(struct pork_acct *acct) {
 	if (acct == NULL || pork_dir == NULL)
 		return (-1);
 
-	snprintf(buf, sizeof(buf), "%s/buddy_list", pork_dir);
-	if (read_buddy_list(acct, buf) != 0)
-		screen_err_msg("There was an error reading your buddy list");
-
 	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
-	if (read_conf(buf) != 0 && errno != ENOENT)
+	if (read_conf(acct, buf) != 0 && errno != ENOENT)
 		screen_err_msg("There was an error reading your porkrc file");
 
 	snprintf(buf, sizeof(buf), "%s/account", pork_dir);
@@ -299,66 +240,8 @@ int read_user_config(struct pork_acct *acct) {
 	return (0);
 }
 
-static int save_buddy_list(struct pork_acct *acct, const char *filename) {
-	char *fn;
-	size_t len;
-	FILE *fp;
-	dlist_t *gcur;
-	struct buddy_pref *pref = acct->buddy_pref;
-
-	len = strlen(filename) + sizeof("-TEMP");
-	fn = xmalloc(len);
-	snprintf(fn, len, "%s-TEMP", filename);
-
-	create_full_path(fn);
-	fp = fopen(fn, "w");
-	if (fp == NULL) {
-		screen_err_msg("Can't open buddy list file for writing: %s",
-			strerror(errno));
-		free(fn);
-		return (-1);
-	}
-
-	fprintf(fp, "m %u\n", pref->privacy_mode);
-	fprintf(fp, "i %u\n", acct->report_idle);
-
-	for (gcur = pref->group_list ; gcur != NULL ; gcur = gcur->next) {
-		struct bgroup *gr = gcur->data;
-		dlist_t *bcur;
-
-		fprintf(fp, "g %s\n", gr->name);
-
-		for (bcur = gr->member_list ; bcur != NULL ; bcur = bcur->next) {
-			struct buddy *buddy = bcur->data;
-
-			fprintf(fp, "b %s:%s\n", buddy->nname, buddy->name);
-
-			if (buddy->last_seen != 0)
-				fprintf(fp, "l %u\n", buddy->last_seen);
-		}
-	}
-
-	for (gcur = pref->permit_list ; gcur != NULL ; gcur = gcur->next)
-		fprintf(fp, "p %s\n", (char *) gcur->data);
-
-	for (gcur = pref->block_list ; gcur != NULL ; gcur = gcur->next)
-		fprintf(fp, "d %s\n", (char *) gcur->data);
-
-	fchmod(fileno(fp), 0600);
-	fclose(fp);
-
-	if (rename(fn, filename) != 0) {
-		debug("rename: %s<=>%s: %s", fn, filename, strerror(errno));
-		unlink(fn);
-		free(fn);
-		return (-1);
-	}
-
-	free(fn);
-	return (0);
-}
-
-static int save_acct_conf(struct pork_acct *acct, char *filename) {
+#if 0
+int save_acct_conf(struct pork_acct *acct, char *filename) {
 	char *fn;
 	size_t len;
 	FILE *fp;
@@ -420,7 +303,7 @@ int read_global_config(void) {
 //	struct passwd *pw;
 //	char *pork_dir;
 
-	if (read_conf(SYSTEM_PORKRC) != 0)
+	if (read_conf(screen.null_acct, SYSTEM_PORKRC) != 0)
 		screen_err_msg("Error reading the system-wide porkrc file");
 
 #if 0
@@ -451,74 +334,4 @@ int read_global_config(void) {
 
 	return (0);
 }
-
-static void write_alias_line(void *data, void *filep) {
-	struct alias *alias = data;
-	FILE *fp = filep;
-
-	fprintf(fp, "alias %s %s%s\n",
-		alias->alias, alias->orig, (alias->args ? alias->args : ""));
-}
-
-static void write_bind_line(void *data, void *filep) {
-	struct binding *binding = data;
-	FILE *fp = filep;
-	char key_name[32];
-
-	bind_get_keyname(binding->key, key_name, sizeof(key_name));
-	fprintf(fp, "bind %s %s\n", key_name, binding->binding);
-}
-
-static void write_bind_blist_line(void *data, void *filep) {
-	struct binding *binding = data;
-	FILE *fp = filep;
-	char key_name[32];
-
-	bind_get_keyname(binding->key, key_name, sizeof(key_name));
-	fprintf(fp, "bind -buddy %s %s\n", key_name, binding->binding);
-}
-
-int save_global_config(void) {
-#if 0
-	char porkrc[PATH_MAX];
-	char *fn;
-	size_t len;
-	FILE *fp;
-	char *pork_dir = opt_get_str(OPT_PORK_DIR);
-
-	if (pork_dir == NULL)
-		return (-1);
-
-	snprintf(porkrc, sizeof(porkrc), "%s/porkrc", pork_dir);
-
-	len = strlen(porkrc) + sizeof("-TEMP");
-	fn = xmalloc(len);
-	snprintf(fn, len, "%s-TEMP", porkrc);
-
-	fp = fopen(fn, "w");
-	if (fp == NULL) {
-		debug("fopen: %s: %s", fn, strerror(errno));
-		return (-1);
-	}
-
-	opt_write(fp);
-	fprintf(fp, "\n");
-	hash_iterate(&screen.alias_hash, write_alias_line, fp);
-	fprintf(fp, "\n");
-	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
-	fprintf(fp, "\n");
-	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
-
-	fclose(fp);
-
-	if (rename(fn, porkrc) != 0) {
-		debug("rename: %s<=>%s: %s", fn, porkrc, strerror(errno));
-		unlink(fn);
-		free(fn);
-		return (-1);
-	}
-
-	free(fn);
 #endif
-	return (0);
-}

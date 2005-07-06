@@ -34,8 +34,11 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
-#include <pork_screen.h>
+#include <pork_acct.h>
 #include <pork_timer.h>
+#include <pork_imwindow.h>
+#include <pork_screen.h>
+#include <pork_screen_io.h>
 #include <pork_perl_xs.h>
 
 XS(PORK_timer_add) {
@@ -57,7 +60,7 @@ XS(PORK_timer_add) {
 	if (command == NULL)
 		XSRETURN_UNDEF;
 
-	XSRETURN_IV(timer_add(&screen.timer_list, command, interval, times));
+	XSRETURN_IV(timer_add(&screen.timer_list, command, cur_window()->owner, interval, times));
 }
 
 XS(PORK_timer_del) {

@@ -72,7 +72,8 @@ static void binding_insert(int key) {
 		input_insert(imwindow->input, key);
 }
 
-static inline void binding_run(struct binding *binding) {
+static inline void binding_run(struct pork_acct *acct, struct binding *binding)
+{
 	/*
 	** Yeah, this is kind of a hack, but it makes things
 	** more pleasant (i.e. you don't see status messages
@@ -84,10 +85,10 @@ static inline void binding_run(struct binding *binding) {
 	if (binding->key != '\n') {
 		int quiet = screen_set_quiet(1);
 
-		run_mcommand(binding->binding);
+		run_mcommand(acct, binding->binding);
 		screen_set_quiet(quiet);
 	} else
-		run_mcommand(binding->binding);
+		run_mcommand(acct, binding->binding);
 }
 
 static void resize_display(void) {
@@ -133,7 +134,6 @@ void keyboard_input(int fd __notused,
 		return;
 
 	time(&acct->last_input);
-	bind_exec(imwindow->active_binds, key);
 
 	if (acct->connected && acct->marked_idle &&
 		opt_get_bool(acct->prefs, ACCT_OPT_REPORT_IDLE))
@@ -144,6 +144,8 @@ void keyboard_input(int fd __notused,
 		screen_win_msg(cur_window(), 1, 1, 0,
 			MSG_TYPE_UNIDLE, "%s is no longer marked idle", acct->username);
 	}
+
+	bind_exec(acct, imwindow->active_binds, key);
 }
 
 int main(int argc, char **argv) {
@@ -187,7 +189,7 @@ int main(int argc, char **argv) {
 	event_init(&screen.events);
 
 	screen_set_quiet(1);
-	ret = read_global_config();
+//	ret = read_global_config();
 	screen_set_quiet(0);
 
 	if (ret != 0)
