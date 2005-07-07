@@ -24,10 +24,12 @@
 #include <pork_list.h>
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
+#include <pork_timer.h>
 #include <pork_buddy.h>
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
 #include <pork_set.h>
+#include <pork_events.h>
 #include <pork_acct.h>
 #include <pork_acct_set.h>
 #include <pork_screen.h>
@@ -62,6 +64,8 @@ static void pork_acct_free(struct pork_acct *acct) {
 		free(acct->blist);
 	}
 
+	free_str_wipe(acct->passwd);
+
 	timer_del_owner(&screen.timer_list, acct);
 
 	opt_destroy(acct->prefs);
@@ -72,7 +76,9 @@ static void pork_acct_free(struct pork_acct *acct) {
 
 	hash_destroy(&acct->autoreply);
 
-	free_str_wipe(acct->passwd);
+	event_destroy(acct->events);
+	free(acct->events);
+
 	free(acct->away_msg);
 	free(acct->username);
 	free(acct->profile);
@@ -138,6 +144,7 @@ void pork_acct_del(dlist_t *node, char *reason) {
 	struct pork_acct *acct = node->data;
 	dlist_t *cur;
 
+	event_generate(acct->events, EVENT_UNLOAD);
 	pork_signoff(acct, reason);
 	chat_leave_all(acct);
 
@@ -362,7 +369,7 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	acct = xcalloc(1, sizeof(*acct));
 	acct->username = xstrdup(user);
-	acct->events = &screen.events;
+	acct->events = xcalloc(1, sizeof(*acct->events));
 
 	acct->proto = proto_get(protocol);
 

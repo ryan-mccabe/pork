@@ -84,7 +84,6 @@ void event_list(struct event *events, const char *event_type);
 int event_generate(struct event *events, u_int32_t event_num, ...);
 int event_del_refnum(struct event *events, u_int32_t refnum);
 int event_del_type(struct event *events, const char *type, const char *func);
-void event_init(struct event *events);
 void event_destroy(struct event *events);
 void event_purge(struct event *events);
 

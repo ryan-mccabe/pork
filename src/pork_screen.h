@@ -21,7 +21,6 @@ struct blist;
 struct imwindow;
 struct pork_acct;
 
-#include <pork_events.h>
 #include <pork_input.h>
 #include <pork_bind.h>
 
@@ -41,7 +40,6 @@ struct screen {
 	struct binds binds;
 	hash_t alias_hash;
 	struct pref_val *global_prefs;
-	struct event events;
 };
 
 #define cur_window() ((struct imwindow *) (screen.cur_window->data))

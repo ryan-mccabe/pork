@@ -186,7 +186,6 @@ int main(int argc, char **argv) {
 	bind_set_handlers(&screen.binds.blist, binding_run, NULL);
 
 	alias_init(&screen.alias_hash);
-	event_init(&screen.events);
 
 	screen_set_quiet(1);
 //	ret = read_global_config();
@@ -247,7 +246,6 @@ int main(int argc, char **argv) {
 */
 
 void pork_exit(int status, char *msg, char *fmt, ...) {
-	event_generate(cur_window()->owner->events, EVENT_UNLOAD);
 	pork_acct_del_all(msg);
 	screen_destroy();
 	perl_destroy();

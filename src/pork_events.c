@@ -108,10 +108,6 @@ static int event_find(const char *name) {
 	return (offset / sizeof(struct event_info));
 }
 
-void event_init(struct event *events) {
-	memset(events, 0, sizeof(*events));
-}
-
 static void event_destroy_cb(void *param __notused, void *data) {
 	struct event_entry *event = (struct event_entry *) data;
 
@@ -120,7 +116,7 @@ static void event_destroy_cb(void *param __notused, void *data) {
 
 inline void event_purge(struct event *events) {
 	event_destroy(events);
-	event_init(events);
+	memset(events, 0, sizeof(*events));
 }
 
 void event_destroy(struct event *events) {

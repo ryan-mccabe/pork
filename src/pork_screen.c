@@ -191,7 +191,6 @@ void screen_destroy(void) {
 	input_destroy(&screen.input);
 	bind_destroy(&screen.binds);
 	hash_destroy(&screen.alias_hash);
-	event_destroy(&screen.events);
 	delwin(screen.status_bar);
 	wclear(curscr);
 }

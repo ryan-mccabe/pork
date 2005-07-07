@@ -32,6 +32,7 @@
 #include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
+#include <pork_events.h>
 #include <pork_imsg.h>
 #include <pork_imwindow.h>
 #include <pork_screen.h>
@@ -272,8 +273,8 @@ static int irc_handler_ctcp_version(struct pork_acct *acct,
 	char *p;
 
 	ret = snprintf(buf, sizeof(buf),
-			"\x01%s %s %s - http://dev.ojnk.net\x01", in->cmd,
-			PACKAGE_NAME, PACKAGE_VERSION);
+			"\x01%s %s %s - %s\x01", in->cmd,
+			PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_WEBSITE);
 
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);

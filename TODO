@@ -10,9 +10,6 @@ The future. Maybe
 - Support making perl and IM protocols loadable plugins (or at least add
   a configure option to allow them to be compiled that way, if desired). 
 
-- Support per-account events (this is easy to do, but I'm not sure it's desirable).
-	- Does anybody want this?
-
 ----------------------------------------
 The stuff I really don't feel like doing
 ----------------------------------------
