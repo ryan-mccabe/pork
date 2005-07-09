@@ -305,6 +305,7 @@ int opt_set_int(struct pref_val *pref, u_int32_t opt, char *args, va_list ap) {
 int opt_set_str(struct pref_val *pref, u_int32_t opt, char *args, va_list ap) {
 	if (pref_needs_free(pref, opt))
 		free(opt_get_str(pref, opt));
+
 	if (args != NULL) {
 		char *str = xstrdup(args);
 

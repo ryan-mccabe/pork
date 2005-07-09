@@ -32,10 +32,11 @@ struct pork_proto {
 	struct command *cmd;
 	size_t num_cmds;
 
-	int (*init)(struct pork_acct *);
-	int (*free)(struct pork_acct *);
 	int (*read_config)(struct pork_acct *);
 	int (*write_config)(struct pork_acct *);
+
+	int (*init)(struct pork_acct *);
+	int (*free)(struct pork_acct *);
 	int (*update)(struct pork_acct *);
 	int (*normalize)(char *dest, const char *str, size_t len);
 	int (*user_compare)(const char *u1, const char *u2);

@@ -114,7 +114,6 @@ static pref_val_t acct_default_pref_vals[] = {
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_TRIES,
 	},{	.pref_val.b = DEFAULT_ACCT_REPORT_IDLE,
 	},{	.pref_val.b = DEFAULT_ACCT_SAVE_PASSWD,
-	},{	.pref_val.b = DEFAULT_ACCT_SAVE_PASSWD,
 	},{	.pref_val.b = DEFAULT_ACCT_SEND_REMOVES_AWAY,
 	},{	.pref_val.i = DEFAULT_ACCT_TRANSFER_PORT_MAX,
 	},{	.pref_val.i = DEFAULT_ACCT_TRANSFER_PORT_MIN,

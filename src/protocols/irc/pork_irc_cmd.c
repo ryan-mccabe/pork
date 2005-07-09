@@ -44,6 +44,7 @@
 /* XXX - todo */
 
 static USER_COMMAND(irc_cmd_save) {
+	/* save default */
 }
 
 static USER_COMMAND(irc_cmd_set) {
