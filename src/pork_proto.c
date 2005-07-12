@@ -91,29 +91,22 @@ void proto_destroy(void) {
 		free(proto_table[i]);
 }
 
-int proto_set(struct pork_acct *acct, char *args) {
-	struct pref_val *pref;
-
-	if (acct->proto->set == NULL || acct->proto->get_default_prefs == NULL ||
-		acct->proto_prefs == NULL)
-	{
+int proto_set(struct pork_proto *proto, struct pref_val *pref, char *args) {
+	if (proto == NULL || proto->set == NULL || proto->get_default_prefs == NULL)
 		return (-1);
-	}
 
-	if (args == NULL || blank_str(args)) {
-		pref = acct->proto_prefs;
-	} else if (!strncasecmp(args, "-default", 8)) {
+	if (pref == NULL)
+		pref = proto->get_default_prefs();
+
+	if (args != NULL && !strncasecmp(args, "-default", 8)) {
 		args += 8;
 		while (args[0] == ' ')
 			args++;
 
-		acct = NULL;
-		pref = acct->proto->get_default_prefs();
-	} else {
-		pref = acct->proto_prefs;
+		pref = proto->get_default_prefs();
 	}
 
-	return (opt_set_var(pref, args, acct));
+	return (opt_set_var(pref, args, proto));
 }
 
 static int proto_init_null(struct pork_proto *proto) {

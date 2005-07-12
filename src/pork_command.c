@@ -2724,20 +2724,33 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
-		if (set == CMDSET_MAIN && proto_get_name(cmd_str) != NULL) {
+		struct pork_proto *proto;
+
+		if (set == CMDSET_MAIN && (proto = proto_get_name(cmd_str)) != NULL) {
 			cmd_str = strsep(&str, " \t");
 
 			if (cmd_str != NULL) {
-				cmd = bsearch(cmd_str, acct->proto->cmd, acct->proto->num_cmds,
+				cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
 						sizeof(struct command), cmd_compare);
 
 				if (cmd == NULL) {
 					screen_err_msg("Unknown %s command: %s (%s)",
-						acct->proto->name, cmd_str, str);
+						proto->name, cmd_str, str);
 					return (-1);
 				}
+
+				if (proto != acct->proto) {
+					if (!strcasecmp(cmd->name, "set")) {
+						cmd->cmd(NULL, str);
+						return (0);
+					} else {
+						screen_err_msg("%s may not run %s commands",
+							acct->username, proto->name);
+						return (-1);
+					}
+				}
 			} else {
-				screen_err_msg("Unknown %scommand", acct->proto->name);
+				screen_err_msg("Unknown %scommand", proto->name);
 				return (-1);
 			}
 		} else {

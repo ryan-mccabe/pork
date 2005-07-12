@@ -127,19 +127,19 @@ static int parseinfo_perms(aim_session_t *sess, aim_module_t *mod, aim_frame_t *
 		 *
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x000a, 1))
-			;
+			(void) 0;
 
 		/* 
 		 * Type 0x000d: Unknown.
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x000d, 1))
-			;
+			(void) 0;
 
 		/* 
 		 * Type 0x0004: Unknown
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x0004, 1))
-			;
+			(void) 0;
 
 		/* 
 		 * Type 0x0002: Unknown
@@ -168,25 +168,25 @@ static int parseinfo_perms(aim_session_t *sess, aim_module_t *mod, aim_frame_t *
 		 * Type 0x00ca: Creation Date 
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00ca, 1))
-			;
+			(void) 0;
 		      
 		/*
 		 * Type 0x00d0: Mandatory Channels?
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00d0, 1))
-			;
+			(void) 0;
 
 		/*
 		 * Type 0x00d1: Maximum Message length
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00d1, 1))
-			;
+			(void) 0;
 
 		/*
 		 * Type 0x00d2: Maximum Occupancy?
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00d2, 1))	
-			;
+			(void) 0;
 
 		/*
 		 * Type 0x00d3: Exchange Description
@@ -200,7 +200,7 @@ static int parseinfo_perms(aim_session_t *sess, aim_module_t *mod, aim_frame_t *
 		 * Type 0x00d4: Exchange Description URL
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00d4, 1))	
-			;
+			(void) 0;
 
 		/*
 		 * Type 0x00d5: Creation Permissions
@@ -252,7 +252,7 @@ static int parseinfo_perms(aim_session_t *sess, aim_module_t *mod, aim_frame_t *
 		 * Type 0x00da: Unknown
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00da, 1))	
-			;
+			(void) 0;
 
 		aim_tlvlist_free(&innerlist);
 	}

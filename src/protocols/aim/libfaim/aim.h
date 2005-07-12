@@ -511,10 +511,7 @@ faim_export int aim_debugconn_sendconnect(aim_session_t *sess, aim_conn_t *conn)
 
 faim_export int aim_logoff(aim_session_t *);
 
-#if !defined(FAIM_INTERNAL)
-/* the library should never call aim_conn_kill */
 faim_export void aim_conn_kill(aim_session_t *sess, aim_conn_t **deadconn);
-#endif
 
 typedef int (*aim_rxcallback_t)(aim_session_t *, aim_frame_t *, ...);
 
@@ -890,37 +887,37 @@ struct aim_incomingim_ch4_args {
 /* ft.c */
 struct aim_fileheader_t {
 #if 0
-	char magic[4];		/* 0 */
-	fu16_t hdrlen;		/* 4 */
-	fu16_t hdrtype;		/* 6 */
+	char magic[4];			/* 0 */
+	fu16_t hdrlen;			/* 4 */
+	fu16_t hdrtype;			/* 6 */
 #endif
-	char bcookie[8];	/* 8 */
-	fu16_t encrypt;		/* 16 */
-	fu16_t compress;	/* 18 */
-	fu16_t totfiles;	/* 20 */
-	fu16_t filesleft;	/* 22 */
-	fu16_t totparts;	/* 24 */
-	fu16_t partsleft;	/* 26 */
-	fu32_t totsize;		/* 28 */
-	fu32_t size;		/* 32 */
-	fu32_t modtime;		/* 36 */
-	fu32_t checksum;	/* 40 */
-	fu32_t rfrcsum;		/* 44 */
-	fu32_t rfsize;		/* 48 */
-	fu32_t cretime;		/* 52 */
-	fu32_t rfcsum;		/* 56 */
-	fu32_t nrecvd;		/* 60 */
-	fu32_t recvcsum;	/* 64 */
-	fu8_t idstring[32];	/* 68 */
-	fu8_t flags;		/* 100 */
-	fu8_t lnameoffset;	/* 101 */
-	fu8_t lsizeoffset;	/* 102 */
-	char dummy[69];		/* 103 */
-	char macfileinfo[16];	/* 172 */
-	fu16_t nencode;		/* 188 */
-	fu16_t nlanguage;	/* 190 */
-	char name[64];		/* 192 */
-				/* 256 */
+	fu8_t bcookie[8];		/* 8 */
+	fu16_t encrypt;			/* 16 */
+	fu16_t compress;		/* 18 */
+	fu16_t totfiles;		/* 20 */
+	fu16_t filesleft;		/* 22 */
+	fu16_t totparts;		/* 24 */
+	fu16_t partsleft;		/* 26 */
+	fu32_t totsize;			/* 28 */
+	fu32_t size;			/* 32 */
+	fu32_t modtime;			/* 36 */
+	fu32_t checksum;		/* 40 */
+	fu32_t rfrcsum;			/* 44 */
+	fu32_t rfsize;			/* 48 */
+	fu32_t cretime;			/* 52 */
+	fu32_t rfcsum;			/* 56 */
+	fu32_t nrecvd;			/* 60 */
+	fu32_t recvcsum;		/* 64 */
+	fu8_t idstring[32];		/* 68 */
+	fu8_t flags;			/* 100 */
+	fu8_t lnameoffset;		/* 101 */
+	fu8_t lsizeoffset;		/* 102 */
+	fu8_t dummy[69];		/* 103 */
+	fu8_t macfileinfo[16];	/* 172 */
+	fu16_t nencode;			/* 188 */
+	fu16_t nlanguage;		/* 190 */
+	fu8_t name[64];			/* 192 */
+							/* 256 */
 };
 
 struct aim_oft_info {
@@ -942,7 +939,7 @@ faim_export int aim_handlerendconnect(aim_session_t *sess, aim_conn_t *cur);
 faim_export int aim_odc_send_typing(aim_session_t *sess, aim_conn_t *conn, int typing);
 faim_export int aim_odc_send_im(aim_session_t *sess, aim_conn_t *conn, const char *msg, int len, int encoding, int isawaymsg);
 faim_export const char *aim_odc_getsn(aim_conn_t *conn);
-faim_export const char *aim_odc_getcookie(aim_conn_t *conn);
+faim_export const fu8_t *aim_odc_getcookie(aim_conn_t *conn);
 faim_export aim_conn_t *aim_odc_getconn(aim_session_t *sess, const char *sn);
 faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, int listenfd,
                                          const fu8_t *localip, fu16_t port, const fu8_t *mycookie);
@@ -1227,6 +1224,7 @@ struct aim_ssi_tmp {
 faim_export struct aim_ssi_item *aim_ssi_itemlist_find(struct aim_ssi_item *list, fu16_t gid, fu16_t bid);
 faim_export struct aim_ssi_item *aim_ssi_itemlist_finditem(struct aim_ssi_item *list, const char *gn, const char *sn, fu16_t type);
 faim_export struct aim_ssi_item *aim_ssi_itemlist_exists(struct aim_ssi_item *list, const char *sn);
+faim_export int aim_ssi_itemlist_valid(struct aim_ssi_item *list, struct aim_ssi_item *item);
 faim_export char *aim_ssi_itemlist_findparentname(struct aim_ssi_item *list, const char *sn);
 faim_export int aim_ssi_getpermdeny(struct aim_ssi_item *list);
 faim_export fu32_t aim_ssi_getpresence(struct aim_ssi_item *list);
@@ -1342,7 +1340,8 @@ faim_export int aim_icq_changepasswd(aim_session_t *sess, const char *passwd);
 faim_export int aim_icq_getsimpleinfo(aim_session_t *sess, const char *uin);
 faim_export int aim_icq_getalias(aim_session_t *sess, const char *uin);
 faim_export int aim_icq_getallinfo(aim_session_t *sess, const char *uin);
-
+faim_export int aim_icq_sendxmlreq(aim_session_t *sess, const char *xml);
+faim_export int aim_icq_sendsms(aim_session_t *sess, const char *name, const char *msg, const char *alias);
 
 
 /* 0x0017 - auth.c */
@@ -1485,7 +1484,7 @@ faim_internal void aim_tlvlist_remove(aim_tlvlist_t **list, const fu16_t type);
 		(((*((buf)+3)) << 24) & 0xff000000))
 
 
-faim_export int aimutil_putstr(char *, const char *, int);
+faim_export int aimutil_putstr(fu8_t *, const char *, int);
 faim_export fu16_t aimutil_iconsum(const fu8_t *buf, int buflen);
 faim_export int aimutil_tokslen(char *toSearch, int theindex, char dl);
 faim_export int aimutil_itemcnt(char *toSearch, char dl);

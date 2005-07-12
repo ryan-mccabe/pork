@@ -13,8 +13,6 @@
 #define IRC_OUT_BUFLEN		2048
 #define IRC_IN_BUFLEN		8192
 
-#include <pork_queue.h>
-
 #define IRC_CHAN_OP			0x01
 #define IRC_CHAN_VOICE		0x02
 #define IRC_CHAN_HALFOP		0x04

@@ -32,8 +32,9 @@
 #include <pork_misc.h>
 #include <pork_color.h>
 #include <pork_html.h>
-#include <pork_proto.h>
 #include <pork_acct.h>
+#include <pork_set.h>
+#include <pork_proto.h>
 #include <pork_buddy.h>
 #include <pork_chat.h>
 #include <pork_transfer.h>

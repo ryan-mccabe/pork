@@ -86,7 +86,7 @@ struct aim_odc_intdata {
  *
  * @param name The filename to convert.
  */
-static void aim_oft_dirconvert_tostupid(char *name)
+static void aim_oft_dirconvert_tostupid(fu8_t *name)
 {
 	while (name[0]) {
 		if (name[0] == 0x01)
@@ -100,7 +100,7 @@ static void aim_oft_dirconvert_tostupid(char *name)
  *
  * @param name The filename to convert.
  */
-static void aim_oft_dirconvert_fromstupid(char *name)
+static void aim_oft_dirconvert_fromstupid(fu8_t *name)
 {
 	while (name[0]) {
 		if (name[0] == G_DIR_SEPARATOR)
@@ -394,7 +394,7 @@ faim_export int aim_odc_send_im(aim_session_t *sess, aim_conn_t *conn, const cha
 	aimbs_put16(hdrbs, 0x393e);
 	aimbs_put16(hdrbs, 0xcac8);
 #endif
-	aimbs_putraw(hdrbs, msg, len);
+	aimbs_putraw(hdrbs, (fu8_t *)msg, len);
 
 	aim_tx_enqueue(sess, fr);
 
@@ -429,7 +429,7 @@ faim_export const char *aim_odc_getsn(aim_conn_t *conn)
  * @param conn The ODC connection.
  * @return The cookie, an 8 byte unterminated string, or NULL if there was an anomaly.
  */
-faim_export const char *aim_odc_getcookie(aim_conn_t *conn)
+faim_export const fu8_t *aim_odc_getcookie(aim_conn_t *conn)
 {
 	struct aim_odc_intdata *intdata;
 
@@ -683,9 +683,9 @@ faim_export struct aim_oft_info *aim_oft_createinfo(aim_session_t *sess, const f
 	new->fh.rfrcsum = 0xffff0000;
 	new->fh.rfcsum = 0xffff0000;
 	new->fh.recvcsum = 0xffff0000;
-	strncpy(new->fh.idstring, "OFT_Windows ICBMFT V1.1 32", 31);
+	strncpy((char *)new->fh.idstring, "OFT_Windows ICBMFT V1.1 32", 31);
 	if (filename) {
-		strncpy(new->fh.name, filename, 63);
+		strncpy((char *)new->fh.name, filename, 63);
 		new->fh.name[63] = '\0';
 	}
 

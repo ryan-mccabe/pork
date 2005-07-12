@@ -12,7 +12,7 @@
 
 struct irc_session;
 
-int irc_init_prefs(struct irc_session *irc);
+int irc_init_prefs(struct pork_acct *acct);
 struct pref_val *irc_get_default_prefs(void);
 
 enum {

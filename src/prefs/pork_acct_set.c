@@ -23,12 +23,11 @@
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_color.h>
-#include <pork_proto.h>
 #include <pork_acct.h>
-#include <pork_acct_set.h>
 #include <pork_set.h>
+#include <pork_acct_set.h>
+#include <pork_proto.h>
 #include <pork_imwindow.h>
-#include <pork_acct.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_screen.h>

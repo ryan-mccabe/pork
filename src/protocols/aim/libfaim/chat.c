@@ -218,7 +218,7 @@ static int infoupdate(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 	 * Type 0x000d4: Unknown (flag only)
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x000d4, 1))
-		;
+		(void) 0;
 
 	/* 
 	 * Type 0x00d5: Unknown. (1 byte)
@@ -231,25 +231,25 @@ static int infoupdate(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 	 * Type 0x00d6: Encoding 1 ("us-ascii")
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x000d6, 1))
-		;
+		(void) 0;
 	
 	/*
 	 * Type 0x00d7: Language 1 ("en")
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x000d7, 1))
-		;
+		(void) 0;
 
 	/*
 	 * Type 0x00d8: Encoding 2 ("us-ascii")
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x000d8, 1))
-		;
+		(void) 0;
 	
 	/*
 	 * Type 0x00d9: Language 2 ("en")
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x000d9, 1))
-		;
+		(void) 0;
 
 	/*
 	 * Type 0x00da: Maximum visible message length
@@ -496,7 +496,7 @@ static int incomingim_ch3(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * room (as opposed to a whisper).
 	 */
 	if (aim_tlv_gettlv(otl, 0x0001, 1))
-		;
+		(void) 0;
 
 	/*
 	 * Type 0x0005: Message Block.  Conains more TLVs.

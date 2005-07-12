@@ -27,6 +27,7 @@
 #include <pork_list.h>
 #include <pork_buddy.h>
 #include <pork_set.h>
+#include <pork_proto.h>
 #include <pork_set_global.h>
 #include <pork_acct.h>
 #include <pork_acct_set.h>

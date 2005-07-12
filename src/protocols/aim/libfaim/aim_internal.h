@@ -213,6 +213,7 @@ faim_internal int aim_reqrates(aim_session_t *, aim_conn_t *);
 faim_internal int aim_rates_addparam(aim_session_t *, aim_conn_t *);
 faim_internal int aim_rates_delparam(aim_session_t *, aim_conn_t *);
 
+faim_internal int bleck(aim_session_t *sess, aim_frame_t *frame, ...);
 faim_internal void faimdprintf(aim_session_t *sess, int dlevel, const char *format, ...);
 
 #endif /* __AIM_INTERNAL_H__ */

@@ -22,10 +22,11 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
+#include <pork_queue.h>
 #include <pork_color.h>
-#include <pork_proto.h>
 #include <pork_acct.h>
 #include <pork_set.h>
+#include <pork_proto.h>
 #include <pork_imwindow.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
@@ -134,7 +135,7 @@ static struct pref_val irc_defaults = {
 	.val = irc_default_pref_vals
 };
 
-int irc_init_prefs(struct irc_session *irc) {
+int irc_init_prefs(struct pork_acct *acct) {
 	struct pref_val *prefs;
 
 	prefs = xmalloc(sizeof(*prefs));
@@ -142,7 +143,7 @@ int irc_init_prefs(struct irc_session *irc) {
 	opt_copy_pref_val(prefs, irc_default_pref_vals,
 		sizeof(irc_default_pref_vals));
 
-	irc->prefs = prefs;
+	acct->proto_prefs = prefs;
 	return (0);
 }
 

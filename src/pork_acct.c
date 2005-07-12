@@ -68,12 +68,19 @@ static void pork_acct_free(struct pork_acct *acct) {
 
 	timer_del_owner(&screen.timer_list, acct);
 
-	opt_destroy(acct->prefs);
-	free(acct->prefs->val);
-	free(acct->prefs);
+	if (acct->prefs) {
+		opt_destroy(acct->prefs);
+		free(acct->prefs->val);
+		free(acct->prefs);
+	}
+
+	if (acct->proto_prefs) {
+		opt_destroy(acct->proto_prefs);
+		free(acct->proto_prefs->val);
+		free(acct->proto_prefs);
+	}
 
 	buddy_destroy(acct);
-
 	hash_destroy(&acct->autoreply);
 
 	event_destroy(acct->events);

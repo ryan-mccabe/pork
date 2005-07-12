@@ -377,7 +377,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	if (aim_tlv_gettlv(tlvlist, 0x0043, 1))
 		info->latestbeta.name = aim_tlv_getstr(tlvlist, 0x0043, 1);
 	if (aim_tlv_gettlv(tlvlist, 0x0048, 1))
-		; /* beta serial */
+		(void) 0; /* beta serial */
 
 	if (aim_tlv_gettlv(tlvlist, 0x0044, 1))
 		info->latestrelease.build = aim_tlv_get32(tlvlist, 0x0044, 1);
@@ -388,7 +388,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	if (aim_tlv_gettlv(tlvlist, 0x0047, 1))
 		info->latestrelease.name = aim_tlv_getstr(tlvlist, 0x0047, 1);
 	if (aim_tlv_gettlv(tlvlist, 0x0049, 1))
-		; /* lastest release serial */
+		(void) 0; /* lastest release serial */
 
 	/*
 	 * URL to change password.
@@ -400,7 +400,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	 * Unknown.  Seen on an @mac.com screen name with value of 0x003f
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x0055, 1))
-		;
+		(void) 0;
 
 	sess->authinfo = info;
 

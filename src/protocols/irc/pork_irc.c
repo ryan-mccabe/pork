@@ -106,6 +106,8 @@ static int irc_init(struct pork_acct *acct) {
 
 	session->data = acct;
 	acct->data = session;
+
+	irc_init_prefs(acct);
 	return (0);
 }
 

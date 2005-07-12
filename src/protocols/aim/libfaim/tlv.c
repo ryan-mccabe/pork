@@ -657,7 +657,7 @@ faim_internal int aim_tlvlist_replace_raw(aim_tlvlist_t **list, const fu16_t typ
  */
 faim_internal int aim_tlvlist_replace_str(aim_tlvlist_t **list, const fu16_t type, const char *str)
 {
-	return aim_tlvlist_replace_raw(list, type, strlen(str), str);
+	return aim_tlvlist_replace_raw(list, type, strlen(str), (fu8_t *)str);
 }
 
 /**

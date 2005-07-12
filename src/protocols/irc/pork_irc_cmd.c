@@ -23,6 +23,7 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
+#include <pork_queue.h>
 #include <pork_imsg.h>
 #include <pork_io.h>
 #include <pork_misc.h>
@@ -49,7 +50,10 @@ static USER_COMMAND(irc_cmd_save) {
 }
 
 static USER_COMMAND(irc_cmd_set) {
-	proto_set(acct, args);
+	if (acct == NULL)
+		proto_set(proto_get(PROTO_IRC), NULL, args);
+	else
+		proto_set(acct->proto, acct->proto_prefs, args);
 }
 
 static USER_COMMAND(irc_cmd_ctcp) {

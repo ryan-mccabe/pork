@@ -86,15 +86,11 @@ struct pork_proto {
 	int (*file_send_data)(struct file_transfer *xfer, char *buf, size_t len);
 	int (*file_recv_complete)(struct file_transfer *xfer);
 	int (*file_send_complete)(struct file_transfer *xfer);
-
-	int (*set)(struct pork_acct *acct, char *str);
+	int (*set)(struct pork_proto *proto, struct pref_val *pref, char *str);
 	struct pref_val *(*get_default_prefs)(void);
-
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
-
 	int (*warn)(struct pork_acct *, char *);
 	int (*warn_anon)(struct pork_acct *, char *);
-
 	int (*send_action)(struct pork_acct *, char *target, char *msg);
 	int (*send_msg)(struct pork_acct *, char *target, char *msg);
 	int (*send_notice)(struct pork_acct *, char *target, char *msg);
@@ -104,9 +100,7 @@ struct pork_proto {
 	int (*get_away_msg)(struct pork_acct *, char *);
 	int (*set_profile)(struct pork_acct *, char *);
 	int (*get_profile)(struct pork_acct *, char *);
-
 	int (*ping)(struct pork_acct *, char *str);
-
 	int (*keepalive)(struct pork_acct *);
 	int (*change_nick)(struct pork_acct *acct, char *nick);
 };
@@ -117,6 +111,6 @@ int proto_new(int proto, const char *name, int (*init)(struct pork_proto *));
 void proto_destroy(void);
 inline struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
-int proto_set(struct pork_acct *acct, char *args);
+int proto_set(struct pork_proto *proto, struct pref_val *pref, char *args);
 
 #endif

@@ -98,7 +98,7 @@ faim_export fu16_t aim_im_fingerprint(const fu8_t *msghdr, int len)
 		{ AIM_CLIENTTYPE_AOL_TOC,
 		  1, {0x01}},
 
-		{ 0, 0}
+		{ 0, 0, {}}
 	};
 	int i;
 
@@ -793,7 +793,7 @@ faim_export int aim_im_sendch2_sendfile_ask(aim_session_t *sess, struct aim_oft_
 		aim_tlvlist_add_16(&subtl, 0x0005, oft_info->port);
 
 		/* TLV t(2711) */
-		buflen = 2+2+4+strlen(oft_info->fh.name)+1;
+		buflen = 2+2+4+strlen((char *)oft_info->fh.name)+1;
 		buf = malloc(buflen);
 		aim_bstream_init(&bs, buf, buflen);
 		aimbs_put16(&bs, (oft_info->fh.totfiles > 1) ? 0x0002 : 0x0001);
@@ -801,7 +801,7 @@ faim_export int aim_im_sendch2_sendfile_ask(aim_session_t *sess, struct aim_oft_
 		aimbs_put32(&bs, oft_info->fh.totsize);
 
 		/* Filename - NULL terminated, for some odd reason */
-		aimbs_putstr(&bs, oft_info->fh.name);
+		aimbs_putstr(&bs, (char *)oft_info->fh.name);
 		aimbs_put8(&bs, 0x00);
 
 		aim_tlvlist_add_raw(&subtl, 0x2711, bs.len, bs.data);
@@ -1389,11 +1389,11 @@ static int incomingim_ch1_parsemsgs(aim_session_t *sess, aim_userinfo_t *userinf
 
 			/* Set up the simple flags */
 			if (args->charsubset == 0x0000)
-				; /* standard subencoding? */
+				(void) 0; /* standard subencoding? */
 			else if (args->charsubset == 0x000b)
 				args->icbmflags |= AIM_IMFLAGS_SUBENC_MACINTOSH;
 			else if (args->charsubset == 0xffff)
-				; /* no subencoding */
+				(void) 0; /* no subencoding */
 
 			args->msg = sec->data;
 			args->msglen = sec->datalen;
@@ -1848,7 +1848,7 @@ static int incomingim_ch2(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * 0x0002 - Also used in ICQ Lite Beta 4.0 URLs
 	 */
 	if (aim_tlv_gettlv(list2, 0x000a, 1))
-		;
+		(void) 0;
 
 	/*
 	 * Error code.
@@ -1883,7 +1883,7 @@ static int incomingim_ch2(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * Also used in ICQ Lite Beta 4.0 URLs.  Also empty.
 	 */
 	if (aim_tlv_gettlv(list2, 0x000f, 1))
-		;
+		(void) 0;
 
 	/*
 	 * Unknown -- no value
@@ -1891,7 +1891,7 @@ static int incomingim_ch2(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * Maybe means we should proxy the file transfer through an AIM server?
 	 */
 	if (aim_tlv_gettlv(list2, 0x0010, 1))
-		;
+		(void) 0;
 
 	if (strlen(proxyip))
 		args.proxyip = (char *)proxyip;
