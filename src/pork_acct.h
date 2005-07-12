@@ -68,6 +68,7 @@ struct pork_acct {
 	struct sockaddr_storage laddr;
 
 	struct pref_val *prefs;
+	struct pref_val *proto_prefs;
 	struct event *events;
 	struct pork_proto *proto;
 	void *data;

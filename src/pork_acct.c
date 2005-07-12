@@ -535,9 +535,13 @@ void pork_acct_reconnect_all(void) {
 	}
 }
 
+/* wrong */
+
 int pork_acct_save(struct pork_acct *acct) {
+#if 0
 	if (acct->proto->write_config != NULL)
 		return (acct->proto->write_config(acct));
+#endif
 
 	return (-1);
 }

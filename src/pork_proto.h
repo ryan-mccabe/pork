@@ -87,6 +87,9 @@ struct pork_proto {
 	int (*file_recv_complete)(struct file_transfer *xfer);
 	int (*file_send_complete)(struct file_transfer *xfer);
 
+	int (*set)(struct pork_acct *acct, char *str);
+	struct pref_val *(*get_default_prefs)(void);
+
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
 
 	int (*warn)(struct pork_acct *, char *);
@@ -114,5 +117,6 @@ int proto_new(int proto, const char *name, int (*init)(struct pork_proto *));
 void proto_destroy(void);
 inline struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
+int proto_set(struct pork_acct *acct, char *args);
 
 #endif

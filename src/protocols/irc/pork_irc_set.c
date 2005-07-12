@@ -31,6 +31,7 @@
 #include <pork_misc.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
+
 #include <pork_irc.h>
 #include <pork_irc_set.h>
 
@@ -41,6 +42,9 @@ static const struct pork_pref irc_pref_list[] = {
 	},{	.name = "CTCP_BLOCK_LEAKS",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
+	},{	.name = "FORMAT_CHAT_CREATED",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
 	},{	.name = "FORMAT_CTCP_REPLY",
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
@@ -48,6 +52,24 @@ static const struct pork_pref irc_pref_list[] = {
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
 	},{	.name = "FORMAT_USER_MODE",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "FORMAT_USERS",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "WHOIS_CHANNELS",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "WHOIS_IRCNAME",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "WHOIS_NICK",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "WHOIS_OPERATOR",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "WHOIS_SERVER",
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
 	},{	.name = "IRCHOST",
@@ -59,6 +81,9 @@ static const struct pork_pref irc_pref_list[] = {
 	},{	.name = "IRCPORT",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
+	},{	.name = "PORK_DIR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
 	},{	.name = "QUIT_MSG",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
@@ -81,18 +106,26 @@ static const struct pref_set irc_pref_set = {
 };
 
 static pref_val_t irc_default_pref_vals[] = {
-	{	.pref_val.b = DEFAULT_CTCP_BLOCK_ALL,
-	},{	.pref_val.b = DEFAULT_CTCP_BLOCK_LEAKS,
-	},{	.pref_val.s = DEFAULT_FORMAT_CTCP_REPLY,
-	},{	.pref_val.s = DEFAULT_FORMAT_CTCP_REQUEST,
-	},{	.pref_val.s = DEFAULT_FORMAT_USER_MODE,
-	},{	.pref_val.s = DEFAULT_IRCHOST,
-	},{	.pref_val.s = DEFAULT_IRCNAME,
-	},{	.pref_val.i = DEFAULT_IRCPORT,
-	},{	.pref_val.s = DEFAULT_QUIT_MSG,
-	},{	.pref_val.s = DEFAULT_SERVER_LIST,
-	},{	.pref_val.s = DEFAULT_USERMODE,
-	},{	.pref_val.s = DEFAULT_USERNAME,
+	{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_ALL,
+	},{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_LEAKS,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CHAT_CREATED,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REPLY,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REQUEST,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_USER_MODE,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_USERS,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_CHANNELS
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_IRCNAME
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_NICK
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_OPERATOR
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_SERVER
+	},{	.pref_val.s = DEFAULT_IRC_IRCHOST,
+	},{	.pref_val.s = DEFAULT_IRC_IRCNAME,
+	},{	.pref_val.i = DEFAULT_IRC_IRCPORT,
+	},{	.pref_val.s = DEFAULT_IRC_PORK_DIR,
+	},{	.pref_val.s = DEFAULT_IRC_QUIT_MSG,
+	},{	.pref_val.s = DEFAULT_IRC_SERVER_LIST,
+	},{	.pref_val.s = DEFAULT_IRC_USERMODE,
+	},{	.pref_val.s = DEFAULT_IRC_USERNAME,
 	}
 };
 

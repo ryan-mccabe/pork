@@ -30,16 +30,17 @@
 #include <pork_html.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
-#include <pork_acct.h>
 #include <pork_command.h>
 #include <pork_conf.h>
 #include <pork_chat.h>
+#include <pork_set.h>
 #include <pork_imwindow.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
 #include <pork_irc.h>
 #include <pork_irc_cmd.h>
+#include <pork_irc_set.h>
 
 /* XXX - todo */
 
@@ -48,6 +49,7 @@ static USER_COMMAND(irc_cmd_save) {
 }
 
 static USER_COMMAND(irc_cmd_set) {
+	proto_set(acct, args);
 }
 
 static USER_COMMAND(irc_cmd_ctcp) {
@@ -93,6 +95,7 @@ static struct command irc_command[] = {
 	{ "ctcp",				irc_cmd_ctcp	},
 	{ "mode",				irc_cmd_mode	},
 	{ "quote",				irc_cmd_quote	},
+	{ "set",				irc_cmd_set		},
 	{ "save",				irc_cmd_save	},
 	{ "who",				irc_cmd_who		},
 	{ "whowas",				irc_cmd_whowas	},

@@ -2727,12 +2727,17 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 		if (set == CMDSET_MAIN && proto_get_name(cmd_str) != NULL) {
 			cmd_str = strsep(&str, " \t");
 
-			cmd = bsearch(cmd_str, acct->proto->cmd, acct->proto->num_cmds,
-					sizeof(struct command), cmd_compare);
+			if (cmd_str != NULL) {
+				cmd = bsearch(cmd_str, acct->proto->cmd, acct->proto->num_cmds,
+						sizeof(struct command), cmd_compare);
 
-			if (cmd == NULL) {
-				screen_err_msg("Unknown %s command: %s (%s)",
-					acct->proto->name, cmd_str, str);
+				if (cmd == NULL) {
+					screen_err_msg("Unknown %s command: %s (%s)",
+						acct->proto->name, cmd_str, str);
+					return (-1);
+				}
+			} else {
+				screen_err_msg("Unknown %scommand", acct->proto->name);
 				return (-1);
 			}
 		} else {

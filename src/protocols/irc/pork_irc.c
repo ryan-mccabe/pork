@@ -38,6 +38,7 @@
 #include <pork_missing.h>
 
 #include <pork_irc.h>
+#include <pork_irc_set.h>
 #include <pork_irc_dcc.h>
 #include <pork_irc_cmd.h>
 
@@ -859,6 +860,9 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->is_chat = irc_is_chat;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
+
+	proto->set = proto_set;
+	proto->get_default_prefs = irc_get_default_prefs;
 
 	proto->file_accept = irc_file_accept;
 	proto->file_recv_data = irc_recv_data;

@@ -47,7 +47,6 @@ struct pork_pref {
 	void (*updated)(struct pref_val *, va_list);
 };
 
-
 void opt_copy_pref_val(struct pref_val *pref, pref_val_t *val, size_t n);
 
 int opt_set_bool(struct pref_val *pref, u_int32_t opt, char *args, va_list);

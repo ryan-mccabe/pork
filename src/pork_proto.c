@@ -19,7 +19,9 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
+#include <pork_acct.h>
 #include <pork_proto.h>
+#include <pork_set.h>
 
 static struct pork_proto *proto_table[PROTO_MAX + 1];
 
@@ -89,6 +91,31 @@ void proto_destroy(void) {
 		free(proto_table[i]);
 }
 
+int proto_set(struct pork_acct *acct, char *args) {
+	struct pref_val *pref;
+
+	if (acct->proto->set == NULL || acct->proto->get_default_prefs == NULL ||
+		acct->proto_prefs == NULL)
+	{
+		return (-1);
+	}
+
+	if (args == NULL || blank_str(args)) {
+		pref = acct->proto_prefs;
+	} else if (!strncasecmp(args, "-default", 8)) {
+		args += 8;
+		while (args[0] == ' ')
+			args++;
+
+		acct = NULL;
+		pref = acct->proto->get_default_prefs();
+	} else {
+		pref = acct->proto_prefs;
+	}
+
+	return (opt_set_var(pref, args, acct));
+}
+
 static int proto_init_null(struct pork_proto *proto) {
 	proto->normalize = xstrncpy;
 	return (0);
@@ -96,8 +123,9 @@ static int proto_init_null(struct pork_proto *proto) {
 
 int proto_init(void) {
 	proto_new(PROTO_NULL, "NULL", proto_init_null);
+#ifdef AIM_SUPPORT
 	proto_new(PROTO_AIM, "AIM", aim_proto_init);
-
+#endif
 #ifdef IRC_SUPPORT
 	proto_new(PROTO_IRC, "IRC", irc_proto_init);
 #endif
