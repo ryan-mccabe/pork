@@ -72,6 +72,7 @@ int read_conf(struct pork_acct *acct, const char *path) {
 	FILE *fp;
 	char buf[8192];
 	u_int32_t line = 0;
+	char cmdchar = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
 
 	fp = fopen(path, "r");
 	if (fp == NULL) {
@@ -87,7 +88,7 @@ int read_conf(struct pork_acct *acct, const char *path) {
 
 		p = strchr(buf, '\n');
 		if (p == NULL) {
-			debug("line %u too long", line);
+			debug("%s: line %u too long", path, line);
 			fclose(fp);
 			return (-1);
 		}
@@ -98,11 +99,11 @@ int read_conf(struct pork_acct *acct, const char *path) {
 			*p++ = ' ';
 
 		p = buf;
+		while (*p == cmdchar || *p == ' ' || *p == '\t')
+			p++;
+
 		if (*p == '#')
 			continue;
-
-		while (*p == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
-			p++;
 
 		if (!blank_str(p))
 			run_command(acct, p);
@@ -224,7 +225,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 
 int read_user_config(struct pork_acct *acct) {
 	char buf[PATH_MAX];
-	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_PORK_DIR);
+	char *pork_dir = opt_get_str(acct->prefs, ACCT_OPT_ACCT_DIR);
 
 	if (acct == NULL || pork_dir == NULL)
 		return (-1);
@@ -298,40 +299,25 @@ int save_user_config(struct pork_acct *acct) {
 
 	return (0);
 }
+#endif
 
 int read_global_config(void) {
-//	struct passwd *pw;
-//	char *pork_dir;
+	char *pork_dir;
+	char buf[4096];
 
 	if (read_conf(screen.null_acct, SYSTEM_PORKRC) != 0)
 		screen_err_msg("Error reading the system-wide porkrc file");
 
-#if 0
-	pw = getpwuid(getuid());
-	if (pw == NULL) {
-		debug("getpwuid: %s", strerror(errno));
+	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
+	if (pork_dir == NULL)
+		return (-1);
+
+	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
+	if (read_conf(screen.null_acct, buf) != 0 &&
+		errno != ENOENT)
+	{
 		return (-1);
 	}
 
-	pork_dir = opt_get_str(OPT_PORK_DIR);
-	if (pork_dir == NULL) {
-		snprintf(buf, sizeof(buf), "%s/.pork", pw->pw_dir);
-		opt_set(OPT_PORK_DIR, buf);
-
-		pork_dir = opt_get_str(OPT_PORK_DIR);
-	} else
-		xstrncpy(buf, pork_dir, sizeof(buf));
-
-	if (pork_mkdir(buf) != 0)
-		return (-1);
-
-	pork_dir = opt_get_str(OPT_PORK_DIR);
-
-	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
-	if (read_conf(buf) != 0 && errno != ENOENT)
-		return (-1);
-#endif
-
 	return (0);
 }
-#endif

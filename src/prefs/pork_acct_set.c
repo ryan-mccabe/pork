@@ -16,7 +16,6 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
-#include <pwd.h>
 
 #include <pork.h>
 #include <pork_missing.h>
@@ -25,6 +24,7 @@
 #include <pork_color.h>
 #include <pork_acct.h>
 #include <pork_set.h>
+#include <pork_set_global.h>
 #include <pork_acct_set.h>
 #include <pork_proto.h>
 #include <pork_imwindow.h>
@@ -34,7 +34,10 @@
 #include <pork_screen_io.h>
 
 static const struct pork_pref acct_pref_list[] = {
-	{	.name = "AUTO_RECONNECT",
+	{	.name = "ACCT_DIR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "AUTO_RECONNECT",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 	},{	.name = "AUTO_REJOIN",
@@ -61,9 +64,6 @@ static const struct pork_pref acct_pref_list[] = {
 	},{	.name = "LOGIN_ON_STARTUP",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
-	},{	.name = "PORK_DIR",
-		.type = OPT_TYPE_STR,
-		.set = opt_set_str,
 	},{	.name = "RECONNECT_INTERVAL",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
@@ -98,7 +98,8 @@ static const struct pref_set acct_pref_set = {
 };
 
 static pref_val_t acct_default_pref_vals[] = {
-	{	.pref_val.i = DEFAULT_ACCT_AUTO_RECONNECT,
+	{	.pref_val.s = DEFAULT_ACCT_DIR,
+	},{	.pref_val.i = DEFAULT_ACCT_AUTO_RECONNECT,
 	},{	.pref_val.i = DEFAULT_ACCT_AUTO_REJOIN,
 	},{	.pref_val.i = DEFAULT_ACCT_AUTOSEND_AWAY,
 	},{	.pref_val.i = DEFAULT_ACCT_CONNECT_TIMEOUT,
@@ -107,7 +108,6 @@ static pref_val_t acct_default_pref_vals[] = {
 	},{	.pref_val.i = DEFAULT_ACCT_IDLE_AFTER,
 	},{	.pref_val.s = DEFAULT_ACCT_LOG_DIR,
 	},{	.pref_val.b = DEFAULT_ACCT_LOGIN_ON_STARTUP,
-	},{	.pref_val.s = DEFAULT_ACCT_PORK_DIR,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_INTERVAL,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_MAX_INTERVAL,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_TRIES,
@@ -126,19 +126,22 @@ static struct pref_val acct_defaults = {
 
 int acct_init_prefs(struct pork_acct *acct) {
 	struct pref_val *prefs;
-	struct passwd *pw;
 	char buf[4096];
 	int ret;
+	char *pork_dir;
 
-	pw = getpwuid(getuid());
-	if (pw == NULL)
-		return (-1);
+	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
+	if (pork_dir == NULL) {
+		pork_dir = DEFAULT_PORK_DIR;
+		if (pork_dir == NULL)
+			return (-1);
+	}
 
 	if (acct->proto->protocol >= 0) {
-		ret = snprintf(buf, sizeof(buf), "%s/.pork/%s/%s",
-				pw->pw_dir, acct->proto->name, acct->username);
+		ret = snprintf(buf, sizeof(buf), "%s%s/%s",
+				pork_dir, acct->proto->name, acct->username);
 	} else {
-		ret = snprintf(buf, sizeof(buf), "%s/.pork", pw->pw_dir);
+		ret = xstrncpy(buf, pork_dir, sizeof(buf));
 	}
 
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
@@ -151,9 +154,9 @@ int acct_init_prefs(struct pork_acct *acct) {
 
 	acct->prefs = prefs;
 
-	opt_set(prefs, ACCT_OPT_PORK_DIR, buf);
+	opt_set(prefs, ACCT_OPT_ACCT_DIR, buf);
 
-	if (xstrncat(buf, "/dl", sizeof(buf)) == -1)
+	if (xstrncat(buf, "/downloads", sizeof(buf)) == -1)
 		return (-1);
 	opt_set(prefs, ACCT_OPT_DOWNLOAD_DIR, buf);
 

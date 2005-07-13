@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
 	alias_init(&screen.alias_hash);
 
 	screen_set_quiet(1);
-//	ret = read_global_config();
+	ret = read_global_config();
 	screen_set_quiet(0);
 
 	if (ret != 0)

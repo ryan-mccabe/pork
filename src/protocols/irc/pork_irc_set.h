@@ -31,7 +31,6 @@ enum {
 	IRC_OPT_IRCHOST,
 	IRC_OPT_IRCNAME,
 	IRC_OPT_IRCPORT,
-	IRC_OPT_PORK_DIR,
 	IRC_OPT_QUIT_MSG,
 	IRC_OPT_SERVER_LIST,
 	IRC_OPT_USERMODE,
@@ -54,7 +53,6 @@ enum {
 #define	DEFAULT_IRC_IRCHOST					NULL
 #define DEFAULT_IRC_IRCNAME					"*Unknown*"
 #define DEFAULT_IRC_IRCPORT					6667
-#define DEFAULT_IRC_PORK_DIR				"~/.pork/IRC/"
 #define DEFAULT_IRC_QUIT_MSG				"eat the piggy [pork: http://dev.ojnk.net]"
 #define DEFAULT_IRC_SERVER_LIST				NULL
 #define DEFAULT_IRC_USERMODE				"+i"
