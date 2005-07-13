@@ -101,7 +101,7 @@ static void opt_print_var(struct pref_val *pref, int i, const char *text) {
 				screen_nocolor_msg("%s %s \"%s\"",
 					pref_name(pref, i), text, str);
 			} else
-				screen_nocolor_msg("%s is <UNSET>", pref_name(pref, i));
+				screen_nocolor_msg("%s is [UNSET]", pref_name(pref, i));
 
 			break;
 		}

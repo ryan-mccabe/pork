@@ -10,5 +10,14 @@
 #ifndef __PORK_AIM_SET_H
 #define __PORK_AIM_SET_H
 
+int aim_init_prefs(struct pork_acct *acct);
+struct pref_val *aim_get_default_prefs(void);
+
+enum {
+	AIM_OPT_AUTOSAVE = 0,
+	AIM_NUM_OPTS
+};
+
+#define DEFAULT_AIM_AUTOSAVE				0
 
 #endif

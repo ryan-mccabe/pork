@@ -33,8 +33,8 @@
 #include <pork_color.h>
 #include <pork_html.h>
 #include <pork_acct.h>
-#include <pork_set.h>
 #include <pork_proto.h>
+#include <pork_set.h>
 #include <pork_buddy.h>
 #include <pork_chat.h>
 #include <pork_transfer.h>
@@ -46,6 +46,7 @@
 
 #include <pork_aim.h>
 #include <pork_aim_proto.h>
+#include <pork_aim_set.h>
 #include <pork_aim_cmd.h>
 
 static int aim_buddy_add(struct pork_acct *acct, struct buddy *buddy) {
@@ -888,6 +889,9 @@ int aim_proto_init(struct pork_proto *proto) {
 	proto->file_recv_data = aim_file_recv_data;
 	proto->file_recv_complete = aim_file_recv_complete;
 	proto->file_send_complete = aim_file_send_complete;
+
+	proto->set = proto_set;
+	proto->get_default_prefs = aim_get_default_prefs;
 
 	aim_cmd_setup(proto);
 	return (0);

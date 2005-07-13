@@ -59,7 +59,13 @@ static USER_COMMAND(aim_cmd_search) {
 }
 
 static USER_COMMAND(aim_cmd_save) {
+}
 
+static USER_COMMAND(aim_cmd_set) {
+	if (acct == NULL)
+		proto_set(proto_get(PROTO_AIM), NULL, args);
+	else
+		proto_set(acct->proto, acct->proto_prefs, args);
 }
 
 static USER_COMMAND(aim_cmd_idle_mode) {
@@ -95,6 +101,7 @@ static struct command aim_command[] = {
 	{ "password",			aim_cmd_passwd			},
 	{ "privacy_mode",		aim_cmd_privacy_mode	},
 	{ "save",				aim_cmd_save			},
+	{ "set",				aim_cmd_set				},
 	{ "search",				aim_cmd_search			},
 };
 
