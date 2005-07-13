@@ -2740,7 +2740,10 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 				}
 
 				if (proto != acct->proto) {
-					if (!strcasecmp(cmd->name, "set")) {
+					/* yeah, this isn't a hack at all. */
+					if (!strcasecmp(cmd->name, "set") ||
+						!strcasecmp(cmd->name, "save"))
+					{
 						cmd->cmd(NULL, str);
 						return (0);
 					} else {
