@@ -114,7 +114,7 @@ int read_conf(struct pork_acct *acct, const char *path) {
 }
 
 int write_global_conf(char *path) {
-	char porkrc[PATH_MAX];
+	char porkrc[4096];
 	FILE *fp;
 	int ret;
 
@@ -132,12 +132,12 @@ int write_global_conf(char *path) {
 	}
 
 	opt_write(screen.global_prefs, fp);
-	fprintf(fp, "\n");
+	fprintf(fp, "\n\n");
 
 	hash_iterate(&screen.alias_hash, write_alias_line, fp);
-	fprintf(fp, "\n");
+	fprintf(fp, "\n\n");
 	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
-	fprintf(fp, "\n");
+	fprintf(fp, "\n\n");
 	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
 
 	if (fchmod(fileno(fp), 0600) != 0) {

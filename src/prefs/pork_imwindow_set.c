@@ -99,6 +99,9 @@ static const struct pork_pref win_pref_list[] = {
 	{	.name = "ACTIVITY_TYPES",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
+	},{	.name = "AUTOSAVE",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
 	},{	.name = "BEEP",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
@@ -164,6 +167,7 @@ static const struct pref_set win_pref_set = {
 
 static pref_val_t win_default_pref_vals[] = {
 	{	.pref_val.i = DEFAULT_WIN_ACTIVITY_TYPES,
+	},{ .pref_val.b = DEFAULT_WIN_AUTOSAVE,
 	},{ .pref_val.b = DEFAULT_WIN_BEEP,
 	},{ .pref_val.i = DEFAULT_WIN_BEEP_MAX,
 	},{ .pref_val.b = DEFAULT_WIN_BEEP_ON_OUTPUT,

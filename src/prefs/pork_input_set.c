@@ -56,7 +56,10 @@ static void opt_updated_prompt(struct pref_val *pref, va_list ap) {
 }
 
 static const struct pork_pref input_pref_list[] = {
-	{	.name = "HISTORY_LEN",
+	{	.name = "AUTOSAVE",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "HISTORY_LEN",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
 		.updated = opt_updated_histlen
@@ -74,7 +77,8 @@ static const struct pref_set input_pref_set = {
 };
 
 static pref_val_t input_default_pref_vals[] = {
-	{	.pref_val.i = DEFAULT_INPUT_HISTORY_LEN,
+	{	.pref_val.b = DEFAULT_INPUT_AUTOSAVE,
+	},{	.pref_val.i = DEFAULT_INPUT_HISTORY_LEN,
 	},{	.pref_val.s = DEFAULT_INPUT_PROMPT_STR,
 	}
 };

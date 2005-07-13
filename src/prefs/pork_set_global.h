@@ -13,7 +13,8 @@
 void init_global_prefs(struct screen *screen);
 
 enum {
-	OPT_BANNER = 0,
+	OPT_AUTOSAVE = 0,
+	OPT_BANNER,
 	OPT_CMDCHARS,
 	OPT_COLOR_BLIST_FOCUS,
 	OPT_COLOR_BLIST_NOFOCUS,
@@ -101,6 +102,7 @@ enum {
 	GLOBAL_NUM_OPTS
 };
 
+#define DEFAULT_AUTOSAVE					0
 #define DEFAULT_BANNER						"*** "
 #define DEFAULT_CMDCHARS					'/'
 #define DEFAULT_COLOR_BLIST_FOCUS			0x200400

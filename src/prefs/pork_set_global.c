@@ -39,7 +39,10 @@
 */
 
 static struct pork_pref global_pref_list[] = {
-	{	.name = "BANNER",
+	{	.name = "AUTOSAVE",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "BANNER",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
 	},{	.name = "CMDCHARS",
@@ -312,7 +315,8 @@ static const struct pref_set global_pref_set = {
 };
 
 static pref_val_t global_default_pref_vals[] = {
-	{	.pref_val.s = DEFAULT_BANNER,
+	{	.pref_val.b = DEFAULT_AUTOSAVE,
+	},{	.pref_val.s = DEFAULT_BANNER,
 	},{	.pref_val.c = DEFAULT_CMDCHARS,
 	},{	.pref_val.i = DEFAULT_COLOR_BLIST_FOCUS,
 	},{	.pref_val.i = DEFAULT_COLOR_BLIST_NOFOCUS,

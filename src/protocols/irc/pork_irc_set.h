@@ -16,7 +16,8 @@ int irc_init_prefs(struct pork_acct *acct);
 struct pref_val *irc_get_default_prefs(void);
 
 enum {
-	IRC_OPT_CTCP_BLOCK_ALL = 0,
+	IRC_OPT_AUTOSAVE = 0,
+	IRC_OPT_CTCP_BLOCK_ALL,
 	IRC_OPT_CTCP_BLOCK_LEAKS,
 	IRC_OPT_FORMAT_CHAT_CREATED,
 	IRC_OPT_FORMAT_CTCP_REPLY,
@@ -38,6 +39,7 @@ enum {
 	IRC_NUM_OPTS	
 };
 
+#define DEFAULT_IRC_AUTOSAVE				0
 #define DEFAULT_IRC_CTCP_BLOCK_ALL			0
 #define DEFAULT_IRC_CTCP_BLOCK_LEAKS		0
 #define DEFAULT_IRC_FORMAT_CHAT_CREATED		""
@@ -53,7 +55,7 @@ enum {
 #define	DEFAULT_IRC_IRCHOST					NULL
 #define DEFAULT_IRC_IRCNAME					"*Unknown*"
 #define DEFAULT_IRC_IRCPORT					6667
-#define DEFAULT_IRC_QUIT_MSG				"eat the piggy [pork: http://dev.ojnk.net]"
+#define DEFAULT_IRC_QUIT_MSG				"pork: http://dev.ojnk.net"
 #define DEFAULT_IRC_SERVER_LIST				NULL
 #define DEFAULT_IRC_USERMODE				"+i"
 #define DEFAULT_IRC_USERNAME				NULL

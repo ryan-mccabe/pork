@@ -37,7 +37,10 @@
 #include <pork_irc_set.h>
 
 static const struct pork_pref irc_pref_list[] = {
-	{	.name = "CTCP_BLOCK_ALL",
+	{	.name = "AUTOSAVE",
+		.type = OPT_TYPE_BOOL,
+		.set = opt_set_bool,
+	},{	.name = "CTCP_BLOCK_ALL",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 	},{	.name = "CTCP_BLOCK_LEAKS",
@@ -104,7 +107,8 @@ static const struct pref_set irc_pref_set = {
 };
 
 static pref_val_t irc_default_pref_vals[] = {
-	{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_ALL,
+	{	.pref_val.b = DEFAULT_IRC_AUTOSAVE,
+	},{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_ALL,
 	},{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_LEAKS,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CHAT_CREATED,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REPLY,

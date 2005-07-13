@@ -17,6 +17,7 @@ struct pref_val *imwindow_get_default_prefs(void);
 
 enum {
 	WIN_OPT_ACTIVITY_TYPES = 0,
+	WIN_OPT_AUTOSAVE,
 	WIN_OPT_BEEP,
 	WIN_OPT_BEEP_MAX,
 	WIN_OPT_BEEP_ON_OUTPUT,
@@ -37,6 +38,7 @@ enum {
 };
 
 #define DEFAULT_WIN_ACTIVITY_TYPES				0xffffffff
+#define DEFAULT_WIN_AUTOSAVE					0
 #define DEFAULT_WIN_BEEP						0
 #define DEFAULT_WIN_BEEP_MAX					3
 #define DEFAULT_WIN_BEEP_ON_OUTPUT				0
