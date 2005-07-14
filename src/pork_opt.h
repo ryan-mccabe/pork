@@ -16,5 +16,6 @@ int opt_is_set(u_int32_t opt);
 #define USE_ADDR	(1 << 1)
 #define USE_PORT	(1 << 2)
 
+#else
+#	warning "included multiple times"
 #endif
-

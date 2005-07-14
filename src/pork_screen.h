@@ -21,9 +21,6 @@ struct blist;
 struct imwindow;
 struct pork_acct;
 
-#include <pork_input.h>
-#include <pork_bind.h>
-
 struct screen {
 	u_int32_t rows;
 	u_int32_t cols;
@@ -62,4 +59,6 @@ void screen_cycle_fwd(void);
 void screen_cycle_bak(void);
 void screen_doupdate(void);
 
+#else
+#	warning "included multiple times"
 #endif

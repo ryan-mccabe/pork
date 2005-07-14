@@ -28,6 +28,8 @@
 #include <pork_misc.h>
 #include <pork_set.h>
 #include <pork_set_global.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_format.h>

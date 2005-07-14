@@ -56,4 +56,6 @@ enum {
 #define DEFAULT_WIN_WORDWRAP					1
 #define DEFAULT_WIN_WORDWRAP_CHAR				' '
 
+#else
+#	warning "included multiple times"
 #endif

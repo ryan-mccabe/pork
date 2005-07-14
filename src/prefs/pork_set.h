@@ -80,4 +80,6 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len);
 #define pref_name(pref,opt)			((pref)->set->prefs[i].name)
 #define pref_type(pref,opt)			((pref)->set->prefs[i].type)
 
+#else
+#	warning "included multiple times"
 #endif

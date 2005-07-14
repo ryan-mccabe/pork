@@ -31,6 +31,7 @@
 #include <pork_acct.h>
 #include <pork_proto.h>
 #include <pork_io.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_screen_io.h>
 #include <pork_events.h>

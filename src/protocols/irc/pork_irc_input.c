@@ -34,7 +34,10 @@
 #include <pork_proto.h>
 #include <pork_events.h>
 #include <pork_imsg.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_chat.h>

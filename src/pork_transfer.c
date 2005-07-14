@@ -31,6 +31,8 @@
 #include <pork_acct.h>
 #include <pork_io.h>
 #include <pork_imsg.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_set.h>

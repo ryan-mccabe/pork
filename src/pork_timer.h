@@ -32,4 +32,6 @@ u_int32_t timer_add(dlist_t **timer_list,
 					time_t interval,
 					u_int32_t count);
 
+#else
+#	warning "included multiple times"
 #endif

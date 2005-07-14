@@ -68,4 +68,6 @@ struct imsg *imsg_new(struct swindow *swindow, chtype *msg, size_t len);
 struct imsg *imsg_copy(struct swindow *swindow, struct imsg *imsg);
 chtype *imsg_partial(struct swindow *swindow, struct imsg *imsg, u_int32_t n);
 
+#else
+#	warning "included multiple times"
 #endif

@@ -13,4 +13,6 @@
 char *strip_html(char *str);
 char *text_to_html(const char *in);
 
+#else
+#	warning "included multiple times"
 #endif

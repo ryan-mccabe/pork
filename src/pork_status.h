@@ -17,4 +17,6 @@ struct pork_acct;
 int status_init(void);
 void status_draw(struct pork_acct *acct);
 
+#else
+#	warning "included multiple times"
 #endif

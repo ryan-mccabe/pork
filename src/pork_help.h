@@ -18,4 +18,6 @@
 int pork_help_print(char *section, char *command);
 int pork_help_get_cmds(char *section, char *buf, size_t len);
 
+#else
+#	warning "included multiple times"
 #endif

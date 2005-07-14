@@ -36,6 +36,7 @@
 #include <pork_list.h>
 #include <pork_set.h>
 #include <pork_imsg.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_acct.h>
 #include <pork_input.h>

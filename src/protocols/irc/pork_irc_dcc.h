@@ -27,4 +27,6 @@ struct dcc {
 	off_t ack;
 };
 
+#else
+#	warning "included multiple times"
 #endif

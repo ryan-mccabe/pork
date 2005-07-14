@@ -87,4 +87,6 @@ int event_del_type(struct event *events, const char *type, const char *func);
 void event_destroy(struct event *events);
 void event_purge(struct event *events);
 
+#else
+#	warning "included multiple times"
 #endif

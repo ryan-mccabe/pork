@@ -34,7 +34,9 @@
 #include <pork_list.h>
 #include <pork_set.h>
 #include <pork_imsg.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_acct_set.h>
 #include <pork_misc.h>
@@ -53,9 +55,7 @@
 #include <pork_timer.h>
 #include <pork_io.h>
 #include <pork_proto.h>
-#include <pork_screen.h>
 #include <pork_queue.h>
-#include <pork_inet.h>
 #include <pork_missing.h>
 
 struct screen screen;

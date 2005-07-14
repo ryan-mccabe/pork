@@ -56,4 +56,6 @@ enum {
 #define DEFAULT_ACCT_TRANSFER_PORT_MAX			15000
 #define DEFAULT_ACCT_TRANSFER_PORT_MIN			10000
 
+#else
+#	warning "included multiple times"
 #endif

@@ -38,4 +38,6 @@ struct command {
 int run_mcommand(struct pork_acct *acct, char *str);
 inline int run_command(struct pork_acct *acct, char *str);
 
+#else
+#	warning "included multiple times"
 #endif

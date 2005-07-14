@@ -23,4 +23,6 @@ int queue_putback_head(pork_queue_t *q, void *data);
 void *queue_get(pork_queue_t *q);
 void queue_destroy(pork_queue_t *q, void (*cleanup)(void *));
 
+#else
+#	warning "included multiple times"
 #endif

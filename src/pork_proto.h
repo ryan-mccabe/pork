@@ -113,4 +113,6 @@ inline struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
 int proto_set(struct pork_proto *proto, struct pref_val *pref, char *args);
 
+#else
+#	warning "included multiple times"
 #endif

@@ -137,4 +137,7 @@ int irc_callback_add_defaults(struct irc_session *session);
 int irc_callback_add(	struct irc_session *session,
 						char *str,
 						int (*handler)(struct pork_acct *, struct irc_input *));
+
+#else
+#	warning "included multiple times"
 #endif

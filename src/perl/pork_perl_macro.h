@@ -49,4 +49,6 @@
 		input = cur_window()->input; \
 } while (0)
 
+#else
+#	warning "included multiple times"
 #endif

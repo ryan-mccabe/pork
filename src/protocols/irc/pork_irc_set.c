@@ -24,12 +24,16 @@
 #include <pork_list.h>
 #include <pork_queue.h>
 #include <pork_color.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_set.h>
 #include <pork_proto.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 

@@ -31,4 +31,6 @@ size_t mvwputstr(WINDOW *win, struct pref_val *,int y, int x, chtype *ch);
 size_t mvwputnstr(WINDOW *win, struct pref_val *, int y, int x, chtype *ch, size_t n);
 size_t wputncstr(WINDOW *win, char *str, size_t n);
 
+#else
+#	warning "included multiple times"
 #endif

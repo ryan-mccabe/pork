@@ -67,4 +67,6 @@ void screen_doupdate(void);
 
 #endif
 
+#else
+#	warning "included multiple times"
 #endif

@@ -188,4 +188,6 @@ enum {
 #define DEFAULT_TEXT_TYPING_PAUSED			"Typing [paused]"
 #define DEFAULT_TEXT_WARN_ANONYMOUS			"%D<%ranonymous%D>%x"
 
+#else
+#	warning "included multiple times"
 #endif

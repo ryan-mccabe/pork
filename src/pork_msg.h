@@ -48,4 +48,6 @@ int pork_notice_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_action_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_signoff(struct pork_acct *acct, char *msg);
 
+#else
+#	warning "included multiple times"
 #endif

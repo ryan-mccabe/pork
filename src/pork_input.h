@@ -68,4 +68,6 @@ int input_set_prompt(struct pork_input *input, char *prompt);
 char *input_get_buf_str(struct pork_input *input);
 u_int32_t input_get_cursor_pos(struct pork_input *input);
 
+#else
+#	warning "included multiple times"
 #endif

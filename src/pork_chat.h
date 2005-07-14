@@ -149,4 +149,6 @@ int chat_got_mode(	struct pork_acct *acct,
 inline struct chat_user *chat_find_user(struct pork_acct *acct,
 										struct chatroom *chat,
 										char *user);
+#else
+#	warning "included multiple times"
 #endif

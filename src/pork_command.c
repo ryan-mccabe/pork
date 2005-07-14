@@ -31,18 +31,21 @@
 #include <pork_set.h>
 #include <pork_set_global.h>
 #include <pork_imsg.h>
+#include <pork_input.h>
+#include <pork_bind.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_imwindow_set.h>
 #include <pork_input_set.h>
+#include <pork_slist.h>
 #include <pork_buddy_list.h>
 #include <pork_proto.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_acct_set.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
 #include <pork_html.h>
-#include <pork_input.h>
-#include <pork_bind.h>
 #include <pork_events.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
@@ -212,9 +215,8 @@ USER_COMMAND(cmd_input_prompt) {
 		prompt = opt_get_str(cur_window()->input->prefs, INPUT_OPT_PROMPT_STR);
 		if (prompt != NULL)
 			input_set_prompt(cur_window()->input, prompt);
-		else {
-			screen_err_msg("No prompt format has been specified for this input");
-		}
+		else
+			screen_err_msg("No prompt format has been specified");
 	}
 }
 
@@ -535,7 +537,7 @@ USER_COMMAND(cmd_win_bind) {
 		if (imwindow->type == WIN_TYPE_CHAT)
 			screen_err_msg("You can't rebind chat windows");
 		else
-			screen_err_msg("Account %s isn't signed on", args);
+			screen_err_msg("Account refnum %s doesn't exist", args);
 	} else {
 		screen_cmd_output("This window is now bound to account %s [refnum %u]",
 			imwindow->owner->username, imwindow->owner->refnum);
@@ -1869,9 +1871,6 @@ USER_COMMAND(cmd_chat_topic) {
 	char *topic = NULL;
 	struct chatroom *chat = NULL;
 
-	if (acct->proto->chat_set_topic == NULL)
-		return;
-
 	if (args != NULL) {
 		topic = strchr(args, ' ');
 		if (topic != NULL)
@@ -1894,7 +1893,7 @@ USER_COMMAND(cmd_chat_topic) {
 		}
 	}
 
-	acct->proto->chat_set_topic(acct, chat, topic);
+	chat_set_topic(acct, chat, topic);
 }
 
 USER_COMMAND(cmd_chat_unignore) {
@@ -2729,13 +2728,13 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 		if (set == CMDSET_MAIN && (proto = proto_get_name(cmd_str)) != NULL) {
 			cmd_str = strsep(&str, " \t");
 
-			if (cmd_str != NULL) {
+			if (cmd_str != NULL && cmd_str[0] != '\0') {
 				cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
 						sizeof(struct command), cmd_compare);
 
 				if (cmd == NULL) {
-					screen_err_msg("Unknown %s command: %s (%s)",
-						proto->name, cmd_str, str);
+					screen_err_msg("Unknown %s command: %s",
+						proto->name, cmd_str);
 					return (-1);
 				}
 
@@ -2753,7 +2752,9 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 					}
 				}
 			} else {
-				screen_err_msg("Unknown %scommand", proto->name);
+				if (str != NULL)
+					screen_err_msg("Unknown %s command: %s", proto->name, str);
+
 				return (-1);
 			}
 		} else {

@@ -82,4 +82,6 @@ FAIM_CB(aim_file_send_accepted);
 FAIM_CB(aim_file_transfer_dead);
 FAIM_CB(aim_file_recv_accept);
 
+#else
+#	warning "included multiple times"
 #endif

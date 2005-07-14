@@ -29,25 +29,23 @@
 #include <pork_misc.h>
 #include <pork_color.h>
 #include <pork_html.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
 #include <pork_command.h>
 #include <pork_conf.h>
 #include <pork_chat.h>
 #include <pork_set.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
 #include <pork_irc.h>
 #include <pork_irc_cmd.h>
 #include <pork_irc_set.h>
-
-/* XXX - todo */
-
-static USER_COMMAND(irc_cmd_save) {
-	/* save default */
-}
 
 static USER_COMMAND(irc_cmd_set) {
 	if (acct == NULL)
@@ -95,12 +93,57 @@ static USER_COMMAND(irc_cmd_whowas) {
 		irc_whowas(acct, args);
 }
 
+static USER_COMMAND(FIXME) {
+	screen_err_msg("This command is not implemented yet.");
+}
+
 static struct command irc_command[] = {
+	{ "capab",				FIXME			},
+	{ "close",				FIXME			},
+	{ "connect",			FIXME			},
 	{ "ctcp",				irc_cmd_ctcp	},
+	{ "die",				FIXME			},
+	{ "dline",				FIXME			},
+	{ "hash",				FIXME			},
+	{ "ison",				FIXME			},
+	{ "kill",				FIXME			},
+	{ "kline",				FIXME			},
+	{ "knock",				FIXME			},
+	{ "gline",				FIXME			},
+	{ "links",				FIXME			},
+	{ "list",				FIXME			},
+	{ "locops",				FIXME			},
+	{ "ltrace",				FIXME			},
+	{ "lusers",				FIXME			},
+	{ "lwallops",			FIXME			},
 	{ "mode",				irc_cmd_mode	},
+	{ "motd",				FIXME			},
+	{ "names",				FIXME			},
+	{ "operwall",			FIXME			},
+	{ "pass",				FIXME			},
 	{ "quote",				irc_cmd_quote	},
+	{ "rehash",				FIXME			},
+	{ "restart",			FIXME			},
+	{ "save",				FIXME			},
+	{ "server",				FIXME			},
 	{ "set",				irc_cmd_set		},
-	{ "save",				irc_cmd_save	},
+	{ "sete",				FIXME			},
+	{ "sjoin",				FIXME			},
+	{ "squit",				FIXME			},
+	{ "stats",				FIXME			},
+	{ "svinfo",				FIXME			},
+	{ "time",				FIXME			},
+	{ "testline",			FIXME			},
+	{ "trace",				FIXME			},
+	{ "undline",			FIXME			},
+	{ "ungline",			FIXME			},
+	{ "unkline",			FIXME			},
+	{ "user",				FIXME			},
+	{ "userhost",			FIXME			},
+	{ "users",				FIXME			},
+	{ "version",			FIXME			},
+	{ "wallops",			FIXME			},
+	{ "wii",				FIXME			},
 	{ "who",				irc_cmd_who		},
 	{ "whowas",				irc_cmd_whowas	},
 };

@@ -22,4 +22,6 @@ int alias_add(hash_t *alias_hash, char *alias, char *str);
 int alias_remove(hash_t *alias_hash, char *alias);
 int alias_resolve(hash_t *alias_hash, char *str, char **result);
 
+#else
+#	warning "included multiple times"
 #endif

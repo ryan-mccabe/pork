@@ -14,8 +14,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <pork_inet.h>
-
 struct pork_acct;
 
 enum {
@@ -99,4 +97,6 @@ struct file_transfer *transfer_find(struct pork_acct *acct,
 									char *peer,
 									char *file);
 
+#else
+#	warning "included multiple times"
 #endif

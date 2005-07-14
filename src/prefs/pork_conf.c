@@ -27,10 +27,13 @@
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_buddy.h>
-#include <pork_imwindow.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
+#include <pork_swindow.h>
+#include <pork_imwindow.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
+#include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_alias.h>
 #include <pork_screen_io.h>

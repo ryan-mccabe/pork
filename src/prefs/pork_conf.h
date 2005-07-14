@@ -22,4 +22,6 @@ int save_user_config(struct pork_acct *acct);
 int read_conf(struct pork_acct *acct, const char *path);
 int write_global_conf(char *path);
 
+#else
+#	warning "included multiple times"
 #endif

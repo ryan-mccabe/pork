@@ -12,11 +12,11 @@
 
 #define IMWINDOW(x)	((struct imwindow *) (x))
 
-struct pork_acct;
 struct imsg;
-
-#include <pork_set.h>
-#include <pork_swindow.h>
+struct pork_acct;
+struct pref_val;
+struct pork_input;
+struct key_binds;
 
 enum {
 	WIN_TYPE_STATUS,
@@ -94,4 +94,6 @@ inline void imwindow_scroll_end(struct imwindow *imwindow);
 inline void imwindow_clear(struct imwindow *imwindow);
 inline void imwindow_erase(struct imwindow *imwindow);
 
+#else
+#	warning "included multiple times"
 #endif

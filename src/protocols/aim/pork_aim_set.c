@@ -23,6 +23,7 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
+#include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_set.h>
 #include <pork_aim_set.h>

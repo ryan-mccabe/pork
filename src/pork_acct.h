@@ -10,12 +10,6 @@
 #ifndef __PORK_ACCT_H
 #define __PORK_ACCT_H
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#include <pork_inet.h>
-
 struct buddy_pref;
 struct blist;
 struct events;
@@ -94,4 +88,6 @@ int pork_acct_save(struct pork_acct *acct);
 void pork_acct_update_blist_format(struct pref_val *pref, va_list ap);
 void pork_acct_update_blist_color(struct pref_val *pref, va_list ap);
 
+#else
+#	warning "included multiple times"
 #endif

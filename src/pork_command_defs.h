@@ -196,4 +196,6 @@ USER_COMMAND(cmd_chat_who);
 
 USER_COMMAND(cmd_protocol);
 
+#else
+#	warning "included multiple times"
 #endif

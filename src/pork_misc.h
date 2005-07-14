@@ -22,4 +22,6 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len);
 int date_to_str(time_t timespec, char *buf, size_t len);
 int wgetinput(WINDOW *win);
 
+#else
+#	warning "included multiple times"
 #endif

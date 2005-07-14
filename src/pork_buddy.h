@@ -105,4 +105,6 @@ int buddy_went_unidle(struct pork_acct *acct, char *user);
 int buddy_went_away(struct pork_acct *acct, char *user);
 int buddy_went_unaway(struct pork_acct *acct, char *user);
 
+#else
+#	warning "included multiple times"
 #endif

@@ -16,4 +16,6 @@ int color_parse_code(const char *code, attr_t *attr);
 int color_get_str(attr_t attr, char *buf, size_t len);
 char *color_quote_codes(const char *str);
 
+#else
+#	warning "included multiple times"
 #endif

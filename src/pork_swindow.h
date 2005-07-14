@@ -89,4 +89,6 @@ void swindow_scroll_to_end(struct swindow *swindow);
 void swindow_scroll_to_start(struct swindow *swindow);
 int swindow_scroll_by(struct swindow *swindow, int lines);
 
+#else
+#	warning "included multiple times"
 #endif

@@ -67,4 +67,6 @@ int _getopt_internal(	int ___argc,
 						int __long_only);
 #	endif
 
+#else
+#	warning "included multiple times"
 #endif

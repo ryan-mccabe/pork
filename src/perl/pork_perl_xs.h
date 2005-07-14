@@ -149,4 +149,6 @@ XS(PORK_input_move_cursor_start);
 XS(PORK_input_remove);
 XS(PORK_input_send);
 
+#else
+#	warning "included multiple times"
 #endif

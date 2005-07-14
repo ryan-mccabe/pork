@@ -40,5 +40,6 @@ int pork_io_add(int fd,
 				void *key,
 				void (*callback)(int fd, u_int32_t condition, void *data));
 
+#else
+#	warning "included multiple times"
 #endif
-

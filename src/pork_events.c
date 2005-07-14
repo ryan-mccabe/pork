@@ -29,6 +29,8 @@
 #include <pork_command.h>
 #include <pork_events.h>
 #include <pork_imsg.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 
 static u_int32_t next_refnum;

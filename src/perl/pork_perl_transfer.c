@@ -34,7 +34,11 @@
 #include <pork_missing.h>
 #include <pork_util.h>
 #include <pork_list.h>
+#include <pork_swindow.h>
+#include <pork_bind.h>
+#include <pork_input.h>
 #include <pork_screen.h>
+#include <pork_inet.h>
 #include <pork_transfer.h>
 #include <pork_perl_xs.h>
 

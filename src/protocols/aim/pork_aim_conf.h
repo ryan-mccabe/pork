@@ -10,4 +10,6 @@
 #ifndef PORK_AIM_CONF_H
 #define PORK_AIM_CONF_H
 
+#else
+#	warning "included multiple times"
 #endif

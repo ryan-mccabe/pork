@@ -60,4 +60,6 @@ enum {
 #define DEFAULT_IRC_USERMODE				"+i"
 #define DEFAULT_IRC_USERNAME				NULL
 
+#else
+#	warning "included multiple times"
 #endif

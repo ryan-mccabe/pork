@@ -90,4 +90,6 @@ int slist_refresh(struct slist *slist);
 dlist_t *slist_node_next(dlist_t *node);
 inline struct slist_cell *slist_get_cursor(struct slist *slist);
 
+#else
+#	warning "included multiple times"
 #endif

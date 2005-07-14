@@ -26,4 +26,6 @@ enum {
 #define DEFAULT_INPUT_HISTORY_LEN		400
 #define DEFAULT_INPUT_PROMPT_STR		"%Mp%mork%w>%x "
 
+#else
+#	warning "included multiple times"
 #endif

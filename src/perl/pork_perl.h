@@ -16,4 +16,6 @@ int perl_load_file(char *filename);
 int execute_perl(char *function, char **args);
 int execute_perl_va(char *function, const char *fmt, va_list ap);
 
+#else
+#	warning "included multiple times"
 #endif

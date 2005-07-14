@@ -29,4 +29,6 @@
 void pork_exit(int status, char *msg, char *fmt, ...) __format((printf, 3, 4));
 void keyboard_input(int fd, u_int32_t condition, void *data);
 
+#else
+#	warning "included multiple times"
 #endif

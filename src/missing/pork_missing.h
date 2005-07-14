@@ -92,4 +92,6 @@ int vasprintf(char **result, const char *format, va_list args);
 #	define NI_MAXHOST 1025
 #endif
 
+#else
+#	warning "included multiple times"
 #endif

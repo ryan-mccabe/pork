@@ -16,8 +16,6 @@ struct pork_acct;
 struct buddy;
 struct bgroup;
 
-#include <pork_slist.h>
-
 struct blist {
 	struct slist slist;
 	size_t label_len;
@@ -53,4 +51,6 @@ void blist_draw_border(struct blist *blist, int border_state);
 void blist_changed_format(struct blist *blist);
 void blist_changed_width(struct blist *blist);
 
+#else
+#	warning "included multiple times"
 #endif

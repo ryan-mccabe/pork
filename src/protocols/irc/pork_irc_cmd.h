@@ -12,4 +12,6 @@
 
 void irc_cmd_setup(struct pork_proto *proto);
 
+#else
+#	warning "included multiple times"
 #endif

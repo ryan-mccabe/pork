@@ -35,9 +35,12 @@
 #include <pork_util.h>
 #include <pork_list.h>
 #include <pork_buddy.h>
+#include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
+#include <pork_input.h>
+#include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_perl_xs.h>
 #include <pork_perl_macro.h>

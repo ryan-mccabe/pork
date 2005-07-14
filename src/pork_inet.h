@@ -10,6 +10,10 @@
 #ifndef __PORK_INET_H
 #define __PORK_INET_H
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #ifdef INET6_ADDRSTRLEN
 #	define MAX_IPLEN 	INET6_ADDRSTRLEN
 #elif defined INET_ADDRSTRLEN
@@ -79,4 +83,6 @@ inline void get_ip(	struct sockaddr_storage *ss,
 					size_t len);
 
 
+#else
+#	warning "included multiple times"
 #endif

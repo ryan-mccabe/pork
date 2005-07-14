@@ -22,4 +22,6 @@ int aim_set_privacy_mode(struct pork_acct *acct, int mode);
 int aim_chat_print_users(	struct pork_acct *acct __notused,
 							struct chatroom *chat);
 
+#else
+#	warning "included multiple times"
 #endif

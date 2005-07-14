@@ -60,4 +60,6 @@ inline int str_to_int(const char *str, int *val);
 int file_get_size(FILE *fp, size_t *result);
 int create_full_path(char *path);
 
+#else
+#	warning "included multiple times"
 #endif

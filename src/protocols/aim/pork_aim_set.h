@@ -20,4 +20,6 @@ enum {
 
 #define DEFAULT_AIM_AUTOSAVE				0
 
+#else
+#	warning "included multiple times"
 #endif

@@ -47,4 +47,6 @@ void hash_destroy(hash_t *hash);
 int hash_exists(hash_t *hash, void *data, u_int32_t cur_hash);
 void hash_iterate(hash_t *hash, void (*func)(void *, void *), void *data);
 
+#else
+#	warning "included multiple times"
 #endif
