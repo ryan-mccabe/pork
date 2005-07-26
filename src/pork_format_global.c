@@ -522,7 +522,6 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 	if (ret < 0 || (size_t) ret >= len)
 		return (-1);
 
-
 	return (0);
 }
 

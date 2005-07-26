@@ -15,7 +15,6 @@
 #	define INET_ADDRSTRLEN 16
 #endif
 
-
 /*
 ** This is an IPv4 only inet_ntop(3) replacement function.
 */

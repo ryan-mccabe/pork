@@ -32,17 +32,17 @@ enum {
 };
 
 #define DEFAULT_AIM_AUTOSAVE					0
-#define DEFAULT_AIM_FORMAT_WHOIS_AWAY           "%D-%Ca%cway message%W:%x $A"
-#define DEFAULT_AIM_FORMAT_WHOIS_IDLE           "%D-%p-%P--%Ci%cdle time%W:%x $i"
-#define DEFAULT_AIM_FORMAT_WHOIS_MEMBER         "%D-%Cm%cember since%W:%x $d"
-#define DEFAULT_AIM_FORMAT_WHOIS_NAME           "%D-%p-%P---%Cu%csername%W:%x $N"
-#define DEFAULT_AIM_FORMAT_WHOIS_SIGNON         "%D-%Co%cnline since%W:%x $s"
-#define DEFAULT_AIM_FORMAT_WHOIS_USERINFO       "%D-%p-%P--%Cu%cser info%W:%x $P"
-#define DEFAULT_AIM_FORMAT_WHOIS_WARNLEVEL      "%D-%p-%P-%Cw%carn level%W:%x $W%%"
-#define DEFAULT_AIM_OUTGOING_MSG_FONT           ""
-#define DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR   "#ffffff"
-#define DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR   "#000000"
-#define DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE      ""
+#define DEFAULT_AIM_FORMAT_WHOIS_AWAY			"%D-%Ca%cway message%W:%x $A"
+#define DEFAULT_AIM_FORMAT_WHOIS_IDLE			"%D-%p-%P--%Ci%cdle time%W:%x $i"
+#define DEFAULT_AIM_FORMAT_WHOIS_MEMBER			"%D-%Cm%cember since%W:%x $d"
+#define DEFAULT_AIM_FORMAT_WHOIS_NAME			"%D-%p-%P---%Cu%csername%W:%x $N"
+#define DEFAULT_AIM_FORMAT_WHOIS_SIGNON			"%D-%Co%cnline since%W:%x $s"
+#define DEFAULT_AIM_FORMAT_WHOIS_USERINFO		"%D-%p-%P--%Cu%cser info%W:%x $P"
+#define DEFAULT_AIM_FORMAT_WHOIS_WARNLEVEL		"%D-%p-%P-%Cw%carn level%W:%x $W%%"
+#define DEFAULT_AIM_OUTGOING_MSG_FONT			""
+#define DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR	"#ffffff"
+#define DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR	"#000000"
+#define DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE		""
 #define DEFAULT_AIM_PORT						FAIM_LOGIN_SERVER
 #define DEFAULT_AIM_SERVER						"80"
 

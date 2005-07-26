@@ -88,7 +88,6 @@ struct file_transfer *transfer_new(	struct pork_acct *acct,
 									char *filename,
 									size_t size);
 
-
 struct file_transfer *transfer_find(struct pork_acct *acct,
 									char *peer,
 									char *file);

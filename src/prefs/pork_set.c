@@ -221,7 +221,6 @@ int opt_find(const struct pref_set *pref_set, const char *name) {
 	return (offset / sizeof(*ppref));
 }
 
-
 /*
 ** The values a boolean variable can accept are TRUE, FALSE and TOGGLE.
 ** TRUE is 1, FALSE is 0. TOGGLE flips the current value of the variable.

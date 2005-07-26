@@ -140,7 +140,6 @@ int chat_user_quit(	struct pork_acct *acct,
 					struct chat_user *user,
 					char *msg);
 
-
 int chat_got_mode(	struct pork_acct *acct,
 					struct chatroom *chat,
 					char *user,
