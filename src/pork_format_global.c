@@ -1111,82 +1111,6 @@ static int format_file_transfer(char opt, char *buf, size_t len, va_list ap) {
 	return (0);
 }
 
-static int format_whois(char opt, char *buf, size_t len, va_list ap) {
-	char *user = va_arg(ap, char *);
-	u_int32_t warn_level = va_arg(ap, unsigned long int);
-	u_int32_t idle_time = va_arg(ap, unsigned long int);
-	u_int32_t online_since = va_arg(ap, unsigned long int);
-	u_int32_t member_since = va_arg(ap, unsigned long int);
-	char *info = va_arg(ap, char *);
-	int ret = 0;
-
-	switch (opt) {
-		/* Timestamp */
-		case 'T':
-			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-			break;
-
-		/* Name */
-		case 'N':
-		case 'n':
-			ret = xstrncpy(buf, user, len);
-			break;
-
-		/* Online since */
-		case 'S':
-		case 's':
-			ret = date_to_str(online_since, buf, len);
-			break;
-
-		/* Idle time */
-		case 'I':
-		case 'i':
-			ret = time_to_str(idle_time, buf, len);
-			break;
-
-		/* Member since */
-		case 'D':
-		case 'd':
-			ret = date_to_str(member_since, buf, len);
-			break;
-
-		/* Warn level */
-		case 'W':
-		case 'w':
-			ret = snprintf(buf, len, "%u", warn_level);
-			break;
-
-		/* Profile or away message */
-		case 'P':
-		case 'A':
-			if (info != NULL) {
-				char *p = strchr(info, '\n');
-				if (p != NULL)
-					ret = snprintf(buf, len, "\n%s", info);
-				else
-					ret = xstrncpy(buf, info, len);
-			}
-			break;
-
-		/*
-		** Same as above, but don't prepend a newline if the profile or away
-		** msg contains one.
-		*/
-		case 'p':
-		case 'a':
-			ret = xstrncpy(buf, info, len);
-			break;
-
-		default:
-			return (-1);
-	}
-
-	if (ret < 0 || (size_t) ret >= len)
-		return (-1);
-
-	return (0);
-}
-
 int (*const global_format_handler[])(char, char *, size_t, va_list) = {
 	format_msg_recv,			/* OPT_FORMAT_ACTION_RECV			*/
 	format_msg_recv,			/* OPT_FORMAT_ACTION_RECV_STATUS	*/
@@ -1243,12 +1167,8 @@ int (*const global_format_handler[])(char, char *, size_t, va_list) = {
 	format_status_typing,		/* OPT_FORMAT_STATUS_TYPING			*/
 	format_status_warn,			/* OPT_FORMAT_STATUS_WARN			*/
 	format_status_timestamp,	/* OPT_FORMAT_TIMESTAMP				*/
-	format_warning,				/* OPT_FORMAT_WARN					*/
-	format_whois,				/* OPT_FORMAT_WHOIS_AWAY			*/
-	format_whois,				/* OPT_FORMAT_WHOIS_IDLE			*/
-	format_whois,				/* OPT_FORMAT_WHOIS_MEMBER			*/
-	format_whois,				/* OPT_FORMAT_WHOIS_NAME			*/
-	format_whois,				/* OPT_FORMAT_WHOIS_SIGNON			*/
-	format_whois,				/* OPT_FORMAT_WHOIS_USERINFO		*/
-	format_whois,				/* OPT_FORMAT_WHOIS_WARNLEVEL		*/
+	format_warning,				/* OPT_FORMAT_WARN_RECV				*/
+	format_warning,				/* OPT_FORMAT_WARN_RECV_ANON		*/
+	format_warning,				/* OPT_FORMAT_WARN_SEND				*/
+	format_warning,				/* OPT_FORMAT_WARN_SEND_ANON		*/
 };
