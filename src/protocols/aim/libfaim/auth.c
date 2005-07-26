@@ -1,7 +1,7 @@
 /*
  * Family 0x0017 - Authentication.
  *
- * Deals with the authorizer for SNAC-based login, and also old-style 
+ * Deals with the authorizer for SNAC-based login, and also old-style
  * non-SNAC login.
  *
  */
@@ -24,7 +24,7 @@
  * the null.  The encoded password buffer /is not %NULL terminated/.
  *
  * The encoding_table seems to be a fixed set of values.  We'll
- * hope it doesn't change over time!  
+ * hope it doesn't change over time!
  *
  * This is only used for the XOR method, not the better MD5 method.
  *
@@ -89,8 +89,8 @@ static int aim_encode_password_md5(const char *password, const char *key, fu8_t 
 #endif
 
 /*
- * The FLAP version is sent by itself at the beginning of authorization 
- * connections.  The FLAP version is also sent before the cookie when connecting 
+ * The FLAP version is sent by itself at the beginning of authorization
+ * connections.  The FLAP version is also sent before the cookie when connecting
  * for other services (BOS, chatnav, chat, etc.).
  */
 faim_export int aim_sendflapver(aim_session_t *sess, aim_conn_t *conn)
@@ -200,7 +200,7 @@ static int goddamnicq2(aim_session_t *sess, aim_conn_t *conn, const char *sn, co
  *   point = (not sent)
  *   build  = 0x0013
  *   unknown= (not sent)
- *   
+ *
  * AIM for Linux 1.1.112:
  *   clientstring = "AOL Instant Messenger (SM)"
  *   clientid = 0x1d09
@@ -284,7 +284,7 @@ faim_export int aim_send_login(aim_session_t *sess, aim_conn_t *conn, const char
 /*
  * This is sent back as a general response to the login command.
  * It can be either an error or a success, depending on the
- * presence of certain TLVs.  
+ * presence of certain TLVs.
  *
  * The client should check the value passed as errorcode. If
  * its nonzero, there was an error.
@@ -344,7 +344,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	/*
 	 * The email address attached to this account
 	 *   Not available for ICQ or @mac.com logins.
-	 *   If you receive this TLV, then you are allowed to use 
+	 *   If you receive this TLV, then you are allowed to use
 	 *   family 0x0018 to check the status of your email.
 	 * XXX - Not really true!
 	 */
@@ -465,11 +465,11 @@ static int goddamnicq(aim_session_t *sess, aim_conn_t *conn, const char *sn)
 /*
  * Subtype 0x0006
  *
- * In AIM 3.5 protocol, the first stage of login is to request login from the 
- * Authorizer, passing it the screen name for verification.  If the name is 
- * invalid, a 0017/0003 is spit back, with the standard error contents.  If 
- * valid, a 0017/0007 comes back, which is the signal to send it the main 
- * login command (0017/0002). 
+ * In AIM 3.5 protocol, the first stage of login is to request login from the
+ * Authorizer, passing it the screen name for verification.  If the name is
+ * invalid, a 0017/0003 is spit back, with the standard error contents.  If
+ * valid, a 0017/0007 comes back, which is the signal to send it the main
+ * login command (0017/0002).
  *
  */
 faim_export int aim_request_login(aim_session_t *sess, aim_conn_t *conn, const char *sn)
@@ -528,8 +528,8 @@ static int keyparse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim
 	keylen = aimbs_get16(bs);
 	keystr = aimbs_getstr(bs, keylen);
 
-	/* XXX - When GiantGrayPanda signed on AIM I got a thing asking me to register 
-	 * for the netscape network.  This SNAC had a type 0x0058 TLV with length 10.  
+	/* XXX - When GiantGrayPanda signed on AIM I got a thing asking me to register
+	 * for the netscape network.  This SNAC had a type 0x0058 TLV with length 10.
 	 * Data is 0x0007 0004 3e19 ae1e 0006 0004 0000 0005 */
 
 	if ((userfunc = aim_callhandler(sess, rx->conn, snac->family, snac->subtype)))

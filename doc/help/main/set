@@ -4,7 +4,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 	There are 5 types of values set variable can take: boolean, integer, string, format string, and color string. The argument for a boolean variable can either be true (or on or 1), false (or off or 0), or toggle. Toggle reverses the variables current value. Integer variables take integer values. String variables take strings that may contain embedded color codes. Color strings take one color code without the leading '%' char, or take a color code string that must begin with '%' and may specify highlighting attributes (see the help for 'color' for info). Format strings contain strings that may contain embedded color codes. Additionally, each format string recognizes one or more variables beginning with a '$' character that will be filled-in dynamically. All format variables for each format string are described below.
 
 	The following global variables exist. Type /set for examples, or type /set <variable> for an example for a particular global variable.
-	
+
  AUTO_RECONNECT (boolean)
 	Automatically reconnect when disconnected.
 
@@ -83,7 +83,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 
 	Variables:
 	  $I - Buddy's idle time.
- 
+
  FORMAT_BLIST_WARN (format string)
 	The format string that specifies how users' warning times will be displayed in the buddy list window.
 
@@ -177,7 +177,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 	The format string that specifies how incoming chat messages will be displayed.
 
 	Variables:
-	  $C - The chatroom in which the message was received. 
+	  $C - The chatroom in which the message was received.
 	  $c - The message destination as specified by its sender.
 	  $N - Message sender.
 	  $h - Userhost of $N, if available.
@@ -189,7 +189,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 	The format string that specifies how outgoing chat messages will be displayed.
 
 	Variables:
-	  $C - The chatroom to which the message was sent. 
+	  $C - The chatroom to which the message was sent.
 	  $c - The message destination as specified by its sender.
 	  $N - Message sender.
 	  $H - Userhost of $N, if available.
@@ -236,7 +236,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 	  $M - Notice text.
 	  $H - Userhost of $R, if available.
 	  $h - Userhost of $N, if available.
- 
+
  FORMAT_NOTICE_RECV (format string)
  FORMAT_NOTICE_RECV_STATUS (format string)
 	The format string that specifies how private notices will be displayed.
@@ -318,7 +318,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 	The format string that specifies how the status message announcing that the current account's username has been warned by another user will be displayed.
 
 	Variables:
-	  $N - The user who was warned. 
+	  $N - The user who was warned.
 	  $U - The user who sent the warning.
 	  $W - The new warning level of the user who was warned.
 
@@ -357,7 +357,7 @@ SYNTAX: set [<variable name> [<new_value>]]
 
 	Variables
 	  $W - Warning level.
-	
+
  HISTORY_LEN (integer)
 	The maximum number of input lines to be retained in the input history.
 

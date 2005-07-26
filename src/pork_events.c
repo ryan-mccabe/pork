@@ -61,6 +61,7 @@ static struct event_info events_info[] = {
 	{ "RECV_RAW",				"SSi",		0	},
 	{ "RECV_SEARCH_RESULT",		"SSi",		0	},
 	{ "RECV_WARN",				"Sii",		0	},
+	{ "RECV_WARN_ANON",			"ii",		0	},
 	{ "SEND_ACTION",			"Ssi",		0	},
 	{ "SEND_AWAY",				"si",		0	},
 	{ "SEND_CHAT_ACTION",		"Ssi",		0	},
@@ -77,9 +78,10 @@ static struct event_info events_info[] = {
 	{ "SEND_LINE",				"si",		0	},
 	{ "SEND_PROFILE",			"si",		0	},
 	{ "SEND_WARN",				"Sii",		0	},
+	{ "SEND_WARN_ANON",			"Sii",		0	},
 	{ "SIGNOFF",				"i",		0	},
 	{ "SIGNON",					"i",		0	},
-	{ "UNLOAD",					"",			0	},
+	{ "UNLOAD",					"i",		0	},
 };
 
 static int event_compare(const void *l, const void *r) {

@@ -31,7 +31,6 @@
 #include <pork_io.h>
 #include <pork_misc.h>
 #include <pork_color.h>
-#include <pork_html.h>
 #include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
@@ -46,6 +45,7 @@
 #include <libfaim/aim.h>
 
 #include <pork_aim.h>
+#include <pork_aim_html.h>
 #include <pork_aim_proto.h>
 #include <pork_aim_set.h>
 #include <pork_aim_cmd.h>
@@ -396,10 +396,12 @@ static int aim_connect(struct pork_acct *acct, char *args) {
 }
 
 static int aim_read_config(struct pork_acct *acct) {
+	return (0);
 	//return (read_user_config(acct));
 }
 
 static int aim_write_config(struct pork_acct *acct) {
+	return (0);
 	//return (save_user_config(acct));
 }
 

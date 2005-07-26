@@ -220,7 +220,7 @@ faim_export int aim_snvalid(const char *sn)
 }
 
 /**
- * Determine if a given screen name is an ICQ screen name 
+ * Determine if a given screen name is an ICQ screen name
  * (i.e. it begins with a number).
  *
  * @sn A valid AIM or ICQ screen name.
@@ -236,9 +236,9 @@ faim_export int aim_sn_is_icq(const char *sn)
 
 /*
 * int snlen(const char *)
-* 
+*
 * This takes a screen name and returns its length without
-* spaces.  If there are no spaces in the SN, then the 
+* spaces.  If there are no spaces in the SN, then the
 * return is equal to that of strlen().
 *
 */
@@ -264,7 +264,7 @@ faim_export int aim_snlen(const char *sn)
 * This takes two screen names and compares them using the rules
 * on screen names for AIM/AOL.  Mainly, this means case and space
 * insensitivity (all case differences and spacing differences are
-* ignored, with the exception that screen names can not start with 
+* ignored, with the exception that screen names can not start with
 * a space).
 *
 * Return: 0 if equal

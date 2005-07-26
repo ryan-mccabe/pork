@@ -28,7 +28,6 @@
 #include <pork_io.h>
 #include <pork_misc.h>
 #include <pork_color.h>
-#include <pork_html.h>
 #include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>

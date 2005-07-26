@@ -409,7 +409,7 @@ EVENTS
 
 	  <message> (string)
 		The text of the action message.
-	
+
 	  <refnum> (integer)
 		The reference number of the account that sent the message.
 
@@ -444,7 +444,7 @@ EVENTS
 		The name of the chat room.
 
 	  <refnum> (integer)
-		The reference number of the account the generated the event. 
+		The reference number of the account the generated the event.
 
   %cSEND_CHAT_MSG
 	This event signal is generated when a local screen name sends a chat message.
@@ -455,10 +455,10 @@ EVENTS
 
 	  <message> (string)
 		The text of the message to be sent.
-	
+
 	  <refnum> (integer)
 		The reference number of the account that sent the message.
-		  
+
   %cSEND_IDLE
 	This event signal is generated when a local screen name reports its idle time.
 
@@ -468,7 +468,7 @@ EVENTS
 
 	  <refnum> (integer)
 		The reference number of the account that reported its idle time.
-		  
+
   %cSEND_IM
 	This event signal is generated when an IM is sent.
 
@@ -491,7 +491,7 @@ EVENTS
 
 	  <refnum> (integer)
 		The reference number of the account on which the event was triggered.
-		  
+
   %cSEND_PROFILE
 	This event signal is generated when a local screen name sends its profile.
 
@@ -501,7 +501,7 @@ EVENTS
 
 	  <refnum> (integer)
 		The reference number of the account whose profile is to be sent.
-		  
+
   %cSEND_WARN
 	This event signal is generated when a local screen name sends a warning.
 
@@ -515,14 +515,14 @@ EVENTS
 
 	  <refnum> (integer)
 		The reference number of the account on which the event was triggered.
-		  
+
   %cSIGNOFF
 	This event signal is generated when a local screen name has been signed off.
 
 	Parameters:
 	  <refnum> (integer)
 		The reference number of the account that signed off.
-		  
+
   %cSIGNON
 	This event signal is generated when a local screen name has been successfully signed on.
 

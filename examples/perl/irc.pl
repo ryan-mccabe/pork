@@ -127,7 +127,7 @@ sub chops {
 		PORK::echo("%D--%m--%M--%C c%chanops%x on %G$target");
 
 		foreach my $i (@users) {
-			$str .= "%D[%g$i" . "%D] ";		
+			$str .= "%D[%g$i" . "%D] ";
 		}
 
 		PORK::echo($str);
@@ -152,7 +152,7 @@ sub nops {
 		PORK::echo("%D--%m--%M--%C n%conops%x on %G$target");
 
 		foreach my $i (@users) {
-			$str .= "%D[%b$i" . "%D] ";		
+			$str .= "%D[%b$i" . "%D] ";
 		}
 
 		PORK::echo($str);

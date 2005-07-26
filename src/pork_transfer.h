@@ -10,10 +10,6 @@
 #ifndef __PORK_TRANSFER_H
 #define __PORK_TRANSFER_H
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
 struct pork_acct;
 
 enum {

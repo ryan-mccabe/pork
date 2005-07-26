@@ -5,7 +5,7 @@
 #
 # This doesn't handle all the events that pork supports;
 # more have been added since I wrote this, but you'll get the
-# idea. 
+# idea.
 #
 
 sub setup {

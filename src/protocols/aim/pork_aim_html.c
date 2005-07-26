@@ -1,6 +1,6 @@
 /*
-** pork_html.c - functions for dealing with HTML
-** Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org>
+** pork_aim_html.c - functions for dealing with AIM HTML
+** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -26,7 +26,9 @@
 #include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_screen.h>
-#include <pork_html.h>
+
+#include <pork_aim_set.h>
+#include <pork_aim_html.h>
 
 /*
 ** Strip any html tags from "str"
@@ -309,10 +311,10 @@ char *text_to_html(const char *src) {
 
 	buf[0] = '\0';
 
-	font_face = opt_get_str(screen.global_prefs, OPT_OUTGOING_MSG_FONT);
-	font_size = opt_get_str(screen.global_prefs, OPT_OUTGOING_MSG_FONT_SIZE);
-	font_bgcolor = opt_get_str(screen.global_prefs, OPT_OUTGOING_MSG_FONT_BGCOLOR);
-	font_fgcolor = opt_get_str(screen.global_prefs, OPT_OUTGOING_MSG_FONT_FGCOLOR);
+	font_face = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT);
+	font_size = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_SIZE);
+	font_bgcolor = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_BGCOLOR);
+	font_fgcolor = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_FGCOLOR);
 
 	ret = snprintf(buf, sizeof(buf), "<FONT LANG=\"0\"");
 	if (ret < 0 || (size_t) ret >= sizeof(buf))

@@ -82,7 +82,6 @@ inline void get_ip(	struct sockaddr_storage *ss,
 					char *buf,
 					size_t len);
 
-
 #else
 #	warning "included multiple times"
 #endif

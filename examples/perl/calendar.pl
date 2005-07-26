@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # PorkCal -- a calendar for pork.
-# 
+#
 # This script sets up an alias that prints out a calendar to your pork
 # window. The calendar can start weeks with either Sunday or Monday,
 # and can be printed with, or without color. For more info, call
@@ -152,7 +152,7 @@ sub print_calendar {
 
 	if ($m == $cm && $y == $cy) {
 	    # We'll need to make sure that if we change the color,
-	    # while marking today, that we put it back. Note that 
+	    # while marking today, that we put it back. Note that
 	    # if the user doesn't have any color for weekdays, then
 	    # there may not be a color code, if Monday is the first
 	    # day.

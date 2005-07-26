@@ -7,7 +7,7 @@
 
 #define FAIM_INTERNAL
 #define FAIM_NEED_CONN_INTERNAL
-#include <aim.h> 
+#include <aim.h>
 
 #ifndef _WIN32
 #include <netdb.h>
@@ -22,17 +22,17 @@
 /**
  * In OSCAR, every connection has a set of SNAC groups associated
  * with it.  These are the groups that you can send over this connection
- * without being guaranteed a "Not supported" SNAC error.  
+ * without being guaranteed a "Not supported" SNAC error.
  *
- * The grand theory of things says that these associations transcend 
+ * The grand theory of things says that these associations transcend
  * what libfaim calls "connection types" (conn->type).  You can probably
- * see the elegance here, but since I want to revel in it for a bit, you 
+ * see the elegance here, but since I want to revel in it for a bit, you
  * get to hear it all spelled out.
  *
  * So let us say that you have your core BOS connection running.  One
  * of your modules has just given you a SNAC of the group 0x0004 to send
  * you.  Maybe an IM destined for some twit in Greenland.  So you start
- * at the top of your connection list, looking for a connection that 
+ * at the top of your connection list, looking for a connection that
  * claims to support group 0x0004.  You find one.  Why, that neat BOS
  * connection of yours can do that.  So you send it on its way.
  *
@@ -50,8 +50,8 @@
  * it.  Great, you say.  Now I have something to do.  Off you go, making
  * that connection.  One of the first things you get from this new server
  * is a message saying that indeed it does support the group you were looking
- * for.  So you continue and send rate confirmation and all that.  
- * 
+ * for.  So you continue and send rate confirmation and all that.
+ *
  * Then you remember you had that SNAC to send, and now you have a means to
  * do it, and you do, and everyone is happy.  Except the Greenlander, who is
  * still stuck in the bitter cold.
@@ -64,7 +64,7 @@
  * scheme for quite some time now.  But I still haven't convinced myself
  * to make libfaim work that way.  It would take a fair amount of effort,
  * and probably some client API changes as well.  (Whenever I don't want
- * to do something, I just say it would change the client API.  Then I 
+ * to do something, I just say it would change the client API.  Then I
  * instantly have a couple of supporters of not doing it.)
  *
  * Generally, addgroup is only called by the internal handling of the
@@ -317,7 +317,7 @@ faim_export void aim_conn_kill(aim_session_t *sess, aim_conn_t **deadconn)
 /**
  * Close (but not free) a connection.
  *
- * This leaves everything untouched except for clearing the 
+ * This leaves everything untouched except for clearing the
  * handler list and setting the fd to -1 (used to recognize
  * dead connections).  It will also remove cookies if necessary.
  *
@@ -345,7 +345,7 @@ faim_export void aim_conn_close(aim_conn_t *deadconn)
 }
 
 /**
- * Locates a connection of the specified type in the 
+ * Locates a connection of the specified type in the
  * specified session.
  *
  * XXX - Except for rendezvous, all uses of this should be removed and
@@ -395,8 +395,8 @@ faim_export aim_conn_t *aim_getconn_fd(aim_session_t *sess, int fd)
 }
 
 /**
- * Handle normal connections or SOCKS5 via an extrememly quick and 
- * dirty SOCKS5 interface. 
+ * Handle normal connections or SOCKS5 via an extrememly quick and
+ * dirty SOCKS5 interface.
  *
  * Attempts to connect to the specified host via the configured
  * proxy settings, if present.  If no proxy is configured for
@@ -569,7 +569,7 @@ static int aim_proxyconnect(aim_session_t *sess, const char *host, fu16_t port, 
  * Clone an aim_conn_t.
  *
  * A new connection is allocated, and the values are filled in
- * appropriately. Note that this function sets the new connnection's
+ * appropriately. Note that this function sets the new connection's
  * ->priv pointer to be equal to that of its parent: only the pointer
  * is copied, not the data it points to.
  *
@@ -600,7 +600,7 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 		 * XXX should clone this section as well, but since currently
 		 * this function only gets called for some of that rendezvous
 		 * crap, and not on SNAC connections, its probably okay for
-		 * now. 
+		 * now.
 		 *
 		 */
 	}
@@ -611,7 +611,7 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 /**
  * Opens a new connection to the specified dest host of specified
  * type, using the proxy settings if available.  If @host is %NULL,
- * the connection is allocated and returned, but no connection 
+ * the connection is allocated and returned, but no connection
  * is made.
  *
  * FIXME: Return errors in a more sane way.
@@ -639,12 +639,12 @@ faim_export aim_conn_t *aim_newconn(aim_session_t *sess, int type, const char *d
 		return connstruct;
 	}
 
-	/* 
-	 * As of 23 Jul 1999, AOL now sends the port number, preceded by a 
-	 * colon, in the BOS redirect.  This fatally breaks all previous 
+	/*
+	 * As of 23 Jul 1999, AOL now sends the port number, preceded by a
+	 * colon, in the BOS redirect.  This fatally breaks all previous
 	 * libfaims.  Bad, bad AOL.
 	 *
-	 * We put this here to catch every case. 
+	 * We put this here to catch every case.
 	 *
 	 */
 
@@ -694,7 +694,7 @@ faim_export int aim_conn_in_sess(aim_session_t *sess, aim_conn_t *conn)
 /**
  * Waits for a socket with data or for timeout, whichever comes first.
  * See select(2).
- * 
+ *
  * Return codes in *status:
  *   -1  error in select() (%NULL returned)
  *    0  no events pending (%NULL returned)
@@ -735,7 +735,7 @@ faim_export aim_conn_t *aim_select(aim_session_t *sess, struct timeval *timeout,
 			maxfd = cur->fd;
 	}
 
-	/* 
+	/*
 	 * If we have data waiting to be sent, return
 	 *
 	 * We have to not do this if theres at least one
@@ -756,8 +756,8 @@ faim_export aim_conn_t *aim_select(aim_session_t *sess, struct timeval *timeout,
 
 	if ((i = select(maxfd+1, &fds, &wfds, NULL, timeout))>=1) {
 		for (cur = sess->connlist; cur; cur = cur->next) {
-			if ((FD_ISSET(cur->fd, &fds)) || 
-					((cur->status & AIM_CONN_STATUS_INPROGRESS) && 
+			if ((FD_ISSET(cur->fd, &fds)) ||
+					((cur->status & AIM_CONN_STATUS_INPROGRESS) &&
 					FD_ISSET(cur->fd, &wfds))) {
 				*status = 2;
 				return cur;
@@ -773,11 +773,11 @@ faim_export aim_conn_t *aim_select(aim_session_t *sess, struct timeval *timeout,
 }
 
 /**
- * Set a forced latency value for connection.  Basically causes 
+ * Set a forced latency value for connection.  Basically causes
  * @newval seconds to be spent between transmits on a connection.
  *
  * This is my lame attempt at overcoming not understanding the rate
- * limiting. 
+ * limiting.
  *
  * XXX: This should really be replaced with something that scales and
  * backs off like the real rate limiting does.
@@ -803,7 +803,7 @@ faim_export int aim_conn_setlatency(aim_conn_t *conn, int newval)
  *
  * Call this with your SOCKS5 proxy server parameters before
  * the first call to aim_newconn().  If called with all %NULL
- * args, it will clear out a previously set proxy.  
+ * args, it will clear out a previously set proxy.
  *
  * Set username and password to %NULL if not applicable.
  *
@@ -840,7 +840,7 @@ static void defaultdebugcb(aim_session_t *sess, int level, const char *format, v
 }
 
 /**
- * Initializes a session structure by setting the initial values 
+ * Initializes a session structure by setting the initial values
  * stuff in the aim_session_t struct.
  *
  * @param sess Session to initialize.
@@ -883,7 +883,7 @@ faim_export void aim_session_init(aim_session_t *sess, fu8_t nonblocking, int de
 
 	/*
 	 * This must always be set.  Default to the queue-based
-	 * version for back-compatibility.  
+	 * version for back-compatibility.
 	 */
 	aim_tx_setenqueue(sess, AIM_TX_QUEUED, NULL);
 

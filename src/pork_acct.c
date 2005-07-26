@@ -156,7 +156,7 @@ void pork_acct_del(dlist_t *node, char *reason) {
 	struct pork_acct *acct = node->data;
 	dlist_t *cur;
 
-	event_generate(acct->events, EVENT_UNLOAD);
+	event_generate(acct->events, EVENT_UNLOAD, acct->refnum);
 	pork_signoff(acct, reason);
 	chat_leave_all(acct);
 
@@ -392,7 +392,7 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 		}
 		goto out_fail2;
 	}
-	
+
 	if (protocol < 0)
 		return (acct);
 

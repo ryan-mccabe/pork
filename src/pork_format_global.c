@@ -829,7 +829,7 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 }
 
 static int format_warning(char opt, char *buf, size_t len, va_list ap) {
-	char *you = va_arg(ap, char *);
+	char *warned = va_arg(ap, char *);
 	char *warner = va_arg(ap, char *);
 	u_int16_t warn_level = va_arg(ap, unsigned int);
 	int ret = 0;
@@ -842,7 +842,7 @@ static int format_warning(char opt, char *buf, size_t len, va_list ap) {
 
 		case 'n':
 		case 'N':
-			ret = xstrncpy(buf, you, len);
+			ret = xstrncpy(buf, warned, len);
 			break;
 
 		case 'u':
@@ -1224,12 +1224,12 @@ int (*const global_format_handler[])(char, char *, size_t, va_list) = {
 	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_ASK			*/
 	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_COMPLETE	*/
 	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_RESUME		*/
-	format_msg_recv,			/* OPT_FORMAT_IM_RECV				*/
-	format_msg_recv,			/* OPT_FORMAT_IM_RECV_AUTO			*/
-	format_msg_recv,			/* OPT_FORMAT_IM_RECV_STATUS		*/
-	format_msg_send,			/* OPT_FORMAT_IM_SEND				*/
-	format_msg_send,			/* OPT_FORMAT_IM_SEND_AUTO			*/
-	format_msg_send,			/* OPT_FORMAT_IM_SEND_STATUS		*/
+	format_msg_recv,			/* OPT_FORMAT_MSG_RECV				*/
+	format_msg_recv,			/* OPT_FORMAT_MSG_RECV_AUTO			*/
+	format_msg_recv,			/* OPT_FORMAT_MSG_RECV_STATUS		*/
+	format_msg_send,			/* OPT_FORMAT_MSG_SEND				*/
+	format_msg_send,			/* OPT_FORMAT_MSG_SEND_AUTO			*/
+	format_msg_send,			/* OPT_FORMAT_MSG_SEND_STATUS		*/
 	format_msg_recv,			/* OPT_FORMAT_NOTICE_RECV			*/
 	format_msg_recv,			/* OPT_FORMAT_NOTICE_RECV_STATUS	*/
 	format_msg_send,			/* OPT_FORMAT_NOTICE_SEND			*/

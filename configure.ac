@@ -77,12 +77,12 @@ fi
 AC_ARG_WITH(ncurses-libs,
 [  --with-ncurses-libs=DIR         Specify location of the ncurses libraries],[
 	LDFLAGS="$LDFLAGS -L$withval"
-])  
-    
+])
+
 AC_ARG_WITH(ncurses-includes,
 [  --with-ncurses-includes=DIR     Specify location of the ncurses header files],[
 	CPPFLAGS="$CPPFLAGS -I$withval"
-])  
+])
 
 withval=""
 AC_ARG_WITH(dmalloc,

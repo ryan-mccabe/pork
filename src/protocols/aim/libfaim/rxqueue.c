@@ -81,7 +81,7 @@ faim_internal void aim_frame_destroy(aim_frame_t *frame)
 }
 
 /*
- * Read a FLAP header from conn into fr, and return the number of 
+ * Read a FLAP header from conn into fr, and return the number of
  * bytes in the payload.
  *
  * @return -1 on error, otherwise return the length of the payload.
@@ -129,7 +129,7 @@ static int aim_get_command_flap(aim_session_t *sess, aim_conn_t *conn, aim_frame
 }
 
 /*
- * Read a rendezvous header from conn into fr, and return the number of 
+ * Read a rendezvous header from conn into fr, and return the number of
  * bytes in the payload.
  *
  * @return -1 on error, otherwise return the length of the payload.
@@ -160,7 +160,7 @@ static int aim_get_command_rendezvous(aim_session_t *sess, aim_conn_t *conn, aim
 }
 
 /*
- * Grab a single command sequence off the socket, and enqueue it in the incoming event queue 
+ * Grab a single command sequence off the socket, and enqueue it in the incoming event queue
  * in a separate struct.
  *
  * @return 0 on success, otherwise return the error number.
@@ -186,7 +186,7 @@ faim_export int aim_get_command(aim_session_t *sess, aim_conn_t *conn)
 		return -ENOMEM;
 
 	/*
-	 * Rendezvous (client to client) connections do not speak FLAP, so this 
+	 * Rendezvous (client to client) connections do not speak FLAP, so this
 	 * function will break on them.
 	 */
 	if (conn->type == AIM_CONN_TYPE_RENDEZVOUS)

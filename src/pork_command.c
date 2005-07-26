@@ -45,7 +45,6 @@
 #include <pork_acct_set.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
-#include <pork_html.h>
 #include <pork_events.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
@@ -677,7 +676,7 @@ USER_COMMAND(cmd_win_set) {
 			return;
 		}
 
-		pref = win->prefs;		
+		pref = win->prefs;
 	} else {
 		win = cur_window();
 		pref = win->prefs;
@@ -1683,7 +1682,7 @@ USER_COMMAND(cmd_acct_set) {
 			return;
 		}
 
-		pref = acct->prefs;		
+		pref = acct->prefs;
 	} else
 		pref = acct->prefs;
 
@@ -2550,10 +2549,12 @@ USER_COMMAND(cmd_perl) {
 */
 
 USER_COMMAND(cmd_perl_dump) {
-	/*
-	** If events are ever made per-account this will have to change.
-	*/
-	event_generate(acct->events, EVENT_UNLOAD);
+	dlist_t *cur;
+
+	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
+		struct pork_acct *a = cur->data;
+		event_generate(acct->events, EVENT_UNLOAD, a->refnum);
+	}
 
 	perl_destroy();
 	perl_init();

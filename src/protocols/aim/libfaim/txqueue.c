@@ -74,7 +74,7 @@ faim_internal aim_frame_t *aim_tx_new(aim_session_t *sess, aim_conn_t *conn, fu8
 	return fr;
 }
 
-/* 
+/*
  * This increments the tx command count, and returns the seqnum
  * that should be stamped on the next FLAP packet sent.  This is
  * normally called during the final step of packet preparation
@@ -134,8 +134,8 @@ static int aim_tx_enqueue__queuebased(aim_session_t *sess, aim_frame_t *fr)
  *
  * Basically the same as its __queuebased couterpart, however
  * instead of doing a list append, it just calls aim_tx_sendframe()
- * right here. 
- * 
+ * right here.
+ *
  */
 static int aim_tx_enqueue__immediate(aim_session_t *sess, aim_frame_t *fr)
 {
@@ -164,7 +164,7 @@ faim_export int aim_tx_setenqueue(aim_session_t *sess, int what, int (*func)(aim
 
 	if (what == AIM_TX_QUEUED)
 		sess->tx_enqueue = &aim_tx_enqueue__queuebased;
-	else if (what == AIM_TX_IMMEDIATE) 
+	else if (what == AIM_TX_IMMEDIATE)
 		sess->tx_enqueue = &aim_tx_enqueue__immediate;
 	else if (what == AIM_TX_USER) {
 		if (!func)
@@ -341,8 +341,8 @@ faim_export int aim_tx_flushqueue(aim_session_t *sess)
 		 * latency and avoid missed messages.
 		 */
 		if ((cur->conn->lastactivity + cur->conn->forcedlatency) >= time(NULL)) {
-			/* 
-			 * XXX should be a break! we don't want to block the 
+			/*
+			 * XXX should be a break! we don't want to block the
 			 * upper layers
 			 *
 			 * XXX or better, just do this right.
@@ -362,9 +362,9 @@ faim_export int aim_tx_flushqueue(aim_session_t *sess)
 }
 
 /*
- * This is responsible for removing sent commands from the transmit 
+ * This is responsible for removing sent commands from the transmit
  * queue. This is not a required operation, but it of course helps
- * reduce memory footprint at run time!  
+ * reduce memory footprint at run time!
  */
 faim_export void aim_tx_purgequeue(aim_session_t *sess)
 {
@@ -382,8 +382,8 @@ faim_export void aim_tx_purgequeue(aim_session_t *sess)
 }
 
 /**
- * Get rid of packets waiting for tx on a dying conn.  For now this 
- * simply marks all packets as sent and lets them disappear without 
+ * Get rid of packets waiting for tx on a dying conn.  For now this
+ * simply marks all packets as sent and lets them disappear without
  * warning.
  *
  * @param sess A session.

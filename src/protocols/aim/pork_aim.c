@@ -40,7 +40,6 @@
 #include <pork_cstr.h>
 #include <pork_color.h>
 #include <pork_conf.h>
-#include <pork_html.h>
 #include <pork_events.h>
 #include <pork_io.h>
 #include <pork_format.h>
@@ -57,7 +56,9 @@
 #include <pork_opt.h>
 
 #include <pork_aim.h>
+#include <pork_aim_html.h>
 #include <pork_aim_proto.h>
+#include <pork_aim_set.h>
 
 static u_int32_t pork_caps =	AIM_CAPS_CHAT | AIM_CAPS_INTEROPERATE |
 								AIM_CAPS_SENDFILE;
@@ -165,20 +166,20 @@ static void aim_print_info(	char *user,
 	if (print_all) {
 		int ret;
 
-		ret = fill_format_str(OPT_FORMAT_WHOIS_NAME, buf, sizeof(buf),
+		ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_NAME, buf, sizeof(buf),
 				user, warn_level, idle_time, online_since, member_since);
 		if (ret > 0)
 			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
 		if (idle_time > 0) {
-			ret = fill_format_str(OPT_FORMAT_WHOIS_IDLE, buf, sizeof(buf),
+			ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_IDLE, buf, sizeof(buf),
 					user, warn_level, idle_time, online_since, member_since);
 			if (ret > 0)
 				screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 		}
 
 		if (warn_level > 0) {
-			ret = fill_format_str(OPT_FORMAT_WHOIS_WARNLEVEL, buf,
+			ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_WARNLEVEL, buf,
 				sizeof(buf), user, warn_level, idle_time,
 				online_since, member_since);
 
@@ -187,14 +188,14 @@ static void aim_print_info(	char *user,
 		}
 
 		if (online_since) {
-			ret = fill_format_str(OPT_FORMAT_WHOIS_SIGNON, buf, sizeof(buf),
+			ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_SIGNON, buf, sizeof(buf),
 					user, warn_level, idle_time, online_since, member_since);
 			if (ret > 0)
 				screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 		}
 
 		if (member_since) {
-			ret = fill_format_str(OPT_FORMAT_WHOIS_MEMBER, buf, sizeof(buf),
+			ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_MEMBER, buf, sizeof(buf),
 					user, warn_level, idle_time, online_since, member_since);
 
 			if (ret > 0)
@@ -202,7 +203,7 @@ static void aim_print_info(	char *user,
 		}
 
 		if (profile) {
-			ret = fill_format_str(OPT_FORMAT_WHOIS_USERINFO, buf, sizeof(buf),
+			ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_USERINFO, buf, sizeof(buf),
 					user, warn_level, idle_time, online_since,
 					member_since, profile);
 
@@ -214,7 +215,7 @@ static void aim_print_info(	char *user,
 	if (away_msg) {
 		int ret;
 
-		ret = fill_format_str(OPT_FORMAT_WHOIS_AWAY, buf, sizeof(buf),
+		ret = fill_format_str(AIM_OPT_FORMAT_WHOIS_AWAY, buf, sizeof(buf),
 				user, warn_level, idle_time, online_since,
 				member_since, away_msg);
 
@@ -896,7 +897,6 @@ static FAIM_CB(aim_recv_evil) {
 	u_int16_t warn_level;
 	aim_userinfo_t *userinfo;
 	struct pork_acct *acct = session->aux_data;
-	char buf[4096];
 
 	va_start(ap, fr);
 	warn_level = va_arg(ap, unsigned int);
@@ -911,36 +911,10 @@ static FAIM_CB(aim_recv_evil) {
 
 	acct->warn_level = warn_level;
 
-	if (event_generate(acct->events, EVENT_RECV_WARN, userinfo->sn, warn_level,
-		acct->refnum))
-	{
-		return (1);
-	}
-
-	if (blank_str(userinfo->sn)) {
-		int ret;
-
-		ret = fill_format_str(OPT_FORMAT_WARN, buf, sizeof(buf), acct->username,
-				opt_get_str(screen.global_prefs, OPT_TEXT_WARN_ANONYMOUS), warn_level);
-
-		if (ret > 0)
-			screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_STATUS);
-	} else {
-		int ret;
-
-		ret = fill_format_str(OPT_FORMAT_WARN, buf, sizeof(buf),
-				acct->username, buddy_name(acct, userinfo->sn), warn_level);
-
-		if (ret > 0) {
-			struct imwindow *win;
-
-			win = imwindow_find(acct, userinfo->sn);
-			if (win == NULL)
-				win = cur_window();
-
-			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_STATUS);
-		}
-	}
+	if (userinfo->sn != NULL && !blank_str(userinfo->sn))
+		pork_recv_warn(acct, userinfo->sn, warn_level);
+	else
+		pork_recv_warn_anon(acct, warn_level);
 
 	return (1);
 }

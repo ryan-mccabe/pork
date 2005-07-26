@@ -26,7 +26,6 @@
 #include <pork_io.h>
 #include <pork_misc.h>
 #include <pork_color.h>
-#include <pork_html.h>
 #include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
@@ -43,6 +42,7 @@
 #include <libfaim/aim.h>
 
 #include <pork_aim.h>
+#include <pork_aim_html.h>
 #include <pork_aim_proto.h>
 #include <pork_aim_cmd.h>
 
@@ -96,7 +96,7 @@ static USER_COMMAND(aim_cmd_privacy_mode) {
 
 	mode = aim_set_privacy_mode(acct, mode);
 	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
-} 
+}
 
 static struct command aim_command[] = {
 	{ "email",				aim_cmd_email			},

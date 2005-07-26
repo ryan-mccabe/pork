@@ -52,7 +52,7 @@ int pork_msg_autoreply(struct pork_acct *acct, char *dest, char *msg) {
 		return (-1);
 
 	screen_get_query_window(acct, dest, &win);
-	ret = fill_format_str(OPT_FORMAT_IM_SEND_AUTO, buf, sizeof(buf), acct, dest, msg);
+	ret = fill_format_str(OPT_FORMAT_MSG_SEND_AUTO, buf, sizeof(buf), acct, dest, msg);
 	if (ret < 1)
 		return (-1);
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
@@ -116,12 +116,12 @@ int pork_recv_msg(	struct pork_acct *acct,
 		int ret;
 
 		if (autoresp)
-			type = OPT_FORMAT_IM_RECV_AUTO;
+			type = OPT_FORMAT_MSG_RECV_AUTO;
 		else {
 			if (win == screen.status_win)
-				type = OPT_FORMAT_IM_RECV_STATUS;
+				type = OPT_FORMAT_MSG_RECV_STATUS;
 			else
-				type = OPT_FORMAT_IM_RECV;
+				type = OPT_FORMAT_MSG_RECV;
 		}
 
 		ret = fill_format_str(type, buf, sizeof(buf), acct, dest,
@@ -237,9 +237,9 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 					screen_goto_window(win->refnum);
 
 				if (win == screen.status_win)
-					type = OPT_FORMAT_IM_SEND_STATUS;
+					type = OPT_FORMAT_MSG_SEND_STATUS;
 				else
-					type = OPT_FORMAT_IM_SEND;
+					type = OPT_FORMAT_MSG_SEND;
 
 				ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
 				if (ret < 1)
@@ -301,45 +301,104 @@ int pork_send_warn(struct pork_acct *acct, char *user) {
 	if (acct->proto->warn == NULL)
 		return (-1);
 
-	if (!event_generate(acct->events, EVENT_SEND_WARN, user, 0, acct->refnum)) {
+	if (!event_generate(acct->events, EVENT_SEND_WARN, user, acct->refnum)) {
 		ret = acct->proto->warn(acct, user);
 		if (ret == 0) {
 			struct imwindow *win;
+			char buf[4096];
 
 			win = imwindow_find(acct, user);
 			if (win == NULL)
 				win = cur_window();
 
-			screen_win_msg(win, 1, 1, 0,
-				MSG_TYPE_CMD_OUTPUT, "%s has warned %s", acct->username, user);
+			ret = fill_format_str(OPT_FORMAT_WARN_SEND, buf, sizeof(buf), acct->username, user);
+			if (ret < 1)
+				return (-1);
+			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
+			imwindow_send_msg(win);
 		}
 	}
 
 	return (ret);
 }
 
-int pork_send_warn_anon(struct pork_acct *acct, char *user) {
-	int ret = 0;
+int pork_recv_warn(struct pork_acct *acct, char *user, u_int16_t warn_level) {
+	if (!event_generate(acct->events, EVENT_RECV_WARN, user, warn_level,
+		acct->refnum))
+	{
+		int ret;
+		char buf[4096];
+		struct imwindow *win;
 
+		win = imwindow_find(acct, user);
+		if (win == NULL)
+			win = screen.status_win;
+
+		ret = fill_format_str(OPT_FORMAT_WARN_RECV, buf, sizeof(buf),
+				acct->username, warn_level);
+
+		if (ret < 1)
+			return (-1);
+
+		screen_print_str(win, buf, (size_t) ret, MSG_TYPE_STATUS);
+		imwindow_send_msg(win);
+		return (0);
+	}
+
+	return (0);
+}
+
+int pork_recv_warn_anon(struct pork_acct *acct, u_int16_t warn_level) {
+	if (!event_generate(acct->events, EVENT_RECV_WARN_ANON, warn_level,
+		acct->refnum))
+	{
+		int ret;
+		char buf[4096];
+
+		ret = fill_format_str(OPT_FORMAT_WARN_RECV_ANON, buf, sizeof(buf),
+				acct->username, warn_level);
+
+		if (ret < 1)
+			return (-1);
+
+		screen_print_str(screen.status_win, buf, (size_t) ret,
+			MSG_TYPE_STATUS);
+		imwindow_send_msg(screen.status_win);
+		return (0);
+	}
+
+	return (0);
+}
+
+int pork_send_warn_anon(struct pork_acct *acct, char *user) {
 	if (acct->proto->warn_anon == NULL)
 		return (-1);
 
-	if (!event_generate(acct->events, EVENT_SEND_WARN, user, 1, acct->refnum)) {
+	if (!event_generate(acct->events, EVENT_SEND_WARN_ANON,
+		user, acct->refnum))
+	{
+		int ret;
+
 		ret = acct->proto->warn_anon(acct, user);
 		if (ret == 0) {
+			char buf[4096];
 			struct imwindow *win;
 
 			win = imwindow_find(acct, user);
 			if (win == NULL)
 				win = cur_window();
 
-			screen_win_msg(win, 0, 0, 1,
-				MSG_TYPE_CMD_OUTPUT, "%s has warned %s anonymously",
-				acct->username, user);
+			ret = fill_format_str(OPT_FORMAT_WARN_SEND_ANON,
+					buf, sizeof(buf), acct->username, user);
+
+			if (ret < 1)
+				return (-1);
+			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
+			imwindow_send_msg(win);
 		}
 	}
 
-	return (ret);
+	return (0);
 }
 
 int pork_change_nick(struct pork_acct *acct, char *nick) {

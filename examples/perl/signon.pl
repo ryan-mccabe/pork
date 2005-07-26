@@ -16,7 +16,7 @@ my $unload_refnum;
 sub normalize {
 	my $name = lc(shift);
 
-	$name =~ s/ //g; 
+	$name =~ s/ //g;
 	return ($name);
 }
 
@@ -29,7 +29,7 @@ sub setup {
 
 	$unload_refnum = PORK::event_add("UNLOAD", "unload_handler");
 	if (!defined $unload_refnum) {
-		PORK::err_msg("Error setting up unload handler."); 
+		PORK::err_msg("Error setting up unload handler.");
 		return (-1);
 	}
 

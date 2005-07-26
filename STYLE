@@ -300,7 +300,7 @@ If you need to declare variables (open a block) inside a case statement, do:
 
 		case 1: {
 			int var1;
-			
+
 			var1 = some_func();
 			break;
 		}

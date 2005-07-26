@@ -8,7 +8,7 @@ The future. Maybe
     - Allow expanding perl variables on the input line (maybe with /eval).
 
 - Support making perl and IM protocols loadable plugins (or at least add
-  a configure option to allow them to be compiled that way, if desired). 
+  a configure option to allow them to be compiled that way, if desired).
 
 ----------------------------------------
 The stuff I really don't feel like doing

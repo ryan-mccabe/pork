@@ -31,7 +31,6 @@
 #include <pork_imwindow_set.h>
 #include <pork_slist.h>
 #include <pork_buddy_list.h>
-#include <pork_html.h>
 #include <pork_proto.h>
 #include <pork_inet.h>
 #include <pork_acct.h>

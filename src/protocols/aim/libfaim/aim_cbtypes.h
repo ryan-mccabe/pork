@@ -34,7 +34,7 @@
 
 /*
  * SNAC Family: Ack.
- * 
+ *
  * Not really a family, but treating it as one really
  * helps it fit into the libfaim callback structure better.
  *
@@ -259,12 +259,12 @@
 /*
  * OFT Services
  *
- * For all of the above #defines, the number is the subtype 
- * of the SNAC.  For OFT #defines, the number is the 
- * "hdrtype" which comes after the magic string and OFT 
+ * For all of the above #defines, the number is the subtype
+ * of the SNAC.  For OFT #defines, the number is the
+ * "hdrtype" which comes after the magic string and OFT
  * packet length.
  *
- * I'm pretty sure the ODC ones are arbitrary right now, 
+ * I'm pretty sure the ODC ones are arbitrary right now,
  * that should be changed.
  */
 #define AIM_CB_OFT_DIRECTIMCONNECTREQ 0x0001	/* connect request -- actually an OSCAR CAP */

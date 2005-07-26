@@ -1,7 +1,7 @@
 /*
  * Cookie Caching stuff. Adam wrote this, apparently just some
  * derivatives of n's SNAC work. I cleaned it up, added comments.
- * 
+ *
  */
 
 /*
@@ -34,14 +34,14 @@ faim_internal int aim_cachecookie(aim_session_t *sess, aim_msgcookie_t *cookie)
 		return -EINVAL;
 
 	newcook = aim_checkcookie(sess, cookie->cookie, cookie->type);
-	
+
 	if (newcook == cookie) {
 		newcook->addtime = time(NULL);
 		return 1;
 	} else if (newcook)
 		aim_cookie_free(sess, newcook);
 
-	cookie->addtime = time(NULL);  
+	cookie->addtime = time(NULL);
 
 	cookie->next = sess->msgcookies;
 	sess->msgcookies = cookie;
@@ -67,7 +67,7 @@ faim_internal aim_msgcookie_t *aim_uncachecookie(aim_session_t *sess, fu8_t *coo
 		return NULL;
 
 	for (prev = &sess->msgcookies; (cur = *prev); ) {
-		if ((cur->type == type) && 
+		if ((cur->type == type) &&
 				(memcmp(cur->cookie, cookie, 8) == 0)) {
 			*prev = cur->next;
 			return cur;
@@ -87,7 +87,7 @@ faim_internal aim_msgcookie_t *aim_uncachecookie(aim_session_t *sess, fu8_t *coo
  * @return returns NULL on error, a pointer to the newly-allocated
  *         cookie on success.
  */
-faim_internal aim_msgcookie_t *aim_mkcookie(fu8_t *c, int type, void *data) 
+faim_internal aim_msgcookie_t *aim_mkcookie(fu8_t *c, int type, void *data)
 {
 	aim_msgcookie_t *cookie;
 
@@ -119,22 +119,22 @@ faim_internal aim_msgcookie_t *aim_checkcookie(aim_session_t *sess, const fu8_t 
 	aim_msgcookie_t *cur;
 
 	for (cur = sess->msgcookies; cur; cur = cur->next) {
-		if ((cur->type == type) && 
+		if ((cur->type == type) &&
 				(memcmp(cur->cookie, cookie, 8) == 0))
-			return cur;   
+			return cur;
 	}
 
 	return NULL;
 }
 
 #if 0 /* debugging feature */
-faim_internal int aim_dumpcookie(aim_session_t *sess, aim_msgcookie_t *cookie) 
+faim_internal int aim_dumpcookie(aim_session_t *sess, aim_msgcookie_t *cookie)
 {
 
 	if (!cookie)
 		return -EINVAL;
 
-	faimdprintf(sess, 0, "\tCookie at %p: %d/%s with %p, next %p\n", cookie, 
+	faimdprintf(sess, 0, "\tCookie at %p: %d/%s with %p, next %p\n", cookie,
 			cookie->type, cookie->cookie, cookie->data, cookie->next);
 
 	return 0;
@@ -154,7 +154,7 @@ faim_internal int aim_dumpcookie(aim_session_t *sess, aim_msgcookie_t *cookie)
  * @return returns -1 on error, 0 on success.
  *
  */
-faim_internal int aim_cookie_free(aim_session_t *sess, aim_msgcookie_t *cookie) 
+faim_internal int aim_cookie_free(aim_session_t *sess, aim_msgcookie_t *cookie)
 {
 	aim_msgcookie_t *cur, **prev;
 
@@ -172,19 +172,19 @@ faim_internal int aim_cookie_free(aim_session_t *sess, aim_msgcookie_t *cookie)
 	free(cookie);
 
 	return 0;
-} 
+}
 
 /* XXX I hate switch */
-faim_internal int aim_msgcookie_gettype(int reqclass) 
+faim_internal int aim_msgcookie_gettype(int reqclass)
 {
 	/* XXX: hokey-assed. needs fixed. */
 	switch(reqclass) {
-	case AIM_CAPS_BUDDYICON: return AIM_COOKIETYPE_OFTICON;
-	case AIM_CAPS_TALK: return AIM_COOKIETYPE_OFTVOICE;
-	case AIM_CAPS_DIRECTIM: return AIM_COOKIETYPE_OFTIMAGE;
-	case AIM_CAPS_CHAT: return AIM_COOKIETYPE_CHAT;
-	case AIM_CAPS_GETFILE: return AIM_COOKIETYPE_OFTGET;
-	case AIM_CAPS_SENDFILE: return AIM_COOKIETYPE_OFTSEND;
-	default: return AIM_COOKIETYPE_UNKNOWN;
-	}           
+		case AIM_CAPS_BUDDYICON: return AIM_COOKIETYPE_OFTICON;
+		case AIM_CAPS_TALK: return AIM_COOKIETYPE_OFTVOICE;
+		case AIM_CAPS_DIRECTIM: return AIM_COOKIETYPE_OFTIMAGE;
+		case AIM_CAPS_CHAT: return AIM_COOKIETYPE_CHAT;
+		case AIM_CAPS_GETFILE: return AIM_COOKIETYPE_OFTGET;
+		case AIM_CAPS_SENDFILE: return AIM_COOKIETYPE_OFTSEND;
+		default: return AIM_COOKIETYPE_UNKNOWN;
+	}
 }

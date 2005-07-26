@@ -203,7 +203,7 @@ static int save_buddy_list(struct pork_acct *acct, const char *filename) {
 
 			if (buddy->last_seen != 0)
 				fprintf(fp, "l %u\n", buddy->last_seen);
-	
+
 			fprintf(fp, "n %u\n", buddy->notify);
 		}
 	}

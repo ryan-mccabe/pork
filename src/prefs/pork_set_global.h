@@ -56,16 +56,20 @@ enum {
 	OPT_FORMAT_FILE_SEND_ASK,
 	OPT_FORMAT_FILE_SEND_COMPLETE,
 	OPT_FORMAT_FILE_SEND_RESUME,
-	OPT_FORMAT_IM_RECV,
-	OPT_FORMAT_IM_RECV_AUTO,
-	OPT_FORMAT_IM_RECV_STATUS,
-	OPT_FORMAT_IM_SEND,
-	OPT_FORMAT_IM_SEND_AUTO,
-	OPT_FORMAT_IM_SEND_STATUS,
+	OPT_FORMAT_MSG_RECV,
+	OPT_FORMAT_MSG_RECV_AUTO,
+	OPT_FORMAT_MSG_RECV_STATUS,
+	OPT_FORMAT_MSG_SEND,
+	OPT_FORMAT_MSG_SEND_AUTO,
+	OPT_FORMAT_MSG_SEND_STATUS,
 	OPT_FORMAT_NOTICE_RECV,
 	OPT_FORMAT_NOTICE_RECV_STATUS,
 	OPT_FORMAT_NOTICE_SEND,
 	OPT_FORMAT_NOTICE_SEND_STATUS,
+	OPT_FORMAT_WARN_RECV,
+	OPT_FORMAT_WARN_RECV_ANON,
+	OPT_FORMAT_WARN_SEND,
+	OPT_FORMAT_WARN_SEND_ANON,
 	OPT_FORMAT_STATUS,
 	OPT_FORMAT_STATUS_ACTIVITY,
 	OPT_FORMAT_STATUS_CHAT,
@@ -75,18 +79,6 @@ enum {
 	OPT_FORMAT_STATUS_TYPING,
 	OPT_FORMAT_STATUS_WARN,
 	OPT_FORMAT_TIMESTAMP,
-	OPT_FORMAT_WARN,
-	OPT_FORMAT_WHOIS_AWAY,
-	OPT_FORMAT_WHOIS_IDLE,
-	OPT_FORMAT_WHOIS_MEMBER,
-	OPT_FORMAT_WHOIS_NAME,
-	OPT_FORMAT_WHOIS_SIGNON,
-	OPT_FORMAT_WHOIS_USERINFO,
-	OPT_FORMAT_WHOIS_WARNLEVEL,
-	OPT_OUTGOING_MSG_FONT,
-	OPT_OUTGOING_MSG_FONT_BGCOLOR,
-	OPT_OUTGOING_MSG_FONT_FGCOLOR,
-	OPT_OUTGOING_MSG_FONT_SIZE,
 	OPT_PORK_DIR,
 	OPT_RECURSIVE_EVENTS,
 	OPT_TEXT_BLIST_GROUP_COLLAPSED,
@@ -98,7 +90,6 @@ enum {
 	OPT_TEXT_NO_ROOM,
 	OPT_TEXT_TYPING,
 	OPT_TEXT_TYPING_PAUSED,
-	OPT_TEXT_WARN_ANONYMOUS,
 	GLOBAL_NUM_OPTS
 };
 
@@ -144,12 +135,12 @@ enum {
 #define DEFAULT_FORMAT_FILE_SEND_ASK		"[$T] Sent request to send $N ($S bytes) from $u to $U, waiting for reply"
 #define DEFAULT_FORMAT_FILE_SEND_COMPLETE	"[$T] Transfer $I has completed successfully: $N ($s bytes) was sent by $U to $u in $T seconds ($R KB/s)"
 #define DEFAULT_FORMAT_FILE_SEND_RESUME		"[$T] $u [$F:$p] has accepted $N from $U, resuming at byte $O"
-#define DEFAULT_FORMAT_IM_RECV				"[$T] %m<%x$N%m>%x $M"
-#define DEFAULT_FORMAT_IM_RECV_AUTO			"[$T] %Ca%cuto%D-%Cr%cesponse%x from %W$N%D:%x $M"
-#define DEFAULT_FORMAT_IM_RECV_STATUS		"[$T] %D*%M$N%D(%m$h%D)*%x $M"
-#define DEFAULT_FORMAT_IM_SEND				"[$T] %c>%x $M"
-#define DEFAULT_FORMAT_IM_SEND_AUTO			"[$T] %Ca%cuto%D-%Cr%cesponse%x to %W$R%D:%x $M"
-#define DEFAULT_FORMAT_IM_SEND_STATUS		"[$T] %D->*%m$R%D*%x $M"
+#define DEFAULT_FORMAT_MSG_RECV				"[$T] %m<%x$N%m>%x $M"
+#define DEFAULT_FORMAT_MSG_RECV_AUTO			"[$T] %Ca%cuto%D-%Cr%cesponse%x from %W$N%D:%x $M"
+#define DEFAULT_FORMAT_MSG_RECV_STATUS		"[$T] %D*%M$N%D(%m$h%D)*%x $M"
+#define DEFAULT_FORMAT_MSG_SEND				"[$T] %c>%x $M"
+#define DEFAULT_FORMAT_MSG_SEND_AUTO		"[$T] %Ca%cuto%D-%Cr%cesponse%x to %W$R%D:%x $M"
+#define DEFAULT_FORMAT_MSG_SEND_STATUS		"[$T] %D->*%m$R%D*%x $M"
 #define DEFAULT_FORMAT_NOTICE_RECV			"[$T] %D-%B$N%D-%x $M"
 #define DEFAULT_FORMAT_NOTICE_RECV_STATUS	"[$T] %D-%B$N%D(%c$h%D)-%x $M"
 #define DEFAULT_FORMAT_NOTICE_SEND			"[$T] %D-> -%c$R%D-%x $M"
@@ -163,18 +154,10 @@ enum {
 #define DEFAULT_FORMAT_STATUS_TYPING		" (%b,w$Y%d,w)"
 #define DEFAULT_FORMAT_STATUS_WARN			"%d,w [%r,w$w%%%d,w]"
 #define DEFAULT_FORMAT_TIMESTAMP			"$H:$M"
-#define DEFAULT_FORMAT_WARN					"[$T] %R$N%r has been warned by %R$U%r.%x Warning level is now %W$W%%"
-#define DEFAULT_FORMAT_WHOIS_AWAY			"%D-%Ca%cway message%W:%x $A"
-#define DEFAULT_FORMAT_WHOIS_IDLE			"%D-%p-%P--%Ci%cdle time%W:%x $i"
-#define DEFAULT_FORMAT_WHOIS_MEMBER			"%D-%Cm%cember since%W:%x $d"
-#define DEFAULT_FORMAT_WHOIS_NAME			"%D-%p-%P---%Cu%csername%W:%x $N"
-#define DEFAULT_FORMAT_WHOIS_SIGNON			"%D-%Co%cnline since%W:%x $s"
-#define DEFAULT_FORMAT_WHOIS_USERINFO		"%D-%p-%P--%Cu%cser info%W:%x $P"
-#define DEFAULT_FORMAT_WHOIS_WARNLEVEL		"%D-%p-%P-%Cw%carn level%W:%x $W%%"
-#define DEFAULT_OUTGOING_MSG_FONT			""
-#define DEFAULT_OUTGOING_MSG_FONT_BGCOLOR	"#ffffff"
-#define DEFAULT_OUTGOING_MSG_FONT_FGCOLOR	"#000000"
-#define DEFAULT_OUTGOING_MSG_FONT_SIZE		""
+#define DEFAULT_FORMAT_WARN_RECV			"[$T] %R$N%r has been warned by %R$U%r.%x Warning level is now %W$W%%"
+#define DEFAULT_FORMAT_WARN_RECV_ANON		"[$T] %R$N%r has been warned anonymously.%x Warning level is now %W$W%%"
+#define DEFAULT_FORMAT_WARN_SEND			"[$T] %R$U%r has warned %R$N"
+#define DEFAULT_FORMAT_WARN_SEND_ANON		"[$T] %R$U%r has warned %R$N%x anonymously"
 #define DEFAULT_PORK_DIR					"~/.pork/"
 #define DEFAULT_RECURSIVE_EVENTS			0
 #define DEFAULT_TEXT_BLIST_GROUP_EXPANDED	"%B+%x"
@@ -186,7 +169,6 @@ enum {
 #define DEFAULT_TEXT_NO_ROOM				":(not joined)"
 #define DEFAULT_TEXT_TYPING					"Typing"
 #define DEFAULT_TEXT_TYPING_PAUSED			"Typing [paused]"
-#define DEFAULT_TEXT_WARN_ANONYMOUS			"%D<%ranonymous%D>%x"
 
 #else
 #	warning "included multiple times"

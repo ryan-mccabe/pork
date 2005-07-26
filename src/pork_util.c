@@ -337,7 +337,7 @@ int create_full_path(char *path) {
 	char buf[8192];
 
 	if (expand_path(path, buf, sizeof(buf)) == -1)
-		return (-1); 
+		return (-1);
 
 	p = strrchr(buf, '/');
 	if (p != NULL && p[1] != '\0')

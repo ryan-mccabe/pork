@@ -36,7 +36,7 @@ No release numbers
   - Fix faim_internal/export confusion for the TLV functions
   - Add aim_addtlvtochain_userinfo() (used by AP)
   - Clean up ICBM Channel 1 parsing ever so slightly
-  - Add multipart message support in both directions, and some 
+  - Add multipart message support in both directions, and some
       fun examples of it in faimtest.
   - Yes, I'm insane.
 
@@ -65,7 +65,7 @@ No release numbers
       someone decides on a good API for passing lists like this to the client.
       In case someone does, the same standard will be used for setbuddylist and
       the as yet nonexistant support for server-side buddy lists.
-  - Make infochange work again. I still don't like it, but I don't want to 
+  - Make infochange work again. I still don't like it, but I don't want to
       fix it.
 
  - Sat Sep  8 19:05:05 PDT 2001
@@ -111,22 +111,22 @@ No release numbers
   - Abstract out the numerical data types to fu8/16/32_t for portability.
   - AIM_FRAMETYPE_OSCAR -> AIM_FRAMETYPE_FLAP.  This makes more sense.
   - aim_conn_t's FLAP sequence number was a signed int.  Oops.
-  - Get rid of the 'struct' on all types suffixed with _t.  That's been 
+  - Get rid of the 'struct' on all types suffixed with _t.  That's been
      annoying me for a while.  They're all real typedefs now.
-     - Yes, client people are going to be rather annoyed by this.  But it 
+     - Yes, client people are going to be rather annoyed by this.  But it
          doesn't stop there.  Keep reading.
   - Make the 'struct aim_rxcblist_t' type local to rxhandlers.c.
   - Combine the command_tx_struct and command_rx_struct into aim_frame_t.
      - Mostly aim_frame_t is command_rx_struct.  For command_tx_struct, the
-         same structure is used, except where ->sent was, ->handled is now 
+         same structure is used, except where ->sent was, ->handled is now
          used.
      - This makes things a lot easier, everywhere.
-     - Get rid of ->lock.  Pointless.  If libfaim is ever preemptible, it 
+     - Get rid of ->lock.  Pointless.  If libfaim is ever preemptible, it
          has much more important problems than that.
   - Welcome to aim_bstream_t.  No more direct buffer accesses.  Anywhere.
      - In fact I plan on getting rid of the aimutil macros completly.
      - This isn't complete yet.  It will be better later.  Believe me.  Maybe
-         even make more sense.  
+         even make more sense.
      - More advanced and configurable boundschecking is coming, too.
   - Clean up lots of stuff, everywhere.
   - Rearrange the implementation of the TLV functions, saving lots of code.
@@ -134,7 +134,7 @@ No release numbers
           particularly in places where TLVs contain TLVs.
   - Get rid of aim_puttlv_() functions.  Those were gross. Use tlvchains.
   - XOR login is temporarily broken.  I'll fix it someday. ("Someone" needs it.)
-  - Fix the return values of most everything -- OSCAR functions should all 
+  - Fix the return values of most everything -- OSCAR functions should all
       return 0 on sucess, negative errno on failure.
   - There are several things braced with #ifdef MID_REWROTE_ALL_THE_CRAP.
       Consider that code broken and nonfunctional for now.
@@ -149,8 +149,8 @@ No release numbers
  - Sat Aug 25 19:46:38 PDT 2001
   - Pass "Maximum visible message length" to client in chat info update
     - This is the real maximum message length now.  There is still a
-      "complexity" limit that will prevent you from sending messages 
-      even if they are less than this limit (102 right now), but I don't 
+      "complexity" limit that will prevent you from sending messages
+      even if they are less than this limit (102 right now), but I don't
       know how that is calculated.
 
  - Sat Aug 25 19:19:16 PDT 2001
@@ -178,7 +178,7 @@ No release numbers
  - Thu Aug 16 06:17:57 PDT 2001
   - Reformat a bit of im.c and aim.h
   - Rearrange encoding/subencoding checks in IM parsing
- 
+
  - Fri Aug  3 14:19:37 EDT 2001
   - Naje aun_sebd_un retyrn sabe vakyes
 
@@ -208,9 +208,9 @@ No release numbers
  - Mon Jun  4 12:45:18 PDT 2001
   - Don't use snacid's for generic requests (gets around recent blocks)
   - If they start doing snacid-based blocks again, an audit will have
-      to be done to see what WinAIM requests uses snacids for and what 
-      it leaves it blank for.  That will be tedious and I'm not going to 
-      do it. 
+      to be done to see what WinAIM requests uses snacids for and what
+      it leaves it blank for.  That will be tedious and I'm not going to
+      do it.
 
  - Thu May 31 23:00:50 PDT 2001
   - Store two hardcoded hashes in login.c.  Sigh.
@@ -251,7 +251,7 @@ No release numbers
   - I had pizza for lunch.
 
  - Mon May  7 15:19:55 PDT 2001
-  - Rename rxhandler_t to aim_rxhandler_t.  This has been 
+  - Rename rxhandler_t to aim_rxhandler_t.  This has been
      bugging me for a while.
 
  - Thu May  3 15:47:23 PDT 2001
@@ -302,7 +302,7 @@ No release numbers
   - vaargs to msgerror and locateerror swapped
      - ** CLIENT CHANGE: Reason code comes before SN now.  This is so that
           the backend code for all three error handlers is identical.
-  - aim_getinfo() returns -1 on failure (hah! I don't think anyone checks 
+  - aim_getinfo() returns -1 on failure (hah! I don't think anyone checks
       return codes from libfaim anyway...they're known for their
       inconsistency and lack of sensicality)
   - Remove _DEFAULT handlers in faimtest...
@@ -351,7 +351,7 @@ No release numbers
   - Banish socklen_t.
 
  - Sun Mar 11 05:51:45 UTC 2001 (jbm)
-  - Split off aim_internal.h 
+  - Split off aim_internal.h
   - Add aim_tx_cleanqueue()
   - Remove sn from directim callback (use priv)
 
@@ -374,7 +374,7 @@ No release numbers
   - Add some EXTRA_DIST to Makefile.am
 
  - Mon Feb 26 01:46:34 UTC 2001
-  - Fix swapped bytes in aim_caps[]. Thanks to 
+  - Fix swapped bytes in aim_caps[]. Thanks to
       Bruce Miller <bmiller@ics.uci.edu> for pointing this out.
 
  - Sun Feb 11 01:07:36 UTC 2001
@@ -384,7 +384,7 @@ No release numbers
     aim_auth_reqconfirm()
   - Add middle handlers for responses to all of above.
   - Add examples of above to faimtest (start with 'reqauth')
- 
+
  - Fri Feb  9 22:31:22 UTC 2001
   - Add aim_tx_setenqueue().
 
@@ -405,7 +405,7 @@ No release numbers
   - Add getopt() to faimtest.
   - Remove aim_buildcode.h/mkbuildinfo.sh crap.
   - Clean up aim_cleansnacs()
-  - There may have been other stuff too.  As always, the diff is the 
+  - There may have been other stuff too.  As always, the diff is the
     most accurate changelog there is.
   - *** FT is currently more broken than it was before.  Also, this patch
     introduces even more memory leaks.  You've been warned.
@@ -420,7 +420,7 @@ No release numbers
   - Clean up aim_bos_clientready().
 
  - Fri Dec 15 23:35:01 UTC 2000
-  - Add genericerr callback/middle. 
+  - Add genericerr callback/middle.
    - This is for catching the errors that come back, for instance, from
      sending a SNAC that isn't supported by the host (such as the
      Watcher Request SNAC).
@@ -485,18 +485,18 @@ No release numbers
   - Rewrote some of the msgcookie stuff
   - Changed cachecookies to uncachecookies where it makes sense (arg!)
   - Minor other stuff
- 
+
  - Fri Nov 10 08:24:34 UTC 2000
   - Add sess->flags (replaces sess->snaclogin)
   - Remove odd setstatus call in chat parser
   - Remove aim_tx_enqueue macro, replace with a smarter one
     - If a connection is in progress, enqueue instead of calling
       the client-specified queuer
-  - Add support for nonblocking connects through the 
+  - Add support for nonblocking connects through the
      AIM_SESS_FLAG_NONBLOCKCONNECT flag to aim_session_init()
   - Add AIM_CB_SPECIAL_CONNCOMPLETE callback. Not real useful.
   - Add AIM_CB_SPECIAL_FLAPVER callback. Can be used as an alternate
-     way of starting the login process, or just to look like you 
+     way of starting the login process, or just to look like you
      know what you're doing. Fixed associated inconsistencies
      in aim_rxhandlers too.
   - Fix some connection status stupidities in faimtest.
@@ -510,7 +510,7 @@ No release numbers
 
  - Wed Nov  8 02:23:25 UTC 2000
   - I'm trying out using a modified version of the kernel-doc scripts
-     to help document the libfaim code a bit.  See aim_conn.c and 
+     to help document the libfaim code a bit.  See aim_conn.c and
      aim_tlv.c, as well as the scripts in utils/docs.
 
  - Wed Oct 25 17:52:20 UTC 2000
@@ -534,7 +534,7 @@ No release numbers
  - Wed Oct  4 21:29:47 CDT 2000 (jbm)
   - Fix borked disconnect callbacks
   - Add aim_conn_in_sess()
-  - A little housekeeping in faimtest ("fixing" order of printf, 
+  - A little housekeeping in faimtest ("fixing" order of printf,
       remove a comment)
 
  - Mon Sep 25 00:21:31 CDT 2000 (jbm)
@@ -552,15 +552,15 @@ No release numbers
   - Eliminated a potential segfault in aim_send_im_direct().
   - make tags (yay!).
   - Added an aim_tx_destroy(); need to move the lib over to using it.
-  - Got rid of some #if 0 BS code in a couple of places 
+  - Got rid of some #if 0 BS code in a couple of places
       (aim_ft::establish() and aim_im::aim_parse_incoming_im_middle()).
-  - Added some file transfer stuff (so experimental, i haven't 
+  - Added some file transfer stuff (so experimental, i haven't
       had a chance to see if it causes cancer in lab animals).
   - Added to faimtest for all of the above.
   - Added myself to AUTHORS with Real Info.
 
  - Thu Sep 21 00:24:36 UTC 2000
-   - Add socks5 proxy support (not tested real well, worked the 
+   - Add socks5 proxy support (not tested real well, worked the
        few times a tried).
    - Added proxy support to faimtest.
 
@@ -577,7 +577,7 @@ No release numbers
    - Remove some extraneous variables
 
  - Tue Sep 12 20:16:51 UTC 2000
-   - Add aim_flap_nop() from my work tree 
+   - Add aim_flap_nop() from my work tree
 
  - Tue Sep 12 05:06:53 UTC 2000
    - Revert the two-byte change in aim_misc, clientready
@@ -666,7 +666,7 @@ No release numbers
         for ages now.  When you send a message with that option, you'll
         get a message back containing the screenname, telling you it was sent.
    - Moved the aim_conn_kill's out of aim_get_command() and into
-      the client.  They're only closed in there now.  This is so that you 
+      the client.  They're only closed in there now.  This is so that you
       can detect what type of connection died.  You'll want to handle
       BOS and chat connections in special ways most likely.  You'll also
       need to call aim_conn_kill when you're done with it.
@@ -680,15 +680,15 @@ No release numbers
    - Fixed 0001/000a chat printf.  (Actually a one liner a few days ago.)
    - Started integrating josh's 3k rendezvous patch.  Currently only
       directim is working.  And its got bugs.  But he's not online
-      right now, so I can't bitch.  I'd love to bitch here, but I'm 
-      tired. 
+      right now, so I can't bitch.  I'd love to bitch here, but I'm
+      tired.
      - Can definitly accept directim connections and send/recieve.
      - See faimtest for the new callbacks.  (Urg.)
      - Here weeee gooooo.  (Not sure if this will break everyone or not.)
 
  - Fri Jun 30 00:04:47 UTC 2000
    - Removed the forceful ICQ-related warnings, just in case they're wrong
-   - Added three new fields to the client info.  
+   - Added three new fields to the client info.
       - **REQUIRES CLIENT CHANGES -- see faimtest for new initializer
    - Cleaned up aim_send_login()
    - Put in a nice hidious fix for AOL's latest bit of the drama.  See
@@ -717,7 +717,7 @@ No release numbers
          second one, you'll be fine.  (Unless you just want to see the message
          for yourself.  Its nifty. (FREE!))
    - ICBM parser now uses aim_extractuserinfo() so that it can benefit
-       from the above changes, as well as clean up the whole "is it the 
+       from the above changes, as well as clean up the whole "is it the
        first or the second one of this type?" issue
      - This also fixes the changes AOL made in away messages.
    = Fixed a possible buffer overflow when AOL changes the max sn length
@@ -737,14 +737,14 @@ No release numbers
  - The week prior to Fri Jun 16 19:37:09 UTC 2000
    - Rethought the rendezvous stuff.  DEFINIT WORK IN PROGRESS
      - Do not bother trying to use this.  This will probably break
-         your clients.  You may or may not want to fix them, since 
-         I may change it again soon.  
+         your clients.  You may or may not want to fix them, since
+         I may change it again soon.
      - I REPEAT: This really is a developer-only version.  It barely
          compiles.  I'm just committing it so I don't have so many
          trees floating around.
    - Added stuff to support OFT as well as OSCAR protocols
    - Added aim_send_im_direct() for directim ("IM Image")
-   - Added caps getting/putting routines 
+   - Added caps getting/putting routines
    - Added more aim_login fixes to avoid more AOL stupidity
      - This is the same as went to libfaim-devel yesterday, so don't upgrade
        just to get these changes.
@@ -753,7 +753,7 @@ No release numbers
    - Added AUTHORS
 
  - Tue Jun  6 01:36:48 UTC 2000
-   - Inverted gethostbyname2() check.  Not sure how that ended up 
+   - Inverted gethostbyname2() check.  Not sure how that ended up
        in that state.
    - Added some of the initial framework to support file transfers
    - Added in a few checks for that
@@ -764,7 +764,7 @@ No release numbers
    - Killed the connection array.  Now a list.  (Suits the
        upcoming features better.)  --- REQUIRES CLIENT CHANGES...
      - In most cases, you need to change aim_conn_close() calls
-         to aim_conn_kill().  This will free them as well as 
+         to aim_conn_kill().  This will free them as well as
          close them.  If you don't do this, you'll pollute the
          connection list and leak memory.
    - Possibly a few other minor things (some cleanups to faimtest for one)
@@ -775,11 +775,11 @@ No release numbers
        values required for logging in with ICQ
    - Removed crash when email and/or reg status aren't
        in the auth response (they're not in ICQ responses)
-   - So now as long as you specify a client version of 
+   - So now as long as you specify a client version of
        4.30.3141 in the client info, and your ICQ number
        as your screen name, you can login to ICQ via libfaim
        and use it just like an AIM account.
-   - Added AIM_CB_SPECIAL_CONNERR callback for recieving 
+   - Added AIM_CB_SPECIAL_CONNERR callback for recieving
        messages such as disconnect reasonses ("you logged
        on from a different machine", etc).
    - Added faimtest's userinfo handler to support away messages
@@ -794,18 +794,18 @@ No release numbers
      - Note that the new max message size is defined as 7988bytes,
          drastically larger than WinAIM lets you put out.  This is a
          libfaim-exclusive feature :)
-   - Reduced base buffer size on aim_send_im()  
- 
+   - Reduced base buffer size on aim_send_im()
+
  - Tue May 30 22:32:31 UTC 2000
    - Added lock around tx seqnum to prevent that race when transmitting
        from diverse threads. (actually committed earlier today)
    - Added aim_meta.c and a few constants and things to keep
-       track of "releases".  
+       track of "releases".
    - Added mkbuildinfo.sh to automatically update build string
        "constants" on every invocation of 'make all'.
 
  - Mon May 29 12:08:28 GMT 2000
-   - Rearranged aim_tx_flushqueue(); moved write operation 
+   - Rearranged aim_tx_flushqueue(); moved write operation
        to aim_tx_sendframe()
    - Turned aim_tx_enqueue() into a macro that calls sess->tx_enqueue,
        a function pointer to whatever you want to use to enqueue
@@ -819,7 +819,7 @@ No release numbers
      - Unfortunatly, only pthreads are supported at this time.
        If you don't have pthreads on your arch, implement the
        macros your arch needs and send me a patch.  (A SysV
-       semaphore implementation would be trivial, as would a 
+       semaphore implementation would be trivial, as would a
        simple integer-based lock.)
 
  - Sun May 21 14:59:20 GMT 2000
@@ -827,15 +827,15 @@ No release numbers
        different types of messages.  AIM_GETINFO_GENERALINFO
        will get you the normal stuff, AIM_GETINFO_AWAYMESSAGE
        will get the normal stuff, with the profile replaced with
-       the user's away message.  Also, the callback adds an 
+       the user's away message.  Also, the callback adds an
        unsigned short to the end to give you the value that
        was originally passed to the request.
-   - There were a few server-pertinent changes that didn't get 
+   - There were a few server-pertinent changes that didn't get
        documented from last month.  I have no idea what they were.
 
  - Sun Apr  2 07:29:11 UTC 2000
    - Redid much of the tx path to remove the superfluous copy.  But
-       it touches every function that transmits.  Its been a long 
+       it touches every function that transmits.  Its been a long
        time in coming.
    - Added caps parameter to aim_bos_setprofile().  You can now
        control what capabilties you show up as others to
@@ -847,8 +847,8 @@ No release numbers
    - Increased AIM_CONN_MAX from 5 to 7.  Precausionary only
    - Removed deprecated TIS_TELNET_PROXY from faim/faimconfig.h
    - Added macros for the simple integer functions in aim_util.c
-   - Removed usage of aim_failsaferead() 
-      - Still not sure why I had it to begin with.  I think it 
+   - Removed usage of aim_failsaferead()
+      - Still not sure why I had it to begin with.  I think it
         was a remament from when we used non-blocking sockets
         (which I don't know why I did either)
    - Removed some of the oddities in aim_get_command()
@@ -859,7 +859,7 @@ No release numbers
  - Thu Mar 23 08:45:40 UTC 2000
    - Removed aim_countconn() > 0 check in aim_select(), its logically redundent
    - Added aim_putuserinfo() (inverse of aim_extractuserinfo())
-   - Added aim_sendbuddyoncoming/offgoing() 
+   - Added aim_sendbuddyoncoming/offgoing()
    - Rearranged loop in rxdispatch()
    - Remove aim_conn_close() if connections dead in aim_get_command()
 
@@ -872,11 +872,11 @@ No release numbers
    - Added aim_sncmp() and aim_snlen()
 
  - Sun Mar 19 06:07:52 UTC 2000
-   - Added a parameter to aim_select to return event type 
+   - Added a parameter to aim_select to return event type
      - REQUIRES CLIENT CHANGES.
-   - For the most part rewrote the tx and rx queuing code 
+   - For the most part rewrote the tx and rx queuing code
      - Should fix many, many outstanding problems in and related
-         to that code, including one that keeps memory from freeing 
+         to that code, including one that keeps memory from freeing
    - Fixed several bugs in various places
    - Reformated a lot of code, and did general cleanups
    - Should have a generally more robust lib now.
@@ -887,7 +887,7 @@ No release numbers
 
  - Mon Jan  3 04:07:55 UTC 2000
    - Fixed bug in aim_snac.c
-   - Fixed condition where commands read from connections that have 
+   - Fixed condition where commands read from connections that have
        been closed were still left in the queue.  Now cancelled.
    - Added some printfs to aim_info to get more informative crahes
    - Fixed a bug in aim_rxqueue::purge
@@ -904,7 +904,7 @@ No release numbers
    - Added AIM_CLASS_* defines, including new Away flag
    - Added awaymsg parameter to bos_setprofile.
      - If awaymsg is nonnull, you will be advertised as being away (your
-         class will be ORed with AIM_CLASS_AWAY), otherwise you'll show 
+         class will be ORed with AIM_CLASS_AWAY), otherwise you'll show
          up normal.
 
  - Wed Dec 29 10:06:35 UTC 1999
@@ -912,10 +912,10 @@ No release numbers
    - Added stubs for the capability TLVs in userinfo.
 
  - Wed Dec 29 09:14:45 UTC 1999
-   - Added a capability block to aim_bos_setprofile.  Can now get chat 
+   - Added a capability block to aim_bos_setprofile.  Can now get chat
        invites again.
    - Extended ICBM parser to support channel 2 messages (chat invites)
-     - A channel parameter has been prepended to the varargs -- REQUIRES 
+     - A channel parameter has been prepended to the varargs -- REQUIRES
          CLIENT CHANGES.
      - Extended faimtest to support chat invites.
    - Changed faimtest to get sn/password from environment
@@ -931,7 +931,7 @@ No release numbers
    - Fiddled with version information.  Added aim_setversions()
    - Added table of SNAC names for showing unknown snacs (jbm)
    - Added a middle handler for MOTD
-   - Added new authorization SNACs to faim/aim_cbtypes.h   
+   - Added new authorization SNACs to faim/aim_cbtypes.h
 
  - Sun Dec 26 22:59:10 UTC 1999
    - Renamed login_phase1_struct to aim_login_struct
@@ -982,14 +982,14 @@ No release numbers
    - Rearranged parse_userinfo_middle().  Now passes an entire
        userinfo struct to client instead of individual variables.
    - Convered the version of parse_im_middle() thats actually getting
-       used to pass up a userinfo struct.  
+       used to pass up a userinfo struct.
    - Updated faimtest to accept new structs.
 
  - Tue Dec 21 06:18:50 UTC 1999
    - Fixed a Win32 header problem
  - Tue Dec 21 03:44:13 UTC 1999
    - Latency timers now update on rx as well as tx.  Gets rid of even more
-       of the rate problems that most clients are having.  
+       of the rate problems that most clients are having.
    - Renamed lasttx and settxlatency to lastactivity and setlatency, respec.
    - Integrated fixes needed for Win32 -- should compile cleanly now (DMP)
    - Cleaned up some places, use aim_putsnac everywhere now.
@@ -1025,7 +1025,7 @@ No release numbers
 
  - Sat Jul 31 05:28:38 UTC 1999
    - Changed aim_bos_setdeny() to aim_bos_changevisibility() and actually
-       did the implementation.  
+       did the implementation.
 
  - Fri Jul 23 17:45:22 UTC 1999
    - Work around for the AOL change in IP syntax (thanks to Eric Peyton)
@@ -1068,6 +1068,6 @@ No release numbers
 
  - Sat Dec  5 00:01:53 MST 1998
    - Released snapshot
- 
+
  - Thu Nov 26 17:50:02 MST 1998
    -  Released snapshot
