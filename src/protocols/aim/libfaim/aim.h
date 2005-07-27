@@ -9,12 +9,8 @@
 #ifndef __AIM_H__
 #define __AIM_H__
 
-#define FAIM_VERSION_MAJOR 0
-#define FAIM_VERSION_MINOR 99
-#define FAIM_VERSION_MINORMINOR 1
-
-#include <faimconfig.h>
-#include <aim_cbtypes.h>
+#include "faimconfig.h"
+#include "aim_cbtypes.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -47,13 +43,13 @@ typedef fu32_t aim_snacid_t;
 typedef fu16_t flap_seqnum_t;
 
 #if defined(mach) && defined(__APPLE__)
-#define gethostbyname(x) gethostbyname2(x, AF_INET)
+#define gethostbyname(x) gethostbyname2(x, AF_INET) 
 #endif
 
 #if defined(_WIN32) && !defined(WIN32_STATIC)
 /*
  * For a win32 DLL, we define WIN32_INDLL if this file
- * is included while compiling the DLL. If its not
+ * is included while compiling the DLL. If its not 
  * defined (its included in a client app), the symbols
  * will be imported instead of exported.
  */
@@ -79,8 +75,8 @@ typedef fu16_t flap_seqnum_t;
 #define TRUE (!FALSE)
 #endif
 
-/*
- * Current Maximum Length for Screen Names (not including NULL)
+/* 
+ * Current Maximum Length for Screen Names (not including NULL) 
  *
  * Currently only names up to 16 characters can be registered
  * however it is apparently legal for them to be larger.
@@ -100,7 +96,7 @@ typedef fu16_t flap_seqnum_t;
  * with utterly oversized instant messages!
  *
  * XXX: the real limit is the total SNAC size at 8192. Fix this.
- *
+ * 
  */
 #define MAXMSGLEN 7987
 
@@ -114,7 +110,7 @@ typedef fu16_t flap_seqnum_t;
  * Current Maximum Length for Chat Room Messages
  *
  * This is actually defined by the protocol to be
- * dynamic, but I have yet to see due cause to
+ * dynamic, but I have yet to see due cause to 
  * define it dynamically here.  Maybe later.
  *
  */
@@ -128,7 +124,7 @@ typedef fu16_t flap_seqnum_t;
 #define AIM_MD5_STRING "AOL Instant Messenger (SM)"
 
 /*
- * Client info.  Filled in by the client and passed in to
+ * Client info.  Filled in by the client and passed in to 
  * aim_send_login().  The information ends up getting passed to OSCAR
  * through the initial login command.
  *
@@ -282,8 +278,8 @@ struct client_info_s {
 #define CLIENTINFO_AIM_KNOWNGOOD CLIENTINFO_AIM_5_1_3036
 #define CLIENTINFO_ICQ_KNOWNGOOD CLIENTINFO_ICQ_5_45_3777
 
-/*
- * These could be arbitrary, but its easier to use the actual AIM values
+/* 
+ * These could be arbitrary, but its easier to use the actual AIM values 
  */
 #define AIM_CONN_TYPE_BOS		0x0002
 #define AIM_CONN_TYPE_ADS		0x0005
@@ -383,7 +379,7 @@ typedef struct aim_msgcookie_s {
 } aim_msgcookie_t;
 
 /*
- * AIM Session: The main client-data interface.
+ * AIM Session: The main client-data interface.  
  *
  */
 typedef struct aim_session_s {
@@ -394,7 +390,7 @@ typedef struct aim_session_s {
 	char sn[MAXSNLEN+1];
 
 	/*
-	 * Pointer to anything the client wants to
+	 * Pointer to anything the client wants to 
 	 * explicitly associate with this session.
 	 *
 	 * This is for use in the callbacks mainly. In any
@@ -414,7 +410,7 @@ typedef struct aim_session_s {
 	 * These are only used when you don't use your own lowlevel
 	 * I/O.  I don't suggest that you use libfaim's internal I/O.
 	 * Its really bad and the API/event model is quirky at best.
-	 *
+	 *  
 	 */
 	aim_frame_t *queue_outgoing;
 	aim_frame_t *queue_incoming;
@@ -443,7 +439,7 @@ typedef struct aim_session_s {
 	void (*debugcb)(struct aim_session_s *sess, int level, const char *format, va_list va); /* same as faim_debugging_callback_t */
 
 	/*
-	 * Outstanding snac handling
+	 * Outstanding snac handling 
 	 *
 	 * XXX: Should these be per-connection? -mid
 	 */
@@ -511,6 +507,7 @@ faim_export int aim_debugconn_sendconnect(aim_session_t *sess, aim_conn_t *conn)
 
 faim_export int aim_logoff(aim_session_t *);
 
+/* the library should never call aim_conn_kill */
 faim_export void aim_conn_kill(aim_session_t *sess, aim_conn_t **deadconn);
 
 typedef int (*aim_rxcallback_t)(aim_session_t *, aim_frame_t *, ...);
@@ -577,7 +574,6 @@ faim_export aim_conn_t *aim_conn_findbygroup(aim_session_t *sess, fu16_t group);
 faim_export aim_session_t *aim_conn_getsess(aim_conn_t *conn);
 faim_export void aim_conn_close(aim_conn_t *deadconn);
 faim_export aim_conn_t *aim_newconn(aim_session_t *, int type, const char *dest);
-faim_export aim_conn_t *aim_select(aim_session_t *, struct timeval *, int *);
 faim_export int aim_conn_in_sess(aim_session_t *sess, aim_conn_t *conn);
 faim_export int aim_conn_isready(aim_conn_t *);
 faim_export int aim_conn_setstatus(aim_conn_t *, int);
@@ -588,7 +584,6 @@ typedef void (*faim_debugging_callback_t)(aim_session_t *sess, int level, const 
 faim_export int aim_setdebuggingcb(aim_session_t *sess, faim_debugging_callback_t);
 faim_export void aim_session_init(aim_session_t *, fu8_t nonblocking, int debuglevel);
 faim_export void aim_session_kill(aim_session_t *);
-faim_export void aim_setupproxy(aim_session_t *sess, const char *server, const char *username, const char *password);
 faim_export aim_conn_t *aim_getconn_type(aim_session_t *, int type);
 faim_export aim_conn_t *aim_getconn_type_all(aim_session_t *, int type);
 faim_export aim_conn_t *aim_getconn_fd(aim_session_t *, int fd);
@@ -768,7 +763,7 @@ struct aim_sendrtfmsg_args {
 
 /*
  * This information is provided in the Incoming ICBM callback for
- * Channel 1 ICBM's.
+ * Channel 1 ICBM's.  
  *
  * Note that although CUSTOMFEATURES and CUSTOMCHARSET say they
  * are optional, both are always set by the current libfaim code.
