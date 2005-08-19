@@ -45,7 +45,7 @@ static int rights(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_m
 	 * TLV type 0x0002: Maximum number of watchers.
 	 *
 	 * Watchers are other users who have you on their buddy
-	 * list.  (This is called the "reverse list" by a certain
+	 * list. (This is called the "reverse list" by a certain
 	 * other IM protocol.)
 	 *
 	 */
@@ -234,7 +234,7 @@ faim_export int aim_buddylist_offgoing(aim_session_t *sess, aim_conn_t *conn, co
  * Subtypes 0x000b and 0x000c - Change in buddy status
  *
  * Oncoming Buddy notifications contain a subset of the
- * user information structure.  It's close enough to run
+ * user information structure. It's close enough to run
  * through aim_info_extract() however.
  *
  * Although the offgoing notification contains no information,

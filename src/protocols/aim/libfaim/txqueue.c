@@ -19,7 +19,7 @@
  *
  * This is more for looks than anything else.
  *
- * Right now, that is.  If/when we implement a pool of transmit
+ * Right now, that is. If/when we implement a pool of transmit
  * frames, this will become the request-an-unused-frame part.
  *
  * framing = AIM_FRAMETYPE_OFT/FLAP
@@ -76,7 +76,7 @@ faim_internal aim_frame_t *aim_tx_new(aim_session_t *sess, aim_conn_t *conn, fu8
 
 /*
  * This increments the tx command count, and returns the seqnum
- * that should be stamped on the next FLAP packet sent.  This is
+ * that should be stamped on the next FLAP packet sent. This is
  * normally called during the final step of packet preparation
  * before enqueuement (in aim_tx_enqueue()).
  */
@@ -91,11 +91,11 @@ static flap_seqnum_t aim_get_next_txseqnum(aim_conn_t *conn)
 
 /*
  * The overall purpose here is to enqueue the passed in command struct
- * into the outgoing (tx) queue.  Basically...
- *   1) Make a scope-irrelevant copy of the struct
- *   3) Mark as not-sent-yet
- *   4) Enqueue the struct into the list
- *   6) Return
+ * into the outgoing (tx) queue. Basically...
+ *	1) Make a scope-irrelevant copy of the struct
+ *	3) Mark as not-sent-yet
+ *	4) Enqueue the struct into the list
+ *	6) Return
  *
  * Note that this is only used when doing queue-based transmitting;
  * that is, when sess->tx_enqueue is set to &aim_tx_enqueue__queuebased.
@@ -216,7 +216,7 @@ static int aim_bstream_send(aim_bstream_t *bs, aim_conn_t *conn, size_t count)
 		 * can. Why is this file called txqueue anyway? Lets rename it to txblock.
 		 */
 		if ((conn->type == AIM_CONN_TYPE_RENDEZVOUS) &&
-		    (conn->subtype == AIM_CONN_SUBTYPE_OFT_DIRECTIM)) {
+			(conn->subtype == AIM_CONN_SUBTYPE_OFT_DIRECTIM)) {
 			const char *sn = aim_odc_getsn(conn);
 			aim_rxcallback_t userfunc;
 
@@ -331,7 +331,7 @@ faim_export int aim_tx_flushqueue(aim_session_t *sess)
 	for (cur = sess->queue_outgoing; cur; cur = cur->next) {
 
 		if (cur->handled)
-	       		continue; /* already been sent */
+			continue; /* already been sent */
 
 		if (cur->conn && (cur->conn->status & AIM_CONN_STATUS_INPROGRESS))
 			continue;
@@ -382,7 +382,7 @@ faim_export void aim_tx_purgequeue(aim_session_t *sess)
 }
 
 /**
- * Get rid of packets waiting for tx on a dying conn.  For now this
+ * Get rid of packets waiting for tx on a dying conn. For now this
  * simply marks all packets as sent and lets them disappear without
  * warning.
  *

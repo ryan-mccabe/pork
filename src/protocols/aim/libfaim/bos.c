@@ -54,7 +54,7 @@ static int rights(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_m
  * Normally 0x1f (all classes).
  *
  * The group permission mask allows you to keep users of a certain
- * class or classes from talking to you.  The mask should be
+ * class or classes from talking to you. The mask should be
  * a bitwise OR of all the user classes you want to see you.
  *
  */
@@ -68,28 +68,27 @@ faim_export int aim_bos_setgroupperm(aim_session_t *sess, aim_conn_t *conn, fu32
  *
  * Changes your visibility depending on changetype:
  *
- *  AIM_VISIBILITYCHANGE_PERMITADD: Lets provided list of names see you
- *  AIM_VISIBILITYCHANGE_PERMIDREMOVE: Removes listed names from permit list
- *  AIM_VISIBILITYCHANGE_DENYADD: Hides you from provided list of names
- *  AIM_VISIBILITYCHANGE_DENYREMOVE: Lets list see you again
+ * AIM_VISIBILITYCHANGE_PERMITADD: Lets provided list of names see you
+ * AIM_VISIBILITYCHANGE_PERMIDREMOVE: Removes listed names from permit list
+ * AIM_VISIBILITYCHANGE_DENYADD: Hides you from provided list of names
+ * AIM_VISIBILITYCHANGE_DENYREMOVE: Lets list see you again
  *
  * list should be a list of
  * screen names in the form "Screen Name One&ScreenNameTwo&" etc.
  *
  * Equivelents to options in WinAIM:
- *   - Allow all users to contact me: Send an AIM_VISIBILITYCHANGE_DENYADD
- *      with only your name on it.
- *   - Allow only users on my Buddy List: Send an
- *      AIM_VISIBILITYCHANGE_PERMITADD with the list the same as your
- *      buddy list
- *   - Allow only the uesrs below: Send an AIM_VISIBILITYCHANGE_PERMITADD
- *      with everyone listed that you want to see you.
- *   - Block all users: Send an AIM_VISIBILITYCHANGE_PERMITADD with only
- *      yourself in the list
- *   - Block the users below: Send an AIM_VISIBILITYCHANGE_DENYADD with
- *      the list of users to be blocked
+ *	- Allow all users to contact me: Send an AIM_VISIBILITYCHANGE_DENYADD
+ *		with only your name on it.
+ *	- Allow only users on my Buddy List: Send an
+ *		AIM_VISIBILITYCHANGE_PERMITADD with the list the same as your
+ *		buddy list
+ *	- Allow only the uesrs below: Send an AIM_VISIBILITYCHANGE_PERMITADD
+ *		with everyone listed that you want to see you.
+ *	- Block all users: Send an AIM_VISIBILITYCHANGE_PERMITADD with only
+ *		yourself in the list
+ *	- Block the users below: Send an AIM_VISIBILITYCHANGE_DENYADD with
+ *		the list of users to be blocked
  *
- * XXX ye gods.
  */
 faim_export int aim_bos_changevisibility(aim_session_t *sess, aim_conn_t *conn, int changetype, const char *denylist)
 {

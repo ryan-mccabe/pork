@@ -1,8 +1,8 @@
 /*
  * Family 0x000c - Translation.
  *
- * I have no idea why this group was issued.  I have never seen anything
- * that uses it.  From what I remember, the last time I tried to poke at
+ * I have no idea why this group was issued. I have never seen anything
+ * that uses it. From what I remember, the last time I tried to poke at
  * the server with this group, it whined about not supporting it.
  *
  * But we advertise it anyway, because its fun.

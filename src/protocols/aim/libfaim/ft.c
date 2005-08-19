@@ -6,42 +6,42 @@
  * ODC stuff, then ft stuff.
  *
  * I feel like this is a good place to explain OFT, so I'm going to
- * do just that.  Each OFT packet has a header type.  I guess this
- * is pretty similar to the subtype of a SNAC packet.  The type
+ * do just that. Each OFT packet has a header type. I guess this
+ * is pretty similar to the subtype of a SNAC packet. The type
  * basically tells the other client the meaning of the OFT packet.
  * There are two distinct types of file transfer, which I usually
- * call "sendfile" and "getfile."  Sendfile is when you send a file
- * to another AIM user.  Getfile is when you share a group of files,
+ * call "sendfile" and "getfile." Sendfile is when you send a file
+ * to another AIM user. Getfile is when you share a group of files,
  * and other users request that you send them the files.
  *
  * A typical sendfile file transfer goes like this:
- *   1) Sender sends a channel 2 ICBM telling the other user that
- *      we want to send them a file.  At the same time, we open a
- *      listener socket (this should be done before sending the
- *      ICBM) on some port, and wait for them to connect to us.
- *      The ICBM we sent should contain our IP address and the port
- *      number that we're listening on.
- *   2) The receiver connects to the sender on the given IP address
- *      and port.  After the connection is established, the receiver
- *      sends an ICBM signifying that we are ready and waiting.
- *   3) The sender sends an OFT PROMPT message over the OFT
- *      connection.
- *   4) The receiver of the file sends back an exact copy of this
- *      OFT packet, except the cookie is filled in with the cookie
- *      from the ICBM.  I think this might be an attempt to verify
- *      that the user that is connected is actually the guy that
- *      we sent the ICBM to.  Oh, I've been calling this the ACK.
- *   5) The sender starts sending raw data across the connection
- *      until the entire file has been sent.
- *   6) The receiver knows the file is finished because the sender
- *      sent the file size in an earlier OFT packet.  So then the
- *      receiver sends the DONE thingy (after filling in the
- *      "received" checksum and size) and closes the connection.
+ *	1) Sender sends a channel 2 ICBM telling the other user that
+ *		we want to send them a file. At the same time, we open a
+ *		listener socket (this should be done before sending the
+ *		ICBM) on some port, and wait for them to connect to us.
+ *		The ICBM we sent should contain our IP address and the port
+ *		number that we're listening on.
+ *	2) The receiver connects to the sender on the given IP address
+ *		and port. After the connection is established, the receiver
+ *		sends an ICBM signifying that we are ready and waiting.
+ *	3) The sender sends an OFT PROMPT message over the OFT
+ *		connection.
+ *	4) The receiver of the file sends back an exact copy of this
+ *		OFT packet, except the cookie is filled in with the cookie
+ *		from the ICBM. I think this might be an attempt to verify
+ *		that the user that is connected is actually the guy that
+ *		we sent the ICBM to. Oh, I've been calling this the ACK.
+ *	5) The sender starts sending raw data across the connection
+ *		until the entire file has been sent.
+ *	6) The receiver knows the file is finished because the sender
+ *		sent the file size in an earlier OFT packet. So then the
+ *		receiver sends the DONE thingy (after filling in the
+ *		"received" checksum and size) and closes the connection.
  */
 
 #define FAIM_INTERNAL
 #ifdef HAVE_CONFIG_H
-#include  <config.h>
+#include <config.h>
 #endif
 
 #include <aim.h>
@@ -63,13 +63,13 @@
 
 /*
  * I really want to switch all our networking code to using IPv6 only,
- * but that really isn't a good idea at all.  Evan S. of Adium says
+ * but that really isn't a good idea at all. Evan S. of Adium says
  * OS X sets all connections as "AF_INET6/PF_INET6," even if there is
- * nothing inherently IPv6 about them.  And I feel like Linux kernel
- * 2.6.5 is doing the same thing.  So we REALLY should accept
- * connections if they're showing up as IPv6.  Old OSes (Solaris?)
+ * nothing inherently IPv6 about them. And I feel like Linux kernel
+ * 2.6.5 is doing the same thing. So we REALLY should accept
+ * connections if they're showing up as IPv6. Old OSes (Solaris?)
  * that might not have full IPv6 support yet will fail if we try
- * to use PF_INET6 but it isn't defined.  --Mark Doliner
+ * to use PF_INET6 but it isn't defined. --Mark Doliner
  */
 #ifndef PF_INET6
 #define PF_INET6 PF_INET
@@ -112,9 +112,9 @@ static void aim_oft_dirconvert_fromstupid(fu8_t *name)
 /**
  * Calculate oft checksum of buffer
  *
- * Prevcheck should be 0xFFFF0000 when starting a checksum of a file.  The
+ * Prevcheck should be 0xFFFF0000 when starting a checksum of a file. The
  * checksum is kind of a rolling checksum thing, so each time you get bytes
- * of a file you just call this puppy and it updates the checksum.  You can
+ * of a file you just call this puppy and it updates the checksum. You can
  * calculate the checksum of an entire file by calling this in a while or a
  * for loop, or something.
  *
@@ -122,11 +122,11 @@ static void aim_oft_dirconvert_fromstupid(fu8_t *name)
  * which is simpler and should be more accurate than Josh Myer's original
  * code. -- wtm
  *
- * This algorithm works every time I have tried it.  The other fails
- * sometimes.  So, AOL who thought this up?  It has got to be the weirdest
+ * This algorithm works every time I have tried it. The other fails
+ * sometimes. So, AOL who thought this up? It has got to be the weirdest
  * checksum I have ever seen.
  *
- * @param buffer Buffer of data to checksum.  Man I'd like to buff her...
+ * @param buffer Buffer of data to checksum. Man I'd like to buff her...
  * @param bufsize Size of buffer.
  * @param prevcheck Previous checksum.
  */
@@ -172,7 +172,7 @@ faim_export fu32_t aim_oft_checksum_file(char *filename) {
 }
 
 /**
- * After establishing a listening socket, this is called to accept a connection.  It
+ * After establishing a listening socket, this is called to accept a connection. It
  * clones the conn used by the listener, and passes both of these to a signal handler.
  * The signal handler should close the listener conn and keep track of the new conn,
  * since this is what is used for file transfers and what not.
@@ -231,7 +231,7 @@ faim_export int aim_handlerendconnect(aim_session_t *sess, aim_conn_t *cur)
 			ret = userfunc(sess, NULL, newconn, cur);
 
 	} else {
-		faimdprintf(sess, 1,"Got a connection on a listener that's not rendezvous.  Closing connection.\n");
+		faimdprintf(sess, 1,"Got a connection on a listener that's not rendezvous. Closing connection.\n");
 		aim_conn_close(newconn);
 		ret = -1;
 	}
@@ -245,7 +245,7 @@ faim_export int aim_handlerendconnect(aim_session_t *sess, aim_conn_t *cur)
  * @param sess The session.
  * @param conn The already-connected ODC connection.
  * @param typing If 0x0002, sends a "typing" message, 0x0001 sends "typed," and
- *        0x0000 sends "stopped."
+ *		0x0000 sends "stopped."
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_odc_send_typing(aim_session_t *sess, aim_conn_t *conn, int typing)
@@ -447,7 +447,7 @@ faim_export const fu8_t *aim_odc_getcookie(aim_conn_t *conn)
  * @param sess The session.
  * @param sn The screen name of the buddy whose direct connection you want to find.
  * @return The conn for the direct connection with the given buddy, or NULL if no
- *         connection was found.
+ *		 connection was found.
  */
 faim_export aim_conn_t *aim_odc_getconn(aim_session_t *sess, const char *sn)
 {
@@ -473,7 +473,7 @@ faim_export aim_conn_t *aim_odc_getconn(aim_session_t *sess, const char *sn)
  *
  * You'll want to set up some kind of watcher on this socket.
  * When the state changes, call aim_handlerendconnection with
- * the connection returned by this.  aim_handlerendconnection
+ * the connection returned by this. aim_handlerendconnection
  * will accept the pending connection and stop listening.
  *
  * @param sess The session
@@ -481,7 +481,7 @@ faim_export aim_conn_t *aim_odc_getconn(aim_session_t *sess, const char *sn)
  * @return The new connection.
  */
 faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, int listenfd,
-                                         const fu8_t *localip, fu16_t port, const fu8_t *mycookie)
+										 const fu8_t *localip, fu16_t port, const fu8_t *mycookie)
 {
 	aim_conn_t *newconn;
 	aim_msgcookie_t *cookie;
@@ -510,7 +510,7 @@ faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, in
 	aim_cachecookie(sess, cookie);
 
 	/* XXX - switch to aim_cloneconn()? */
-	if (!(newconn = aim_newconn(sess, AIM_CONN_TYPE_LISTENER, NULL))) {
+	if (!(newconn = aim_newconn(sess, AIM_CONN_TYPE_LISTENER))) {
 		close(listenfd);
 		return NULL;
 	}
@@ -534,12 +534,8 @@ faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, in
  *
  * This is a wrapper for aim_newconn.
  *
- * If addr is NULL, the socket is not created, but the connection is
- * allocated and setup to connect.
- *
  * @param sess The Godly session.
- * @param sn The screen name we're connecting to.  I hope it's a girl...
- * @param addr Address to connect to.
+ * @param sn The screen name we're connecting to. I hope it's a girl...
  * @return The new connection.
  */
 faim_export aim_conn_t *aim_odc_connect(aim_session_t *sess, const char *sn, const char *addr, const fu8_t *cookie)
@@ -557,8 +553,7 @@ faim_export aim_conn_t *aim_odc_connect(aim_session_t *sess, const char *sn, con
 	if (addr)
 		strncpy(intdata->ip, addr, sizeof(intdata->ip));
 
-	/* XXX - verify that non-blocking connects actually work */
-	if (!(newconn = aim_newconn(sess, AIM_CONN_TYPE_RENDEZVOUS, addr))) {
+	if (!(newconn = aim_newconn(sess, AIM_CONN_TYPE_RENDEZVOUS))) {
 		free(intdata);
 		return NULL;
 	}
@@ -672,6 +667,7 @@ faim_export struct aim_oft_info *aim_oft_createinfo(aim_session_t *sess, const f
 	if (sn)
 		new->sn = strdup(sn);
 	new->port = port;
+	new->success = FALSE;
 	new->fh.totfiles = 1;
 	new->fh.filesleft = 1;
 	new->fh.totparts = 1;
@@ -733,12 +729,12 @@ faim_export int aim_oft_destroyinfo(struct aim_oft_info *oft_info)
  *
  * You'll want to set up some kind of watcher on this socket.
  * When the state changes, call aim_handlerendconnection with
- * the connection returned by this.  aim_handlerendconnection
+ * the connection returned by this. aim_handlerendconnection
  * will accept the pending connection and stop listening.
  *
  * @param sess The session.
  * @param oft_info File transfer information associated with this
- *        connection.
+ *		connection.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_sendfile_listen(aim_session_t *sess, struct aim_oft_info *oft_info, int listenfd)
@@ -746,7 +742,7 @@ faim_export int aim_sendfile_listen(aim_session_t *sess, struct aim_oft_info *of
 	if (!oft_info)
 		return -EINVAL;
 
-	if (!(oft_info->conn = aim_newconn(sess, AIM_CONN_TYPE_LISTENER, NULL))) {
+	if (!(oft_info->conn = aim_newconn(sess, AIM_CONN_TYPE_LISTENER))) {
 		close(listenfd);
 		return -ENOMEM;
 	}
@@ -857,7 +853,7 @@ static int aim_oft_buildheader(aim_bstream_t *bs, struct aim_fileheader_t *fh)
  * @param sess The session.
  * @param type The subtype of the OFT packet we're sending.
  * @param oft_info The aim_oft_info struct with the connection and OFT
- *        info we're sending.
+ *		info we're sending.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_oft_sendheader(aim_session_t *sess, fu16_t type, struct aim_oft_info *oft_info)
@@ -900,14 +896,14 @@ faim_export int aim_oft_sendheader(aim_session_t *sess, fu16_t type, struct aim_
 }
 
 /**
- * Handle incoming data on a rendezvous connection.  This is analogous to the
+ * Handle incoming data on a rendezvous connection. This is analogous to the
  * consumesnac function in rxhandlers.c, and I really think this should probably
  * be in rxhandlers.c as well, but I haven't finished cleaning everything up yet.
  *
  * @param sess The session.
  * @param fr The frame allocated for the incoming data.
  * @return Return 0 if the packet was handled correctly, otherwise return the
- *         error number.
+ *		 error number.
  */
 faim_internal int aim_rxdispatch_rendezvous(aim_session_t *sess, aim_frame_t *fr)
 {

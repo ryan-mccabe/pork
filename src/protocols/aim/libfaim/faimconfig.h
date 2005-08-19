@@ -1,5 +1,5 @@
 /*
- *  faimconfig.h
+ * faimconfig.h
  *
  * Contains various compile-time options that apply _only_ to libfaim.
  *
@@ -11,11 +11,11 @@
 /*
  * USE_SNAC_FOR_IMS is an old feature that allowed better
  * tracking of error messages by caching SNAC IDs of outgoing
- * ICBMs and comparing them to incoming errors.  However,
+ * ICBMs and comparing them to incoming errors. However,
  * its a helluvalot of overhead for something that should
  * rarely happen.
  *
- * Default: defined.  This is now defined by default
+ * Default: defined. This is now defined by default
  * because it should be stable and its not too bad.
  * And Josh wanted it.
  *
@@ -29,15 +29,15 @@
  * your own server.
  *
  * Note that only one server is needed to start the whole
- * AIM process.  The later server addresses come from
+ * AIM process. The later server addresses come from
  * the authorizer service.
  *
- * This is only here for convenience.  Its still up to
+ * This is only here for convenience. Its still up to
  * the client to connect to it.
  *
  */
-#define FAIM_LOGIN_SERVER "login.oscar.aol.com"
-#define FAIM_LOGIN_PORT 5190
+#define FAIM_LOGIN_SERVER	"login.oscar.aol.com"
+#define FAIM_LOGIN_PORT		5190
 
 /*
  * Size of the SNAC caching hash.
@@ -55,5 +55,3 @@
 #define WIN32_STATIC
 
 #endif /* __FAIMCONFIG_H__ */
-
-

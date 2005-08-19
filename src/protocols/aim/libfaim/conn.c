@@ -7,7 +7,7 @@
 
 #define FAIM_INTERNAL
 #define FAIM_NEED_CONN_INTERNAL
-#include <aim.h> 
+#include <aim.h>
 
 #ifndef _WIN32
 #include <netdb.h>
@@ -21,57 +21,56 @@
 
 /**
  * In OSCAR, every connection has a set of SNAC groups associated
- * with it.  These are the groups that you can send over this connection
- * without being guaranteed a "Not supported" SNAC error.  
+ * with it. These are the groups that you can send over this connection
+ * without being guaranteed a "Not supported" SNAC error.
  *
- * The grand theory of things says that these associations transcend 
- * what libfaim calls "connection types" (conn->type).  You can probably
- * see the elegance here, but since I want to revel in it for a bit, you 
+ * The grand theory of things says that these associations transcend
+ * what libfaim calls "connection types" (conn->type). You can probably
+ * see the elegance here, but since I want to revel in it for a bit, you
  * get to hear it all spelled out.
  *
- * So let us say that you have your core BOS connection running.  One
+ * So let us say that you have your core BOS connection running. One
  * of your modules has just given you a SNAC of the group 0x0004 to send
- * you.  Maybe an IM destined for some twit in Greenland.  So you start
- * at the top of your connection list, looking for a connection that 
- * claims to support group 0x0004.  You find one.  Why, that neat BOS
- * connection of yours can do that.  So you send it on its way.
+ * you. Maybe an IM destined for some twit in Greenland. So you start
+ * at the top of your connection list, looking for a connection that
+ * claims to support group 0x0004. You find one. Why, that neat BOS
+ * connection of yours can do that. So you send it on its way.
  *
  * Now, say, that fellow from Greenland has friends and they all want to
- * meet up with you in a lame chat room.  This has landed you a SNAC
- * in the family 0x000e and you have to admit you're a bit lost.  You've
+ * meet up with you in a lame chat room. This has landed you a SNAC
+ * in the family 0x000e and you have to admit you're a bit lost. You've
  * searched your connection list for someone who wants to make your life
  * easy and deliver this SNAC for you, but there isn't one there.
  *
- * Here comes the good bit.  Without even letting anyone know, particularly
+ * Here comes the good bit. Without even letting anyone know, particularly
  * the module that decided to send this SNAC, and definitely not that twit
- * in Greenland, you send out a service request.  In this request, you have
- * marked the need for a connection supporting group 0x000e.  A few seconds
+ * in Greenland, you send out a service request. In this request, you have
+ * marked the need for a connection supporting group 0x000e. A few seconds
  * later, you receive a service redirect with an IP address and a cookie in
- * it.  Great, you say.  Now I have something to do.  Off you go, making
- * that connection.  One of the first things you get from this new server
+ * it. Great, you say. Now I have something to do. Off you go, making
+ * that connection. One of the first things you get from this new server
  * is a message saying that indeed it does support the group you were looking
- * for.  So you continue and send rate confirmation and all that.  
- * 
+ * for. So you continue and send rate confirmation and all that.
+ *
  * Then you remember you had that SNAC to send, and now you have a means to
- * do it, and you do, and everyone is happy.  Except the Greenlander, who is
+ * do it, and you do, and everyone is happy. Except the Greenlander, who is
  * still stuck in the bitter cold.
  *
- * Oh, and this is useful for building the Migration SNACs, too.  In the
+ * Oh, and this is useful for building the Migration SNACs, too. In the
  * future, this may help convince me to implement rate limit mitigation
- * for real.  We'll see.
+ * for real. We'll see.
  *
  * Just to make me look better, I'll say that I've known about this great
- * scheme for quite some time now.  But I still haven't convinced myself
- * to make libfaim work that way.  It would take a fair amount of effort,
- * and probably some client API changes as well.  (Whenever I don't want
- * to do something, I just say it would change the client API.  Then I 
+ * scheme for quite some time now. But I still haven't convinced myself
+ * to make libfaim work that way. It would take a fair amount of effort,
+ * and probably some client API changes as well. (Whenever I don't want
+ * to do something, I just say it would change the client API. Then I
  * instantly have a couple of supporters of not doing it.)
  *
  * Generally, addgroup is only called by the internal handling of the
- * server ready SNAC.  So if you want to do something before that, you'll
- * have to be more creative.  That is done rather early, though, so I don't
- * think you have to worry about it.  Unless you're me.  I care deeply
- * about such inane things.
+ * server ready SNAC. So if you want to do something before that, you'll
+ * have to be more creative. That is done rather early, though, so I don't
+ * think you have to worry about it.
  *
  */
 faim_internal void aim_conn_addgroup(aim_conn_t *conn, fu16_t group)
@@ -183,8 +182,8 @@ static void connkill_real(aim_session_t *sess, aim_conn_t **deadconn)
 }
 
 /**
- * This sends an empty channel 4 SNAC.  This is sent to signify
- * that we're logging off.  This shouldn't really be necessary--
+ * This sends an empty channel 4 SNAC. This is sent to signify
+ * that we're logging off. This shouldn't really be necessary--
  * usually the AIM server will detect that the TCP connection has
  * been destroyed.
  */
@@ -317,11 +316,11 @@ faim_export void aim_conn_kill(aim_session_t *sess, aim_conn_t **deadconn)
 /**
  * Close (but not free) a connection.
  *
- * This leaves everything untouched except for clearing the 
+ * This leaves everything untouched except for clearing the
  * handler list and setting the fd to -1 (used to recognize
- * dead connections).  It will also remove cookies if necessary.
+ * dead connections). It will also remove cookies if necessary.
  *
- * Why only if fd >= 3?  Seems rather implementation specific...
+ * Why only if fd >= 3? Seems rather implementation specific...
  * fd's do not have to be distributed in a particular order, do they?
  *
  * @param deadconn The connection to close.
@@ -345,7 +344,7 @@ faim_export void aim_conn_close(aim_conn_t *deadconn)
 }
 
 /**
- * Locates a connection of the specified type in the 
+ * Locates a connection of the specified type in the
  * specified session.
  *
  * XXX - Except for rendezvous, all uses of this should be removed and
@@ -354,7 +353,7 @@ faim_export void aim_conn_close(aim_conn_t *deadconn)
  * @param sess The session to search.
  * @param type The type of connection to look for.
  * @return Returns the first connection found of the given target type,
- *         or NULL if none could be found.
+ *		 or NULL if none could be found.
  */
 faim_export aim_conn_t *aim_getconn_type(aim_session_t *sess, int type)
 {
@@ -381,7 +380,7 @@ faim_export aim_conn_t *aim_getconn_type_all(aim_session_t *sess, int type)
 	return cur;
 }
 
-/* If you pass -1 for the fd, you'll get what you ask for.  Gibberish. */
+/* If you pass -1 for the fd, you'll get what you ask for. Gibberish. */
 faim_export aim_conn_t *aim_getconn_fd(aim_session_t *sess, int fd)
 {
 	aim_conn_t *cur;
@@ -392,177 +391,6 @@ faim_export aim_conn_t *aim_getconn_fd(aim_session_t *sess, int fd)
 	}
 
 	return cur;
-}
-
-/**
- * Handle normal connections or SOCKS5 via an extrememly quick and 
- * dirty SOCKS5 interface. 
- *
- * Attempts to connect to the specified host via the configured
- * proxy settings, if present.  If no proxy is configured for
- * this session, the connection is done directly.
- *
- * XXX - this is really awful.
- * XXX - Split the SOCKS5 and the normal connection stuff into two
- *        separate functions.
- *
- * @param sess Session to connect.
- * @param host Host to connect to.
- * @param port Port to connect to.
- * @param statusret Return value of the connection.
- */
-static int aim_proxyconnect(aim_session_t *sess, const char *host, fu16_t port, fu32_t *statusret)
-{
-	int fd = -1;
-
-	if (strlen(sess->socksproxy.server)) { /* connecting via proxy */
-		int i;
-		unsigned char buf[512];
-		struct sockaddr_in sa;
-		struct hostent *hp;
-		char *proxy;
-		unsigned short proxyport = 1080;
-
-		for(i=0;i<(int)strlen(sess->socksproxy.server);i++) {
-			if (sess->socksproxy.server[i] == ':') {
-				proxyport = atoi(&(sess->socksproxy.server[i+1]));
-				break;
-			}
-		}
-
-		proxy = (char *)malloc(i+1);
-		strncpy(proxy, sess->socksproxy.server, i);
-		proxy[i] = '\0';
-
-		if (!(hp = gethostbyname(proxy))) {
-			faimdprintf(sess, 0, "proxyconnect: unable to resolve proxy name\n");
-			*statusret = (h_errno | AIM_CONN_STATUS_RESOLVERR);
-			return -1;
-		}
-		free(proxy);
-
-		memset(&sa.sin_zero, 0, 8);
-		sa.sin_port = htons(proxyport);
-		memcpy(&sa.sin_addr, hp->h_addr, hp->h_length);
-		sa.sin_family = hp->h_addrtype;
-
-		fd = socket(hp->h_addrtype, SOCK_STREAM, 0);
-		if (connect(fd, (struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0) {
-			faimdprintf(sess, 0, "proxyconnect: unable to connect to proxy\n");
-			close(fd);
-			return -1;
-		}
-
-		i = 0;
-		buf[0] = 0x05; /* SOCKS version 5 */
-		if (strlen(sess->socksproxy.username)) {
-			buf[1] = 0x02; /* two methods */
-			buf[2] = 0x00; /* no authentication */
-			buf[3] = 0x02; /* username/password authentication */
-			i = 4;
-		} else {
-			buf[1] = 0x01;
-			buf[2] = 0x00;
-			i = 3;
-		}
-		if (write(fd, buf, i) < i) {
-			*statusret = errno;
-			close(fd);
-			return -1;
-		}
-		if (read(fd, buf, 2) < 2) {
-			*statusret = errno;
-			close(fd);
-			return -1;
-		}
-
-		if ((buf[0] != 0x05) || (buf[1] == 0xff)) {
-			*statusret = EINVAL;
-			close(fd);
-			return -1;
-		}
-
-		/* check if we're doing username authentication */
-		if (buf[1] == 0x02) {
-			i  = aimutil_put8(buf, 0x01); /* version 1 */
-			i += aimutil_put8(buf+i, strlen(sess->socksproxy.username));
-			i += aimutil_putstr(buf+i, sess->socksproxy.username, strlen(sess->socksproxy.username));
-			i += aimutil_put8(buf+i, strlen(sess->socksproxy.password));
-			i += aimutil_putstr(buf+i, sess->socksproxy.password, strlen(sess->socksproxy.password));
-			if (write(fd, buf, i) < i) {
-				*statusret = errno;
-				close(fd);
-				return -1;
-			}
-			if (read(fd, buf, 2) < 2) {
-				*statusret = errno;
-				close(fd);
-				return -1;
-			}
-			if ((buf[0] != 0x01) || (buf[1] != 0x00)) {
-				*statusret = EINVAL;
-				close(fd);
-				return -1;
-			}
-		}
-
-		i  = aimutil_put8(buf, 0x05);
-		i += aimutil_put8(buf+i, 0x01); /* CONNECT */
-		i += aimutil_put8(buf+i, 0x00); /* reserved */
-		i += aimutil_put8(buf+i, 0x03); /* address type: host name */
-		i += aimutil_put8(buf+i, strlen(host));
-		i += aimutil_putstr(buf+i, host, strlen(host));
-		i += aimutil_put16(buf+i, port);
-
-		if (write(fd, buf, i) < i) {
-			*statusret = errno;
-			close(fd);
-			return -1;
-		}
-
-		if (read(fd, buf, 10) < 10) {
-			*statusret = errno;
-			close(fd);
-			return -1;
-		}
-		if ((buf[0] != 0x05) || (buf[1] != 0x00)) {
-			*statusret = EINVAL;
-			close(fd);
-			return -1;
-		}
-
-	} else { /* connecting directly */
-		struct sockaddr_in sa;
-		struct hostent *hp;
-
-		if (!(hp = gethostbyname(host))) {
-			*statusret = (h_errno | AIM_CONN_STATUS_RESOLVERR);
-			return -1;
-		}
-
-		memset(&sa, 0, sizeof(struct sockaddr_in));
-		sa.sin_port = htons(port);
-		memcpy(&sa.sin_addr, hp->h_addr, hp->h_length);
-		sa.sin_family = hp->h_addrtype;
-
-		fd = socket(hp->h_addrtype, SOCK_STREAM, 0);
-
-		if (sess->nonblocking)
-			fcntl(fd, F_SETFL, O_NONBLOCK); /* XXX save flags */
-
-		if (connect(fd, (struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0) {
-			if (sess->nonblocking) {
-				if ((errno == EINPROGRESS) || (errno == EINTR)) {
-					if (statusret)
-						*statusret |= AIM_CONN_STATUS_INPROGRESS;
-					return fd;
-				}
-			}
-			close(fd);
-			fd = -1;
-		}
-	}
-	return fd;
 }
 
 /**
@@ -600,7 +428,7 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 		 * XXX should clone this section as well, but since currently
 		 * this function only gets called for some of that rendezvous
 		 * crap, and not on SNAC connections, its probably okay for
-		 * now. 
+		 * now.
 		 *
 		 */
 	}
@@ -609,68 +437,27 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 }
 
 /**
- * Opens a new connection to the specified dest host of specified
- * type, using the proxy settings if available.  If @host is %NULL,
- * the connection is allocated and returned, but no connection 
- * is made.
- *
- * FIXME: Return errors in a more sane way.
+ * Allocate and return connection
  *
  * @param sess Session to create connection in
  * @param type Type of connection to create
- * @param dest Host to connect to (in "host:port" syntax)
  */
-faim_export aim_conn_t *aim_newconn(aim_session_t *sess, int type, const char *dest)
-{
-	aim_conn_t *connstruct;
-	fu16_t port = FAIM_LOGIN_PORT;
-	char *host;
-	int i, ret;
 
-	if (!(connstruct = aim_conn_getnext(sess)))
+faim_export aim_conn_t *aim_newconn(aim_session_t *sess, int type)
+{
+	aim_conn_t *conn;
+
+	if (!(conn = aim_conn_getnext(sess)))
 		return NULL;
 
-	connstruct->sessv = (void *)sess;
-	connstruct->type = type;
+	conn->sessv = (void *)sess;
+	conn->type = type;
 
-	if (!dest) { /* just allocate a struct */
-		connstruct->fd = -1;
-		connstruct->status = 0;
-		return connstruct;
-	}
-
-	/* 
-	 * As of 23 Jul 1999, AOL now sends the port number, preceded by a 
-	 * colon, in the BOS redirect.  This fatally breaks all previous 
-	 * libfaims.  Bad, bad AOL.
-	 *
-	 * We put this here to catch every case. 
-	 *
-	 */
-
-	for(i = 0; i < (int)strlen(dest); i++) {
-		if (dest[i] == ':') {
-			port = atoi(&(dest[i+1]));
-			break;
-		}
-	}
-
-	host = (char *)malloc(i+1);
-	strncpy(host, dest, i);
-	host[i] = '\0';
-
-	if ((ret = aim_proxyconnect(sess, host, port, &connstruct->status)) < 0) {
-		connstruct->fd = -1;
-		connstruct->status = (errno | AIM_CONN_STATUS_CONNERR);
-		free(host);
-		return connstruct;
-	} else
-		connstruct->fd = ret;
-
-	free(host);
-
-	return connstruct;
+	conn->fd = -1;
+	conn->status = 0;
+	return conn;
 }
+
 
 /**
  * Searches @sess for the passed connection.
@@ -692,18 +479,18 @@ faim_export int aim_conn_in_sess(aim_session_t *sess, aim_conn_t *conn)
 }
 
 /**
- * Set a forced latency value for connection.  Basically causes 
+ * Set a forced latency value for connection. Basically causes
  * @newval seconds to be spent between transmits on a connection.
  *
  * This is my lame attempt at overcoming not understanding the rate
- * limiting. 
+ * limiting.
  *
  * XXX: This should really be replaced with something that scales and
- * backs off like the real rate limiting does.
+ *		backs off like the real rate limiting does.
  *
- * @param conn Conn to set latency for.
- * @param newval Number of seconds to force between transmits.
- * @return Returns -1 if the connection does not exist, zero otherwise.
+ * @param conn		Conn to set latency for.
+ * @param newval	Number of seconds to force between transmits.
+ * @return			Returns -1 if the connection does not exist, zero otherwise.
  */
 faim_export int aim_conn_setlatency(aim_conn_t *conn, int newval)
 {
@@ -719,14 +506,12 @@ faim_export int aim_conn_setlatency(aim_conn_t *conn, int newval)
 
 static void defaultdebugcb(aim_session_t *sess, int level, const char *format, va_list va)
 {
-
 	vfprintf(stderr, format, va);
-
 	return;
 }
 
 /**
- * Initializes a session structure by setting the initial values 
+ * Initializes a session structure by setting the initial values
  * stuff in the aim_session_t struct.
  *
  * @param sess Session to initialize.
@@ -768,8 +553,8 @@ faim_export void aim_session_init(aim_session_t *sess, fu8_t nonblocking, int de
 	sess->oft_info = NULL;
 
 	/*
-	 * This must always be set.  Default to the queue-based
-	 * version for back-compatibility.  
+	 * This must always be set. Default to the queue-based
+	 * version for back-compatibility.
 	 */
 	aim_tx_setenqueue(sess, AIM_TX_QUEUED, NULL);
 
@@ -846,9 +631,9 @@ faim_export int aim_setdebuggingcb(aim_session_t *sess, faim_debugging_callback_
  * Determine if a connection is connecting.
  *
  * @param conn Connection to examine.
- * @return Returns nonzero if the connection is in the process of
- *         connecting (or if it just completed and
- *         aim_conn_completeconnect() has yet to be called on it).
+ * @return	Returns nonzero if the connection is in the process of
+ *			connecting (or if it just completed and
+ *			aim_conn_completeconnect() has yet to be called on it).
  */
 faim_export int aim_conn_isconnecting(aim_conn_t *conn)
 {
@@ -859,9 +644,6 @@ faim_export int aim_conn_isconnecting(aim_conn_t *conn)
 	return !!(conn->status & AIM_CONN_STATUS_INPROGRESS);
 }
 
-/*
- * XXX this is nearly as ugly as proxyconnect().
- */
 faim_export int aim_conn_completeconnect(aim_session_t *sess, aim_conn_t *conn)
 {
 	aim_rxcallback_t userfunc;
@@ -879,7 +661,7 @@ faim_export int aim_conn_completeconnect(aim_session_t *sess, aim_conn_t *conn)
 	if ((userfunc = aim_callhandler(sess, conn, AIM_CB_FAM_SPECIAL, AIM_CB_SPECIAL_CONNCOMPLETE)))
 		userfunc(sess, NULL, conn);
 
-	/* Flush out the queues if there was something waiting for this conn  */
+	/* Flush out the queues if there was something waiting for this conn */
 	aim_tx_flushqueue(sess);
 
 	return 0;
@@ -902,13 +684,13 @@ faim_export aim_session_t *aim_conn_getsess(aim_conn_t *conn)
  */
 faim_export int aim_logoff(aim_session_t *sess)
 {
-	aim_connrst(sess);  /* in case we want to connect again */
+	aim_connrst(sess); /* in case we want to connect again */
 
 	return 0;
 }
 
 /**
- * No-op.  This sends an empty channel 5 SNAC.  WinAIM 4.x and higher
+ * No-op. This sends an empty channel 5 SNAC. WinAIM 4.x and higher
  * sends these _every minute_ to keep the connection alive.
  */
 faim_export int aim_flap_nop(aim_session_t *sess, aim_conn_t *conn)

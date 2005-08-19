@@ -18,12 +18,12 @@
  * Encode a password using old XOR method
  *
  * This takes a const pointer to a (null terminated) string
- * containing the unencoded password.  It also gets passed
+ * containing the unencoded password. It also gets passed
  * an already allocated buffer to store the encoded password.
  * This buffer should be the exact length of the password without
- * the null.  The encoded password buffer /is not %NULL terminated/.
+ * the null. The encoded password buffer /is not %NULL terminated/.
  *
- * The encoding_table seems to be a fixed set of values.  We'll
+ * The encoding_table seems to be a fixed set of values. We'll
  * hope it doesn't change over time!
  *
  * This is only used for the XOR method, not the better MD5 method.
@@ -90,7 +90,7 @@ static int aim_encode_password_md5(const char *password, const char *key, fu8_t 
 
 /*
  * The FLAP version is sent by itself at the beginning of authorization
- * connections.  The FLAP version is also sent before the cookie when connecting
+ * connections. The FLAP version is also sent before the cookie when connecting
  * for other services (BOS, chatnav, chat, etc.).
  */
 faim_export int aim_sendflapver(aim_session_t *sess, aim_conn_t *conn)
@@ -135,7 +135,7 @@ faim_export int aim_sendcookie(aim_session_t *sess, aim_conn_t *conn, const fu16
 
 #ifdef USE_XOR_FOR_ICQ
 /*
- * Part two of the ICQ hack.  Note the ignoring of the key.
+ * Part two of the ICQ hack. Note the ignoring of the key.
  */
 static int goddamnicq2(aim_session_t *sess, aim_conn_t *conn, const char *sn, const char *password, struct client_info_s *ci)
 {
@@ -193,23 +193,23 @@ static int goddamnicq2(aim_session_t *sess, aim_conn_t *conn, const char *sn, co
  * executable that you're pulling the data from.
  *
  * Java AIM 1.1.19:
- *   clientstring = "AOL Instant Messenger (TM) version 1.1.19 for Java built 03/24/98, freeMem 215871 totalMem 1048567, i686, Linus, #2 SMP Sun Feb 11 03:41:17 UTC 2001 2.4.1-ac9, IBM Corporation, 1.1.8, 45.3, Tue Mar 27 12:09:17 PST 2001"
- *   clientid = 0x0001
- *   major  = 0x0001
- *   minor  = 0x0001
- *   point = (not sent)
- *   build  = 0x0013
- *   unknown= (not sent)
+ *	clientstring = "AOL Instant Messenger (TM) version 1.1.19 for Java built 03/24/98, freeMem 215871 totalMem 1048567, i686, Linus, #2 SMP Sun Feb 11 03:41:17 UTC 2001 2.4.1-ac9, IBM Corporation, 1.1.8, 45.3, Tue Mar 27 12:09:17 PST 2001"
+ *	clientid = 0x0001
+ *	major = 0x0001
+ *	minor = 0x0001
+ *	point = (not sent)
+ *	build = 0x0013
+ *	unknown= (not sent)
  *
  * AIM for Linux 1.1.112:
- *   clientstring = "AOL Instant Messenger (SM)"
- *   clientid = 0x1d09
- *   major  = 0x0001
- *   minor  = 0x0001
- *   point = 0x0001
- *   build  = 0x0070
- *   unknown= 0x0000008b
- *   serverstore = 0x01
+ *	clientstring = "AOL Instant Messenger (SM)"
+ *	clientid = 0x1d09
+ *	major = 0x0001
+ *	minor = 0x0001
+ *	point = 0x0001
+ *	build = 0x0070
+ *	unknown= 0x0000008b
+ *	serverstore = 0x01
  *
  */
 faim_export int aim_send_login(aim_session_t *sess, aim_conn_t *conn, const char *sn, const char *password, struct client_info_s *ci, const char *key)
@@ -300,7 +300,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	memset(info, 0, sizeof(struct aim_authresp_info));
 
 	/*
-	 * Read block of TLVs.  All further data is derived
+	 * Read block of TLVs. All further data is derived
 	 * from what is parsed here.
 	 */
 	tlvlist = aim_tlvlist_read(bs);
@@ -315,7 +315,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 	}
 
 	/*
-	 * Check for an error code.  If so, we should also
+	 * Check for an error code. If so, we should also
 	 * have an error url.
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x0008, 1))
@@ -343,24 +343,24 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 
 	/*
 	 * The email address attached to this account
-	 *   Not available for ICQ or @mac.com logins.
-	 *   If you receive this TLV, then you are allowed to use
-	 *   family 0x0018 to check the status of your email.
+	 *	Not available for ICQ or @mac.com logins.
+	 *	If you receive this TLV, then you are allowed to use
+	 *	family 0x0018 to check the status of your email.
 	 * XXX - Not really true!
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x0011, 1))
 		info->email = aim_tlv_getstr(tlvlist, 0x0011, 1);
 
 	/*
-	 * The registration status.  (Not real sure what it means.)
-	 *   Not available for ICQ or @mac.com logins.
+	 * The registration status. (Not real sure what it means.)
+	 *	Not available for ICQ or @mac.com logins.
 	 *
-	 *   1 = No disclosure
-	 *   2 = Limited disclosure
-	 *   3 = Full disclosure
+	 *	1 = No disclosure
+	 *	2 = Limited disclosure
+	 *	3 = Full disclosure
 	 *
 	 * This has to do with whether your email address is available
-	 * to other users or not.  AFAIK, this feature is no longer used.
+	 * to other users or not. AFAIK, this feature is no longer used.
 	 *
 	 * Means you can use the admin family? (0x0007)
 	 *
@@ -397,7 +397,7 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
 		info->chpassurl = aim_tlv_getstr(tlvlist, 0x0054, 1);
 
 	/*
-	 * Unknown.  Seen on an @mac.com screen name with value of 0x003f
+	 * Unknown. Seen on an @mac.com screen name with value of 0x003f
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x0055, 1))
 		(void) 0;
@@ -419,19 +419,19 @@ static int parse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mo
  * This is a bit confusing.
  *
  * Normal SNAC login goes like this:
- *   - connect
- *   - server sends flap version
- *   - client sends flap version
- *   - client sends screen name (17/6)
- *   - server sends hash key (17/7)
- *   - client sends auth request (17/2 -- aim_send_login)
- *   - server yells
+ *	- connect
+ *	- server sends flap version
+ *	- client sends flap version
+ *	- client sends screen name (17/6)
+ *	- server sends hash key (17/7)
+ *	- client sends auth request (17/2 -- aim_send_login)
+ *	- server yells
  *
  * XOR login (for ICQ) goes like this:
- *   - connect
- *   - server sends flap version
- *   - client sends auth request which contains flap version (aim_send_login)
- *   - server yells
+ *	- connect
+ *	- server sends flap version
+ *	- client sends auth request which contains flap version (aim_send_login)
+ *	- server yells
  *
  * For the client API, we make them implement the most complicated version,
  * and for the simpler version, we fake it and make it look like the more
@@ -466,8 +466,8 @@ static int goddamnicq(aim_session_t *sess, aim_conn_t *conn, const char *sn)
  * Subtype 0x0006
  *
  * In AIM 3.5 protocol, the first stage of login is to request login from the
- * Authorizer, passing it the screen name for verification.  If the name is
- * invalid, a 0017/0003 is spit back, with the standard error contents.  If
+ * Authorizer, passing it the screen name for verification. If the name is
+ * invalid, a 0017/0003 is spit back, with the standard error contents. If
  * valid, a 0017/0007 comes back, which is the signal to send it the main
  * login command (0017/0002).
  *
@@ -499,7 +499,7 @@ faim_export int aim_request_login(aim_session_t *sess, aim_conn_t *conn, const c
 	/* Tell the server we support SecurID logins. */
 	aim_tlvlist_add_noval(&tl, 0x004b);
 
-	/* Unknown.  Sent in recent WinAIM clients.*/
+	/* Unknown. Sent in recent WinAIM clients.*/
 	aim_tlvlist_add_noval(&tl, 0x005a);
 
 	aim_tlvlist_write(&fr->data, &tl);
@@ -513,7 +513,7 @@ faim_export int aim_request_login(aim_session_t *sess, aim_conn_t *conn, const c
 /*
  * Subtype 0x0007
  *
- * Middle handler for 0017/0007 SNACs.  Contains the auth key prefixed
+ * Middle handler for 0017/0007 SNACs. Contains the auth key prefixed
  * by only its length in a two byte word.
  *
  * Calls the client, which should then use the value to call aim_send_login.
@@ -529,7 +529,7 @@ static int keyparse(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim
 	keystr = aimbs_getstr(bs, keylen);
 
 	/* XXX - When GiantGrayPanda signed on AIM I got a thing asking me to register
-	 * for the netscape network.  This SNAC had a type 0x0058 TLV with length 10.
+	 * for the netscape network. This SNAC had a type 0x0058 TLV with length 10.
 	 * Data is 0x0007 0004 3e19 ae1e 0006 0004 0000 0005 */
 
 	if ((userfunc = aim_callhandler(sess, rx->conn, snac->family, snac->subtype)))

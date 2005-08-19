@@ -480,7 +480,7 @@ int aim_login(struct pork_acct *acct) {
 	screen_win_msg(cur_window(), 1, 1, 0,
 		MSG_TYPE_STATUS, "Logging in as %s...", acct->username);
 
-	auth_conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_AUTH, NULL);
+	auth_conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_AUTH);
 	if (auth_conn == NULL) {
 		screen_err_msg("Connection error while logging in as %s",
 			acct->username);
@@ -1660,7 +1660,7 @@ static FAIM_CB(aim_recv_redirect) {
 		int sock;
 		int ret;
 
-		chatnav = aim_newconn(session, AIM_CONN_TYPE_CHATNAV, NULL);
+		chatnav = aim_newconn(session, AIM_CONN_TYPE_CHATNAV);
 		if (chatnav == NULL) {
 			screen_err_msg("Unable to connect to the chatnav server: %s",
 				strerror(errno));
@@ -1698,7 +1698,7 @@ static FAIM_CB(aim_recv_redirect) {
 		int ret;
 		char *chat_title;
 
-		chat_conn = aim_newconn(session, AIM_CONN_TYPE_CHAT, NULL);
+		chat_conn = aim_newconn(session, AIM_CONN_TYPE_CHAT);
 		if (chat_conn == NULL) {
 			screen_err_msg("Unable to connect to the chat server");
 			return (0);
@@ -2259,7 +2259,7 @@ static FAIM_CB(aim_parse_authresp) {
 		return (1);
 	}
 
-	bos_conn = aim_newconn(session, AIM_CONN_TYPE_BOS, NULL);
+	bos_conn = aim_newconn(session, AIM_CONN_TYPE_BOS);
 	if (bos_conn == NULL) {
 		aim_conn_kill(session, &bos_conn);
 		screen_err_msg("Unable to connect to the AIM BOS server");

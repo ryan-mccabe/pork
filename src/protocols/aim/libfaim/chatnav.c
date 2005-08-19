@@ -2,7 +2,7 @@
  * Family 0x000d - Handle ChatNav.
  *
  * The ChatNav(igation) service does various things to keep chat
- * alive.  It provides room information, room searching and creating,
+ * alive. It provides room information, room searching and creating,
  * as well as giving users the right ("permission") to use chat.
  *
  */
@@ -43,13 +43,13 @@ faim_export int aim_chatnav_createroom(aim_session_t *sess, aim_conn_t *conn, co
 	aimbs_put16(&fr->data, exchange);
 
 	/*
-	 * This looks to be a big hack.  You'll note that this entire
+	 * This looks to be a big hack. You'll note that this entire
 	 * SNAC is just a room info structure, but the hard room name,
 	 * here, is set to "create".
 	 *
 	 * Either this goes on the "list of questions concerning
 	 * why-the-hell-did-you-do-that", or this value is completely
-	 * ignored.  Without experimental evidence, but a good knowledge of
+	 * ignored. Without experimental evidence, but a good knowledge of
 	 * AOL style, I'm going to guess that it is the latter, and that
 	 * the value of the room name in create requests is ignored.
 	 */
@@ -205,9 +205,9 @@ static int parseinfo_perms(aim_session_t *sess, aim_module_t *mod, aim_frame_t *
 		/*
 		 * Type 0x00d5: Creation Permissions
 		 *
-		 * 0  Creation not allowed
-		 * 1  Room creation allowed
-		 * 2  Exchange creation allowed
+		 * 0 Creation not allowed
+		 * 1 Room creation allowed
+		 * 2 Exchange creation allowed
 		 *
 		 */
 		if (aim_tlv_gettlv(innerlist, 0x00d5, 1)) {
@@ -356,15 +356,15 @@ static int parseinfo_create(aim_session_t *sess, aim_module_t *mod, aim_frame_t 
  * Since multiple things can trigger this callback, we must lookup the
  * snacid to determine the original snac subtype that was called.
  *
- * XXX This isn't really how this works.  But this is:  Every d/9 response
+ * XXX This isn't really how this works. But this is: Every d/9 response
  * has a 16bit value at the beginning. That matches to:
- *    Short Desc = 1
- *    Full Desc = 2
- *    Instance Info = 4
- *    Nav Short Desc = 8
- *    Nav Instance Info = 16
- * And then everything is really asynchronous.  There is no specific
- * attachment of a response to a create room request, for example.  Creating
+ *	Short Desc = 1
+ *	Full Desc = 2
+ *	Instance Info = 4
+ *	Nav Short Desc = 8
+ *	Nav Instance Info = 16
+ * And then everything is really asynchronous. There is no specific
+ * attachment of a response to a create room request, for example. Creating
  * the room yields no different a response than requesting the room's info.
  *
  */

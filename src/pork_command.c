@@ -365,7 +365,7 @@ USER_COMMAND(cmd_scroll_up) {
 
 static struct command file_command[] = {
 	{ "abort",				cmd_file_cancel		},
-	{ "cancel",				cmd_file_cancel 	},
+	{ "cancel",				cmd_file_cancel		},
 	{ "get",				cmd_file_get		},
 	{ "list",				cmd_file_list		},
 	{ "resume",				cmd_file_resume		},
@@ -1944,7 +1944,7 @@ static struct command_set {
 	size_t elem;
 	char *type;
 } command_set[] = {
-	{	command,			array_elem(command),			"" 			},
+	{	command,			array_elem(command),			""			},
 	{	window_command,		array_elem(window_command),		"win "		},
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},

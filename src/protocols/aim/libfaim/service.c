@@ -1,5 +1,5 @@
 /*
- * Family 0x0001 - This is a very special group.  All connections support
+ * Family 0x0001 - This is a very special group. All connections support
  * this group, as it does some particularly good things (like rate limiting).
  */
 
@@ -55,8 +55,8 @@ faim_export int aim_clientready(aim_session_t *sess, aim_conn_t *conn)
  *
  * This info probably doesn't even need to make it to the client.
  *
- * We don't actually call the client here.  This starts off the connection
- * initialization routine required by all AIM connections.  The next time
+ * We don't actually call the client here. This starts off the connection
+ * initialization routine required by all AIM connections. The next time
  * the client is called is the CONNINITDONE callback, which should be
  * shortly after the rate information is acknowledged.
  *
@@ -98,8 +98,8 @@ faim_export int aim_reqservice(aim_session_t *sess, aim_conn_t *conn, fu16_t ser
 }
 
 /*
- * Join a room of name roomname.  This is the first step to joining an
- * already created room.  It's basically a Service Request for
+ * Join a room of name roomname. This is the first step to joining an
+ * already created room. It's basically a Service Request for
  * family 0x000e, with a little added on to specify the exchange and room
  * name.
  */
@@ -196,10 +196,10 @@ faim_internal int aim_reqrates(aim_session_t *sess, aim_conn_t *conn)
 }
 
 /*
- * OSCAR defines several 'rate classes'.  Each class has separate
+ * OSCAR defines several 'rate classes'. Each class has separate
  * rate limiting properties (limit level, alert level, disconnect
  * level, etc), and a set of SNAC family/type pairs associated with
- * it.  The rate classes, their limiting properties, and the definitions
+ * it. The rate classes, their limiting properties, and the definitions
  * of which SNACs are belong to which class, are defined in the
  * Rate Response packet at login to each host.
  *
@@ -214,31 +214,31 @@ faim_internal int aim_reqrates(aim_session_t *sess, aim_conn_t *conn)
  * Currently, BOS defines five rate classes, with the commonly used
  * members as follows...
  *
- *  Rate class 0x0001:
- *  	- Everything thats not in any of the other classes
+ * Rate class 0x0001:
+ *	- Everything thats not in any of the other classes
  *
- *  Rate class 0x0002:
- * 	- Buddy list add/remove
+ * Rate class 0x0002:
+ *	- Buddy list add/remove
  *	- Permit list add/remove
  *	- Deny list add/remove
  *
- *  Rate class 0x0003:
+ * Rate class 0x0003:
  *	- User information requests
  *	- Outgoing ICBMs
  *
- *  Rate class 0x0004:
+ * Rate class 0x0004:
  *	- A few unknowns: 2/9, 2/b, and f/2
  *
- *  Rate class 0x0005:
+ * Rate class 0x0005:
  *	- Chat room create
  *	- Outgoing chat ICBMs
  *
  * The only other thing of note is that class 5 (chat) has slightly looser
- * limiting properties than class 3 (normal messages).  But thats just a
+ * limiting properties than class 3 (normal messages). But thats just a
  * small bit of trivia for you.
  *
  * The last thing that needs to be learned about the rate limiting
- * system is how the actual numbers relate to the passing of time.  This
+ * system is how the actual numbers relate to the passing of time. This
  * seems to be a big mystery.
  *
  */
@@ -327,7 +327,7 @@ static int rateresp(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim
 
 		/*
 		 * The server will send an extra five bytes of parameters
-		 * depending on the version we advertised in 1/17.  If we
+		 * depending on the version we advertised in 1/17. If we
 		 * didn't send 1/17 (evil!), then this will crash and you
 		 * die, as it will default to the old version but we have
 		 * the new version hardcoded here.
@@ -366,7 +366,7 @@ static int rateresp(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim
 
 	/*
 	 * We don't pass the rate information up to the client, as it really
-	 * doesn't care.  The information is stored in the connection, however
+	 * doesn't care. The information is stored in the connection, however
 	 * so that we can do more fun stuff later (not really).
 	 */
 
@@ -462,7 +462,7 @@ static int ratechange(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
  * with a Server Pause Ack, which contains the families it needs on this
  * connection. The server will send a Migration Notice with an IP address, and
  * then disconnect. Next the client should open the connection and send the
- * cookie.  Repeat the normal login process and pretend this never happened.
+ * cookie. Repeat the normal login process and pretend this never happened.
  *
  * The Server Pause contains no data.
  *
@@ -506,7 +506,7 @@ faim_export int aim_sendpauseack(aim_session_t *sess, aim_conn_t *conn)
 
 	/*
 	 * This list should have all the groups that the original
-	 * Host Online / Server Ready said this host supports.  And
+	 * Host Online / Server Ready said this host supports. And
 	 * we want them all back after the migration.
 	 */
 	for (sg = ins->groups; sg; sg = sg->next)
@@ -578,9 +578,9 @@ static int evilnotify(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 /*
  * Subtype 0x0011 - Idle Notification
  *
- * Should set your current idle time in seconds.  Note that this should
- * never be called consecutively with a non-zero idle time.  That makes
- * OSCAR do funny things.  Instead, just set it once you go idle, and then
+ * Should set your current idle time in seconds. Note that this should
+ * never be called consecutively with a non-zero idle time. That makes
+ * OSCAR do funny things. Instead, just set it once you go idle, and then
  * call it again with zero when you're back.
  *
  */
@@ -614,7 +614,7 @@ static int migrate(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_
 	/*
 	 * Apparently there's some fun stuff that can happen right here. The
 	 * migration can actually be quite selective about what groups it
-	 * moves to the new server.  When not all the groups for a connection
+	 * moves to the new server. When not all the groups for a connection
 	 * are migrated, or they are all migrated but some groups are moved
 	 * to a different server than others, it is called a bifurcated
 	 * migration.
@@ -660,11 +660,11 @@ static int motd(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mod
 	 * Code.
 	 *
 	 * Valid values:
-	 *   1 Mandatory upgrade
-	 *   2 Advisory upgrade
-	 *   3 System bulletin
-	 *   4 Nothing's wrong ("top o the world" -- normal)
-	 *   5 Lets-break-something.
+	 *	1 Mandatory upgrade
+	 *	2 Advisory upgrade
+	 *	3 System bulletin
+	 *	4 Nothing's wrong ("top o the world" -- normal)
+	 *	5 Lets-break-something.
 	 *
 	 */
 	id = aimbs_get16(bs);
@@ -691,8 +691,8 @@ static int motd(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_mod
  *
  * Normally 0x03.
  *
- *  Bit 1:  Allows other AIM users to see how long you've been idle.
- *  Bit 2:  Allows other AIM users to see how long you've been a member.
+ * Bit 1: Allows other AIM users to see how long you've been idle.
+ * Bit 2: Allows other AIM users to see how long you've been a member.
  *
  */
 faim_export int aim_bos_setprivacyflags(aim_session_t *sess, aim_conn_t *conn, fu32_t flags)
@@ -703,10 +703,10 @@ faim_export int aim_bos_setprivacyflags(aim_session_t *sess, aim_conn_t *conn, f
 /*
  * Subtype 0x0016 - No-op
  *
- * WinAIM sends these every 4min or so to keep the connection alive.  Its not
+ * WinAIM sends these every 4min or so to keep the connection alive. Its not
  * really necessary.
  *
- * Wha?  No?  Since when?  I think WinAIM sends an empty channel 3
+ * Wha? No? Since when? I think WinAIM sends an empty channel 3
  * SNAC as a no-op...
  */
 faim_export int aim_nop(aim_session_t *sess, aim_conn_t *conn)
@@ -718,7 +718,7 @@ faim_export int aim_nop(aim_session_t *sess, aim_conn_t *conn)
  * Subtype 0x0017 - Set client versions
  *
  * If you've seen the clientonline/clientready SNAC you're probably
- * wondering what the point of this one is.  And that point seems to be
+ * wondering what the point of this one is. And that point seems to be
  * that the versions in the client online SNAC are sent too late for the
  * server to be able to use them to change the protocol for the earlier
  * login packets (client versions are sent right after Host Online is
@@ -793,7 +793,7 @@ static int hostversions(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx,
  * if your status is visible on ICQ web sites, and you can set
  * your IP address info and what not.
  *
- * These are the same TLVs seen in user info.  You can
+ * These are the same TLVs seen in user info. You can
  * also set 0x0008 and 0x000c.
  */
 faim_export int aim_setextstatus(aim_session_t *sess, fu32_t status)
@@ -832,10 +832,10 @@ faim_export int aim_setextstatus(aim_session_t *sess, fu32_t status)
 /*
  * Subtype 0x001e - Extended Status.
  *
- * Sets your "available" message.  This is currently only supported by iChat
+ * Sets your "available" message. This is currently only supported by iChat
  * and Gaim.
  *
- * These are the same TLVs seen in user info.  You can
+ * These are the same TLVs seen in user info. You can
  * also set 0x0008 and 0x000c.
  */
 faim_export int aim_srv_setavailmsg(aim_session_t *sess, const char *msg)
@@ -884,39 +884,39 @@ faim_export int aim_srv_setavailmsg(aim_session_t *sess, const char *msg)
 
 /*
  * Starting this past week (26 Mar 2001, say), AOL has started sending
- * this nice little extra SNAC.  AFAIK, it has never been used until now.
+ * this nice little extra SNAC. AFAIK, it has never been used until now.
  *
- * The request contains eight bytes.  The first four are an offset, the
+ * The request contains eight bytes. The first four are an offset, the
  * second four are a length.
  *
  * The offset is an offset into aim.exe when it is mapped during execution
- * on Win32.  So far, AOL has only been requesting bytes in static regions
- * of memory.  (I won't put it past them to start requesting data in
+ * on Win32. So far, AOL has only been requesting bytes in static regions
+ * of memory. (I won't put it past them to start requesting data in
  * less static regions -- regions that are initialized at run time, but still
  * before the client receives this request.)
  *
  * When the client receives the request, it adds it to the current ds
  * (0x00400000) and dereferences it, copying the data into a buffer which
- * it then runs directly through the MD5 hasher.  The 16 byte output of
+ * it then runs directly through the MD5 hasher. The 16 byte output of
  * the hash is then sent back to the server.
  *
  * If the client does not send any data back, or the data does not match
  * the data that the specific client should have, the client will get the
  * following message from "AOL Instant Messenger":
- *    "You have been disconnected from the AOL Instant Message Service (SM)
- *     for accessing the AOL network using unauthorized software.  You can
- *     download a FREE, fully featured, and authorized client, here
- *     http://www.aol.com/aim/download2.html"
+ *	"You have been disconnected from the AOL Instant Message Service (SM)
+ *	 for accessing the AOL network using unauthorized software. You can
+ *	 download a FREE, fully featured, and authorized client, here
+ *	 http://www.aol.com/aim/download2.html"
  * The connection is then closed, receiving disconnect code 1, URL
  * http://www.aim.aol.com/errors/USER_LOGGED_OFF_NEW_LOGIN.html.
  *
  * Note, however, that numerous inconsistencies can cause the above error,
- * not just sending back a bad hash.  Do not immediatly suspect this code
- * if you get disconnected.  AOL and the open/free software community have
+ * not just sending back a bad hash. Do not immediatly suspect this code
+ * if you get disconnected. AOL and the open/free software community have
  * played this game for a couple years now, generating the above message
  * on numerous ocassions.
  *
- * Anyway, neener.  We win again.
+ * Anyway, neener. We win again.
  *
  */
 /* Subtype 0x001f - Client verification */
@@ -944,29 +944,6 @@ static int memrequest(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 
 	return ret;
 }
-
-#if 0
-static void dumpbox(aim_session_t *sess, unsigned char *buf, int len)
-{
-	int i;
-
-	if (!sess || !buf || !len)
-		return;
-
-	faimdprintf(sess, 1, "\nDump of %d bytes at %p:", len, buf);
-
-	for (i = 0; i < len; i++) {
-		if ((i % 8) == 0)
-			faimdprintf(sess, 1, "\n\t");
-
-		faimdprintf(sess, 1, "0x%2x ", buf[i]);
-	}
-
-	faimdprintf(sess, 1, "\n\n");
-
-	return;
-}
-#endif
 
 /* Subtype 0x0020 - Client verification reply */
 faim_export int aim_sendmemblock(aim_session_t *sess, aim_conn_t *conn, fu32_t offset, fu32_t len, const fu8_t *buf, fu8_t flag)
@@ -1006,7 +983,7 @@ faim_export int aim_sendmemblock(aim_session_t *sess, aim_conn_t *conn, fu32_t o
 
 		/*
 		 * These MD5 routines are stupid in that you have to have
-		 * at least one append.  So thats why this doesn't look
+		 * at least one append. So thats why this doesn't look
 		 * real logical.
 		 */
 		md5_init(&state);
@@ -1059,7 +1036,7 @@ faim_export int aim_sendmemblock(aim_session_t *sess, aim_conn_t *conn, fu32_t o
  * Subtype 0x0021 - Receive our extended status
  *
  * This is used for iChat's "available" messages, and maybe ICQ extended
- * status messages?  It's also used to tell the client whether or not it
+ * status messages? It's also used to tell the client whether or not it
  * needs to upload an SSI buddy icon... who engineers this stuff, anyway?
  */
 static int aim_parse_extstatus(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)

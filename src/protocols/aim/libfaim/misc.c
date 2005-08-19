@@ -1,7 +1,7 @@
 /*
  * misc.c
  *
- * Random stuff.  Basically just a few functions for sending
+ * Random stuff. Basically just a few functions for sending
  * simple SNACs, and then the generic error handler.
  *
  */
@@ -16,8 +16,8 @@
  * right now...
  *
  * I had one big function that handled all three cases, but then it broke
- * and I split it up into three.  But then I fixed it.  I just never went
- * back to the single.  I don't see any advantage to doing it either way.
+ * and I split it up into three. But then I fixed it. I just never went
+ * back to the single. I don't see any advantage to doing it either way.
  *
  */
 faim_internal int aim_genericreq_n(aim_session_t *sess, aim_conn_t *conn, fu16_t family, fu16_t subtype)

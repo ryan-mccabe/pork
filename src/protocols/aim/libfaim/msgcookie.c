@@ -23,8 +23,8 @@
  *
  * @param sess session to add to
  * @param cookie pointer to struct to append
- * @return returns -1 on error, 0 on append, 1 on update.  the cookie you pass
- *         in may be free'd, so don't count on its value after calling this!
+ * @return returns -1 on error, 0 on append, 1 on update. the cookie you pass
+ *		 in may be free'd, so don't count on its value after calling this!
  */
 faim_internal int aim_cachecookie(aim_session_t *sess, aim_msgcookie_t *cookie)
 {
@@ -85,7 +85,7 @@ faim_internal aim_msgcookie_t *aim_uncachecookie(aim_session_t *sess, fu8_t *coo
  * @param type cookie type to use
  * @param data data to be cached with the cookie
  * @return returns NULL on error, a pointer to the newly-allocated
- *         cookie on success.
+ *		 cookie on success.
  */
 faim_internal aim_msgcookie_t *aim_mkcookie(fu8_t *c, int type, void *data)
 {
@@ -111,7 +111,7 @@ faim_internal aim_msgcookie_t *aim_mkcookie(fu8_t *c, int type, void *data)
  * @param cookie pointer to the cookie string array
  * @param type type of the cookie to look for
  * @return returns a pointer to the cookie struct (still in the list)
- *         on success; returns NULL on error/not found
+ *		 on success; returns NULL on error/not found
  */
 
 faim_internal aim_msgcookie_t *aim_checkcookie(aim_session_t *sess, const fu8_t *cookie, int type)
@@ -126,20 +126,6 @@ faim_internal aim_msgcookie_t *aim_checkcookie(aim_session_t *sess, const fu8_t 
 
 	return NULL;
 }
-
-#if 0 /* debugging feature */
-faim_internal int aim_dumpcookie(aim_session_t *sess, aim_msgcookie_t *cookie)
-{
-
-	if (!cookie)
-		return -EINVAL;
-
-	faimdprintf(sess, 0, "\tCookie at %p: %d/%s with %p, next %p\n", cookie,
-			cookie->type, cookie->cookie, cookie->data, cookie->next);
-
-	return 0;
-}
-#endif
 
 /**
  * aim_cookie_free - free an aim_msgcookie_t struct
@@ -174,17 +160,28 @@ faim_internal int aim_cookie_free(aim_session_t *sess, aim_msgcookie_t *cookie)
 	return 0;
 }
 
-/* XXX I hate switch */
 faim_internal int aim_msgcookie_gettype(int reqclass)
 {
-	/* XXX: hokey-assed. needs fixed. */
-	switch(reqclass) {
-		case AIM_CAPS_BUDDYICON: return AIM_COOKIETYPE_OFTICON;
-		case AIM_CAPS_TALK: return AIM_COOKIETYPE_OFTVOICE;
-		case AIM_CAPS_DIRECTIM: return AIM_COOKIETYPE_OFTIMAGE;
-		case AIM_CAPS_CHAT: return AIM_COOKIETYPE_CHAT;
-		case AIM_CAPS_GETFILE: return AIM_COOKIETYPE_OFTGET;
-		case AIM_CAPS_SENDFILE: return AIM_COOKIETYPE_OFTSEND;
-		default: return AIM_COOKIETYPE_UNKNOWN;
+	switch (reqclass) {
+		case AIM_CAPS_BUDDYICON:
+			return AIM_COOKIETYPE_OFTICON;
+
+		case AIM_CAPS_TALK:
+			return AIM_COOKIETYPE_OFTVOICE;
+
+		case AIM_CAPS_DIRECTIM:
+			return AIM_COOKIETYPE_OFTIMAGE;
+
+		case AIM_CAPS_CHAT:
+			return AIM_COOKIETYPE_CHAT;
+
+		case AIM_CAPS_GETFILE:
+			return AIM_COOKIETYPE_OFTGET;
+
+		case AIM_CAPS_SENDFILE:
+			return AIM_COOKIETYPE_OFTSEND;
+
+		default:
+			return AIM_COOKIETYPE_UNKNOWN;
 	}
 }

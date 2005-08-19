@@ -1,6 +1,6 @@
 /*
  * This file contains the management routines for the receive
- * (incoming packet) queue.  The actual packet handlers are in
+ * (incoming packet) queue. The actual packet handlers are in
  * rxhandlers.c.
  */
 
@@ -39,7 +39,7 @@ faim_internal int aim_recv(int fd, void *buf, size_t count)
 }
 
 /*
- * Read into a byte stream.  Will not read more than count, but may read
+ * Read into a byte stream. Will not read more than count, but may read
  * less if there is not enough room in the stream buffer.
  */
 faim_internal int aim_bstream_recv(aim_bstream_t *bs, int fd, size_t count)
@@ -94,15 +94,15 @@ static int aim_get_command_flap(aim_session_t *sess, aim_conn_t *conn, aim_frame
 	fr->hdrtype = AIM_FRAMETYPE_FLAP;
 
 	/*
-	 * Read FLAP header.  Six bytes total.
+	 * Read FLAP header. Six bytes total.
 	 *
-	 *   Byte # | Description
-	 *   -------|-------------
-	 *    0x00  | Always 0x2a
-	 *    0x01  | Channel number, usually "2."  "1" is used during login,
-	 *          |   4 is used during logoff.
-	 *    0x02  | Sequence number, 2 bytes.
-	 *    0x04  | Number of data bytes that follow, 2 bytes.
+	 *	Byte #	| Description
+	 * ---------|-------------
+	 *	0x00	| Always 0x2a
+	 *	0x01	| Channel number, usually "2." "1" is used during login,
+	 *			| 4 is used during logoff.
+	 *	0x02	| Sequence number, 2 bytes.
+	 *	0x04	| Number of data bytes that follow, 2 bytes.
 	 */
 	aim_bstream_init(&hdr, hdr_raw, sizeof(hdr_raw));
 	if (aim_bstream_recv(&hdr, conn->fd, 6) < 6) {
@@ -114,7 +114,7 @@ static int aim_get_command_flap(aim_session_t *sess, aim_conn_t *conn, aim_frame
 
 	/*
 	 * This shouldn't happen unless the socket breaks, the server breaks,
-	 * or we break.  We must handle it just in case.
+	 * or we break. We must handle it just in case.
 	 */
 	if (aimbs_get8(&hdr) != 0x2a) {
 		faimdprintf(sess, 0, "Invalid FLAP frame received on FLAP connection!");
@@ -176,9 +176,6 @@ faim_export int aim_get_command(aim_session_t *sess, aim_conn_t *conn)
 	if (conn->fd == -1)
 		return -1; /* it's an aim_conn_close()'d connection */
 
-	if (conn->fd < 3) /* can happen when people abuse the interface */
-		return -1;
-
 	if (conn->status & AIM_CONN_STATUS_INPROGRESS)
 		return aim_conn_completeconnect(sess, conn);
 
@@ -227,7 +224,7 @@ faim_export int aim_get_command(aim_session_t *sess, aim_conn_t *conn)
 	fr->conn = conn;
 
 	/* Enqueue this puppy */
-	fr->next = NULL;  /* this will always be at the bottom */
+	fr->next = NULL; /* this will always be at the bottom */
 	if (sess->queue_incoming == NULL)
 		sess->queue_incoming = fr;
 	else {

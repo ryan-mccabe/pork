@@ -181,7 +181,7 @@ faim_export int aim_admin_setemail(aim_session_t *sess, aim_conn_t *conn, const 
  * Subtype 0x0006 - Request account confirmation.
  *
  * This will cause an email to be sent to the address associated with
- * the account.  By following the instructions in the mail, you can
+ * the account. By following the instructions in the mail, you can
  * get the TRIAL flag removed from your account.
  *
  */

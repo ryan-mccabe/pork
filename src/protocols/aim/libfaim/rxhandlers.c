@@ -2,7 +2,7 @@
  * rxhandlers.c
  *
  * This file contains most all of the incoming packet handlers, along
- * with aim_rxdispatch(), the Rx dispatcher.  Queue/list management is
+ * with aim_rxdispatch(), the Rx dispatcher. Queue/list management is
  * actually done in aim_rxqueue.c.
  *
  */
@@ -112,18 +112,18 @@ static int consumesnac(aim_session_t *sess, aim_frame_t *rx)
 	if (snac.flags & 0x0001) {
 		/*
 		 * This means the SNAC will be followed by another SNAC with
-		 * related information.  We don't need to do anything about
+		 * related information. We don't need to do anything about
 		 * this here.
 		 */
 	}
 	if (snac.flags & 0x8000) {
 		/*
 		 * This packet contains the version of the family that this SNAC is
-		 * in.  You get this when your SSI module is version 2 or higher.
+		 * in. You get this when your SSI module is version 2 or higher.
 		 * For now we have no need for this, but you could always save
-		 * it as a part of aim_modnsac_t, or something.  The format is...
+		 * it as a part of aim_modnsac_t, or something. The format is...
 		 * 2 byte length of total mini-header (which is 6 bytes), then TLV
-		 * of  type 0x0001, length 0x0002, value is the 2 byte version
+		 * of type 0x0001, length 0x0002, value is the 2 byte version
 		 * number
 		 */
 		aim_bstream_advance(&rx->data, aimbs_get16(&rx->data));
@@ -460,7 +460,7 @@ faim_internal aim_rxcallback_t aim_callhandler(aim_session_t *sess, aim_conn_t *
 		return NULL; /* prevent infinite recursion */
 	}
 
-	faimdprintf(sess, 1, "aim_callhandler: no handler for  0x%04x/0x%04x\n", family, type);
+	faimdprintf(sess, 1, "aim_callhandler: no handler for 0x%04x/0x%04x\n", family, type);
 
 	return aim_callhandler(sess, conn, family, AIM_CB_SPECIAL_DEFAULT);
 }
@@ -491,11 +491,11 @@ faim_internal int aim_callhandler_noparam(aim_session_t *sess, aim_conn_t *conn,
  * aim_rxdispatch()
  *
  * Basically, heres what this should do:
- *   1) Determine correct packet handler for this packet
- *   2) Mark the packet handled (so it can be dequeued in purge_queue())
- *   3) Send the packet to the packet handler
- *   4) Go to next packet in the queue and start over
- *   5) When done, run purge_queue() to purge handled commands
+ *	1) Determine correct packet handler for this packet
+ *	2) Mark the packet handled (so it can be dequeued in purge_queue())
+ *	3) Send the packet to the packet handler
+ *	4) Go to next packet in the queue and start over
+ *	5) When done, run purge_queue() to purge handled commands
  *
  * TODO: Clean up.
  * TODO: More support for mid-level handlers.
@@ -554,7 +554,7 @@ faim_export void aim_rxdispatch(aim_session_t *sess)
 	}
 
 	/*
-	 * This doesn't have to be called here.  It could easily be done
+	 * This doesn't have to be called here. It could easily be done
 	 * by a separate thread or something. It's an administrative operation,
 	 * and can take a while. Though the less you call it the less memory
 	 * you'll have :)

@@ -15,9 +15,9 @@
 #include <arpa/inet.h>
 
 #ifdef INET6_ADDRSTRLEN
-#	define MAX_IPLEN 	INET6_ADDRSTRLEN
+#	define MAX_IPLEN	INET6_ADDRSTRLEN
 #elif defined INET_ADDRSTRLEN
-#	define MAX_IPLEN 	INET_ADDRSTRLEN
+#	define MAX_IPLEN	INET_ADDRSTRLEN
 #else
 #	define MAX_IPLEN	46
 #endif

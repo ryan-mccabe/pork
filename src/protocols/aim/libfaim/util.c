@@ -36,8 +36,8 @@ faim_export int aimutil_putstr(fu8_t *dest, const char *src, int len)
 }
 
 /*
- * Tokenizing functions.  Used to portably replace strtok/sep.
- *   -- DMP.
+ * Tokenizing functions. Used to portably replace strtok/sep.
+ *	-- DMP.
  *
  */
 faim_export int aimutil_tokslen(char *toSearch, int theindex, char dl)
@@ -224,8 +224,8 @@ faim_export int aim_snvalid(const char *sn)
  * (i.e. it begins with a number).
  *
  * @sn A valid AIM or ICQ screen name.
- * @return 1 if the screen name is an ICQ screen name.  Otherwise 0
- *         is returned.
+ * @return 1 if the screen name is an ICQ screen name. Otherwise 0
+ *		 is returned.
  */
 faim_export int aim_sn_is_icq(const char *sn)
 {
@@ -238,7 +238,7 @@ faim_export int aim_sn_is_icq(const char *sn)
 * int snlen(const char *)
 *
 * This takes a screen name and returns its length without
-* spaces.  If there are no spaces in the SN, then the
+* spaces. If there are no spaces in the SN, then the
 * return is equal to that of strlen().
 *
 */
@@ -262,13 +262,13 @@ faim_export int aim_snlen(const char *sn)
 * int sncmp(const char *, const char *)
 *
 * This takes two screen names and compares them using the rules
-* on screen names for AIM/AOL.  Mainly, this means case and space
+* on screen names for AIM/AOL. Mainly, this means case and space
 * insensitivity (all case differences and spacing differences are
 * ignored, with the exception that screen names can not start with
 * a space).
 *
 * Return: 0 if equal
-*     non-0 if different
+*	 non-0 if different
 *
 */
 faim_export int aim_sncmp(const char *sn1, const char *sn2)

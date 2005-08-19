@@ -51,7 +51,7 @@ faim_internal void aim_bstream_rewind(aim_bstream_t *bs)
 
 /*
  * N can be negative, which can be used for going backwards
- * in a bstream.  I'm not sure if libfaim actually does
+ * in a bstream. I'm not sure if libfaim actually does
  * this anywhere...
  */
 faim_internal int aim_bstream_advance(aim_bstream_t *bs, int n)

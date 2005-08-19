@@ -8,13 +8,13 @@
  * We keep 2 copies of SSI data:
  * 1) An exact copy of what is stored on the AIM servers.
  * 2) A local copy that we make changes to, and then send diffs
- *    between this and the exact copy to keep them in sync.
+ *	between this and the exact copy to keep them in sync.
  *
  * All the "aim_ssi_itemlist_bleh" functions near the top just modify the list
  * that is given to them (i.e. they don't send SNACs).
  *
  * The SNAC sending and receiving functions are lower down in the file, and
- * they're simpler.  They are in the order of the subtypes they deal with,
+ * they're simpler. They are in the order of the subtypes they deal with,
  * starting with the request rights function (subtype 0x0002), then parse
  * rights (subtype 0x0003), then--well, you get the idea.
  *
@@ -31,7 +31,7 @@
  *
  * @param list A pointer to a pointer to the current list of items.
  * @param name A null terminated string containing the group name, or NULL
- *        if you want to modify the master group.
+ *		if you want to modify the master group.
  * @return Return a pointer to the modified item.
  */
 static struct aim_ssi_item *aim_ssi_itemlist_rebuildgroup(struct aim_ssi_item *list, const char *name)
@@ -87,7 +87,7 @@ static struct aim_ssi_item *aim_ssi_itemlist_rebuildgroup(struct aim_ssi_item *l
  *
  * @param list A pointer to a pointer to the current list of items.
  * @param name A null terminated string of the name of the new item, or NULL if the
- *        item should have no name.
+ *		item should have no name.
  * @param gid The group ID# you want the new item to have, or 0xFFFF if we should pick something.
  * @param bid The buddy ID# you want the new item to have, or 0xFFFF if we should pick something.
  * @param type The type of the item, 0x0000 for a contact, 0x0001 for a group, etc.
@@ -141,7 +141,7 @@ static struct aim_ssi_item *aim_ssi_itemlist_add(struct aim_ssi_item **list, con
 	/* Set the TLV list */
 	new->data = aim_tlvlist_copy(data);
 
-	/* Add the item to the list in the correct numerical position.  Fancy, eh? */
+	/* Add the item to the list in the correct numerical position. Fancy, eh? */
 	if (*list) {
 		if ((new->gid < (*list)->gid) || ((new->gid == (*list)->gid) && (new->bid < (*list)->bid))) {
 			new->next = *list;
@@ -259,7 +259,7 @@ faim_export struct aim_ssi_item *aim_ssi_itemlist_find(struct aim_ssi_item *list
 }
 
 /**
- * Locally find an item given a group name, screen name, and type.  If group name
+ * Locally find an item given a group name, screen name, and type. If group name
  * and screen name are null, then just return the first item of the given type.
  *
  * @param list A pointer to the current list of items.
@@ -361,8 +361,8 @@ faim_export int aim_ssi_getpermdeny(struct aim_ssi_item *list)
 }
 
 /**
- * Locally find the presence flag item, and return the setting.  The returned setting is a
- * bitmask of the user flags that you are visible to.  See the AIM_FLAG_* #defines
+ * Locally find the presence flag item, and return the setting. The returned setting is a
+ * bitmask of the user flags that you are visible to. See the AIM_FLAG_* #defines
  * in aim.h
  *
  * @param list A pointer to the current list of items.
@@ -386,8 +386,8 @@ faim_export fu32_t aim_ssi_getpresence(struct aim_ssi_item *list)
  * @param gn The group of the buddy.
  * @param sn The name of the buddy.
  * @return A pointer to a NULL terminated string that is the buddy's
- *         alias, or NULL if the buddy has no alias.  You should free
- *         this returned value!
+ *		 alias, or NULL if the buddy has no alias. You should free
+ *		 this returned value!
  */
 faim_export char *aim_ssi_getalias(struct aim_ssi_item *list, const char *gn, const char *sn)
 {
@@ -411,8 +411,8 @@ faim_export char *aim_ssi_getalias(struct aim_ssi_item *list, const char *gn, co
  * @param gn The group of the buddy.
  * @param sn The name of the buddy.
  * @return A pointer to a NULL terminated string that is the buddy's
- *         comment, or NULL if the buddy has no comment.  You should free
- *         this returned value!
+ *		 comment, or NULL if the buddy has no comment. You should free
+ *		 this returned value!
  */
 faim_export char *aim_ssi_getcomment(struct aim_ssi_item *list, const char *gn, const char *sn)
 {
@@ -436,8 +436,8 @@ faim_export char *aim_ssi_getcomment(struct aim_ssi_item *list, const char *gn, 
  * @param gn The group of the buddy.
  * @param sn The name of the buddy.
  * @return A pointer to a NULL terminated string that is the buddies
- *         alias, or NULL if the buddy has no alias.  You should free
- *         this returned value!
+ *		 alias, or NULL if the buddy has no alias. You should free
+ *		 this returned value!
  */
 faim_export int aim_ssi_waitingforauth(struct aim_ssi_item *list, const char *gn, const char *sn)
 {
@@ -471,10 +471,10 @@ static int aim_ssi_sync(aim_session_t *sess)
 	/*
 	 * Compare the 2 lists and create an aim_ssi_tmp for each difference.
 	 * We should only send either additions, modifications, or deletions
-	 * before waiting for an acknowledgement.  So first do deletions, then
-	 * additions, then modifications.  Also, both the official and the local
+	 * before waiting for an acknowledgement. So first do deletions, then
+	 * additions, then modifications. Also, both the official and the local
 	 * list should be in ascending numerical order for the group ID#s and the
-	 * buddy ID#s, which makes things more efficient.  I think.
+	 * buddy ID#s, which makes things more efficient. I think.
 	 */
 
 	/* Additions */
@@ -629,7 +629,7 @@ faim_export int aim_ssi_deletelist(aim_session_t *sess)
 }
 
 /**
- * This "cleans" the ssi list.  It does the following:
+ * This "cleans" the ssi list. It does the following:
  * 1) Makes sure all buddies, permits, and denies have names.
  * 2) Makes sure that all buddies are in a group that exist.
  * 3) Deletes any empty groups
@@ -907,7 +907,7 @@ faim_export int aim_ssi_deldeny(aim_session_t *sess, const char *name)
 }
 
 /**
- * Move a buddy from one group to another group.  This basically just deletes the
+ * Move a buddy from one group to another group. This basically just deletes the
  * buddy and re-adds it.
  *
  * @param sess The oscar session.
@@ -932,7 +932,7 @@ faim_export int aim_ssi_movebuddy(aim_session_t *sess, const char *oldgn, const 
  * @param gn The group that the buddy is currently in.
  * @param sn The screen name of the buddy.
  * @param alias The new alias for the buddy, or NULL if you want to remove
- *        a buddy's comment.
+ *		a buddy's comment.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_ssi_aliasbuddy(aim_session_t *sess, const char *gn, const char *sn, const char *alias)
@@ -964,7 +964,7 @@ faim_export int aim_ssi_aliasbuddy(aim_session_t *sess, const char *gn, const ch
  * @param gn The group that the buddy is currently in.
  * @param sn The screen name of the buddy.
  * @param alias The new comment for the buddy, or NULL if you want to remove
- *        a buddy's comment.
+ *		a buddy's comment.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_ssi_editcomment(aim_session_t *sess, const char *gn, const char *sn, const char *comment)
@@ -1021,14 +1021,14 @@ faim_export int aim_ssi_rename_group(aim_session_t *sess, const char *oldgn, con
  * Stores your permit/deny setting on the server, and starts using it.
  *
  * @param sess The oscar session.
- * @param permdeny Your permit/deny setting.  Can be one of the following:
- *        1 - Allow all users
- *        2 - Block all users
- *        3 - Allow only the users below
- *        4 - Block only the users below
- *        5 - Allow only users on my buddy list
+ * @param permdeny Your permit/deny setting. Can be one of the following:
+ *		1 - Allow all users
+ *		2 - Block all users
+ *		3 - Allow only the users below
+ *		4 - Block only the users below
+ *		5 - Allow only users on my buddy list
  * @param vismask A bitmask of the class of users to whom you want to be
- *        visible.  See the AIM_FLAG_BLEH #defines in aim.h
+ *		visible. See the AIM_FLAG_BLEH #defines in aim.h
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_ssi_setpermdeny(aim_session_t *sess, fu8_t permdeny, fu32_t vismask)
@@ -1059,7 +1059,7 @@ faim_export int aim_ssi_setpermdeny(aim_session_t *sess, fu8_t permdeny, fu32_t 
  *
  * @param sess The oscar session.
  * @param iconcsum The MD5 checksum of the icon you are using.
- * @param iconcsumlen Length of the MD5 checksum given above.  Should be 0x10 bytes.
+ * @param iconcsumlen Length of the MD5 checksum given above. Should be 0x10 bytes.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_ssi_seticon(aim_session_t *sess, fu8_t *iconsum, fu16_t iconsumlen)
@@ -1093,7 +1093,7 @@ faim_export int aim_ssi_seticon(aim_session_t *sess, fu8_t *iconsum, fu16_t icon
 }
 
 /**
- * Remove a reference to a server stored buddy icon.  This will make your
+ * Remove a reference to a server stored buddy icon. This will make your
  * icon stop showing up to other people.
  *
  * @param sess The oscar session.
@@ -1116,13 +1116,13 @@ faim_export int aim_ssi_delicon(aim_session_t *sess)
 }
 
 /**
- * Stores your setting for various SSI settings.  Whether you
+ * Stores your setting for various SSI settings. Whether you
  * should show up as idle or not, etc.
  *
  * @param sess The oscar session.
  * @param presence I think it's a bitmask, but I only know what one of the bits is:
- *        0x00000002 - Hide wireless?
- *        0x00000400 - Allow others to see your idle time
+ *		0x00000002 - Hide wireless?
+ *		0x00000400 - Allow others to see your idle time
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_ssi_setpresence(aim_session_t *sess, fu32_t presence) {
@@ -1263,7 +1263,7 @@ static int parsedata(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, ai
 	char *name;
 	aim_tlvlist_t *data;
 
-	fmtver = aimbs_get8(bs); /* Version of ssi data.  Should be 0x00 */
+	fmtver = aimbs_get8(bs); /* Version of ssi data. Should be 0x00 */
 	sess->ssi.numitems += aimbs_get16(bs); /* # of items in this SSI SNAC */
 
 	/* Read in the list */
@@ -1303,7 +1303,7 @@ static int parsedata(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, ai
  * Subtype 0x0007 - SSI Activate Data.
  *
  * Should be sent after receiving 13/6 or 13/f to tell the server you
- * are ready to begin using the list.  It will promptly give you the
+ * are ready to begin using the list. It will promptly give you the
  * presence information for everyone in your list and put your permit/deny
  * settings into effect.
  *
@@ -1322,7 +1322,7 @@ faim_export int aim_ssi_enable(aim_session_t *sess)
  * Subtype 0x0008/0x0009/0x000a - SSI Add/Mod/Del Item(s).
  *
  * Sends the SNAC to add, modify, or delete an item from the server-stored
- * information.  These 3 SNACs all have an identical structure.  The only
+ * information. These 3 SNACs all have an identical structure. The only
  * difference is the subtype that is set for the SNAC.
  *
  */
@@ -1524,7 +1524,7 @@ static int parseack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim
 
 	/*
 	 * If outcome is 0, then add the item to the item list, or replace the other item,
-	 * or remove the old item.  If outcome is non-zero, then remove the item from the
+	 * or remove the old item. If outcome is non-zero, then remove the item from the
 	 * local list, or unmodify it, or add it.
 	 */
 	for (cur=sess->ssi.pending; (cur && (cur->ack != 0xffff)); cur=cur->next) {
@@ -1757,7 +1757,7 @@ static int receiveauthgrant(aim_session_t *sess, aim_module_t *mod, aim_frame_t 
 /*
  * Subtype 0x0018 - Send authorization request
  *
- * Sends a request for authorization to the given contact.  The request will either be
+ * Sends a request for authorization to the given contact. The request will either be
  * granted, denied, or dropped.
  *
  */
@@ -1832,7 +1832,7 @@ static int receiveauthrequest(aim_session_t *sess, aim_module_t *mod, aim_frame_
 /*
  * Subtype 0x001a - Send authorization reply
  *
- * Sends a reply to a request for authorization.  The reply can either
+ * Sends a reply to a request for authorization. The reply can either
  * grant authorization or deny authorization.
  *
  * if reply=0x00 then deny

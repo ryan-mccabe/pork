@@ -467,7 +467,7 @@ static int format_status_warn(char opt, char *buf, size_t len, va_list ap) {
 static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 	struct pork_acct *acct = va_arg(ap, struct pork_acct *);
 	char *dest = va_arg(ap, char *);
- 	char *msg = va_arg(ap, char *);
+	char *msg = va_arg(ap, char *);
 	int ret = 0;
 
 	switch (opt) {
@@ -528,7 +528,7 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 	struct pork_acct *acct = va_arg(ap, struct pork_acct *);
 	char *dest = va_arg(ap, char *);
- 	char *sender = va_arg(ap, char *);
+	char *sender = va_arg(ap, char *);
 	char *sender_userhost = va_arg(ap, char *);
 	char *msg = va_arg(ap, char *);
 	int ret = 0;
@@ -952,7 +952,7 @@ static int format_blist_buddy_label(char opt, char *buf, size_t len, va_list ap)
 			return (-1);
 	}
 
-	if (ret < 0 || (size_t) 	ret >= len)
+	if (ret < 0 || (size_t) ret >= len)
 		return (-1);
 
 	return (0);

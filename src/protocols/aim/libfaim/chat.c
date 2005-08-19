@@ -10,8 +10,8 @@
 
 /* Stored in the ->internal of chat connections */
 struct chatconnpriv {
-	fu16_t exchange;
 	char *name;
+	fu16_t exchange;
 	fu16_t instance;
 };
 
@@ -76,8 +76,8 @@ faim_export int aim_chat_attachname(aim_conn_t *conn, fu16_t exchange, const cha
 	if (!(ccp = malloc(sizeof(struct chatconnpriv))))
 		return -ENOMEM;
 
-	ccp->exchange = exchange;
 	ccp->name = strdup(roomname);
+	ccp->exchange = exchange;
 	ccp->instance = instance;
 
 	conn->internal = (void *)ccp;
@@ -92,9 +92,9 @@ faim_internal int aim_chat_readroominfo(aim_bstream_t *bs, struct aim_chat_roomi
 	if (!bs || !outinfo)
 		return 0;
 
-	outinfo->exchange = aimbs_get16(bs);
 	namelen = aimbs_get8(bs);
 	outinfo->name = aimbs_getstr(bs, namelen);
+	outinfo->exchange = aimbs_get16(bs);
 	outinfo->instance = aimbs_get16(bs);
 
 	return 0;
@@ -113,7 +113,7 @@ faim_export int aim_chat_leaveroom(aim_session_t *sess, const char *name)
 }
 
 /*
- * Subtype 0x0002 - General room information.  Lots of stuff.
+ * Subtype 0x0002 - General room information. Lots of stuff.
  *
  * Values I know are in here but I haven't attached
  * them to any of the 'Unknown's:
@@ -166,7 +166,7 @@ static int infoupdate(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 		usercount = aim_tlv_get16(tlvlist, 0x006f, 1);
 
 	/*
-	 * Type 0x0073:  Occupant list.
+	 * Type 0x0073: Occupant list.
 	 */
 	if (aim_tlv_gettlv(tlvlist, 0x0073, 1)) {
 		int curoccupant = 0;
@@ -312,11 +312,11 @@ static int userlistchange(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
  * Subtype 0x0005 - Send a Chat Message.
  *
  * Possible flags:
- *   AIM_CHATFLAGS_NOREFLECT   --  Unset the flag that requests messages
- *                                 should be sent to their sender.
- *   AIM_CHATFLAGS_AWAY        --  Mark the message as an autoresponse
- *                                 (Note that WinAIM does not honor this,
- *                                 and displays the message as normal.)
+ *	AIM_CHATFLAGS_NOREFLECT	--	Unset the flag that requests messages
+ *								should be sent to their sender.
+ *	AIM_CHATFLAGS_AWAY		--	Mark the message as an autoresponse
+ *								(Note that WinAIM does not honor this,
+ *								and displays the message as normal.)
  *
  * XXX convert this to use tlvchains
  */
@@ -391,7 +391,7 @@ faim_export int aim_chat_send_im(aim_session_t *sess, aim_conn_t *conn, fu16_t f
 		aim_tlvlist_add_str(&itl, 0x0003, language);
 
 	/*
-	 * Type 5: Message block.  Contains more TLVs.
+	 * Type 5: Message block. Contains more TLVs.
 	 *
 	 * This could include other information... We just
 	 * put in a message TLV however.
@@ -417,21 +417,21 @@ faim_export int aim_chat_send_im(aim_session_t *sess, aim_conn_t *conn, fu16_t f
  * would be the same, we might as well do it here.
  *
  * General outline of this SNAC:
- *   snac
- *   cookie
- *   channel id
- *   tlvlist
- *     unknown
- *     source user info
- *       name
- *       evility
- *       userinfo tlvs
- *         online time
- *         etc
- *     message metatlv
- *       message tlv
- *         message string
- *       possibly others
+ *	snac
+ *	cookie
+ *	channel id
+ *	tlvlist
+ *	 unknown
+ *	 source user info
+ *		name
+ *		evility
+ *		userinfo tlvs
+ *		 online time
+ *		 etc
+ *	 message metatlv
+ *		message tlv
+ *		 message string
+ *		possibly others
  *
  */
 static int incomingim_ch3(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)
@@ -499,7 +499,7 @@ static int incomingim_ch3(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 		(void) 0;
 
 	/*
-	 * Type 0x0005: Message Block.  Conains more TLVs.
+	 * Type 0x0005: Message Block. Conains more TLVs.
 	 */
 	if (aim_tlv_gettlv(otl, 0x0005, 1)) {
 		aim_tlvlist_t *itl;

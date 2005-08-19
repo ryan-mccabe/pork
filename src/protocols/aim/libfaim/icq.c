@@ -75,7 +75,7 @@ faim_export int aim_icq_ackofflinemsgs(aim_session_t *sess)
  *
  * @param sess The oscar session.
  * @param auth Ask authorization when a buddy adds us?
- * @param web  Show our presence on the ICQ web site.
+ * @param web Show our presence on the ICQ web site.
  * @param hide Hide our IP address.
  * @return Return 0 if no errors, otherwise return the error number.
  */
@@ -107,7 +107,7 @@ faim_export int aim_icq_setsecurity(aim_session_t *sess, const int auth, const i
 	aimbs_putle16(&fr->data, snacid); /* eh. */
 	aimbs_putle16(&fr->data, 0x0424); /* shrug. */
 	aimbs_putle8(&fr->data, (auth == TRUE) ? 0x00 : 0x01);
-	aimbs_putle8(&fr->data, (web  == TRUE) ? 0x00 : 0x01);
+	aimbs_putle8(&fr->data, (web == TRUE) ? 0x00 : 0x01);
 	aimbs_putle8(&fr->data, (hide == TRUE) ? 0x00 : 0x01);
 	aimbs_putle8(&fr->data, 0x00);
 
@@ -118,7 +118,7 @@ faim_export int aim_icq_setsecurity(aim_session_t *sess, const int auth, const i
 
 /**
  * I'm not really sure what the difference is between this function
- * and the one above.  They both definitely exist.
+ * and the one above. They both definitely exist.
  */
 faim_export int aim_icq_setauthsetting(aim_session_t *sess, int auth_required)
 {
@@ -163,8 +163,8 @@ faim_export int aim_icq_setauthsetting(aim_session_t *sess, int auth_required)
  * Change your ICQ password.
  *
  * @param sess The oscar session
- * @param passwd The new password.  If this is longer than 8 characters it
- *        will be truncated.
+ * @param passwd The new password. If this is longer than 8 characters it
+ *		will be truncated.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_icq_changepasswd(aim_session_t *sess, const char *passwd)
@@ -375,22 +375,22 @@ faim_export int aim_icq_sendxmlreq(aim_session_t *sess, const char *xml)
 }
 
 /*
- * Send an SMS message.  This is the non-US way.  The US-way is to IM
+ * Send an SMS message. This is the non-US way. The US-way is to IM
  * their cell phone number (+19195551234).
  *
- * We basically construct and send an XML message.  The format is:
+ * We basically construct and send an XML message. The format is:
  * <icq_sms_message>
- *   <destination>full_phone_without_leading_+</destination>
- *   <text>message</text>
- *   <codepage>1252</codepage>
- *   <senders_UIN>self_uin</senders_UIN>
- *   <senders_name>self_name</senders_name>
- *   <delivery_receipt>Yes|No</delivery_receipt>
- *   <time>Wkd, DD Mmm YYYY HH:MM:SS TMZ</time>
+ *	<destination>full_phone_without_leading_+</destination>
+ *	<text>message</text>
+ *	<codepage>1252</codepage>
+ *	<senders_UIN>self_uin</senders_UIN>
+ *	<senders_name>self_name</senders_name>
+ *	<delivery_receipt>Yes|No</delivery_receipt>
+ *	<time>Wkd, DD Mmm YYYY HH:MM:SS TMZ</time>
  * </icq_sms_message>
  *
- * Yeah hi Peter, whaaaat's happening.  If there's any way to use
- * a codepage other than 1252 that would be great.  Thaaaanks.
+ * Yeah hi Peter, whaaaat's happening. If there's any way to use
+ * a codepage other than 1252 that would be great. Thaaaanks.
  */
 faim_export int aim_icq_sendsms(aim_session_t *sess, const char *name, const char *msg, const char *alias)
 {

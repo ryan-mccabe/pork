@@ -525,8 +525,7 @@ static int aim_file_accept(struct file_transfer *xfer) {
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
-	oft_info->conn = aim_newconn(&priv->aim_session,
-						AIM_CONN_TYPE_RENDEZVOUS, NULL);
+	oft_info->conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_RENDEZVOUS);
 
 	if (oft_info->conn == NULL) {
 		screen_err_msg("Error connecting to %s@%s while receiving %s",

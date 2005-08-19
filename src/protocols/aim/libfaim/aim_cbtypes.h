@@ -260,7 +260,7 @@
  * OFT Services
  *
  * For all of the above #defines, the number is the subtype
- * of the SNAC.  For OFT #defines, the number is the
+ * of the SNAC. For OFT #defines, the number is the
  * "hdrtype" which comes after the magic string and OFT
  * packet length.
  *

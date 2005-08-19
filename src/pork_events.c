@@ -148,7 +148,7 @@ static void event_print_type(struct event *events, u_int32_t type) {
 			"[refnum %u] EVENT %s: %s",
 			event->refnum,
 			events_info[type].name,
- 			event->command);
+			event->command);
 
 		cur = cur->next;
 	} while (cur != NULL);

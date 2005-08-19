@@ -46,8 +46,6 @@ faim_export int aim_bart_upload(aim_session_t *sess, const fu8_t *icon, fu16_t i
 
 /**
  * Subtype 0x0003 - Acknowledgement for uploading a buddy icon.
- *
- * You get this honky after you upload a buddy icon.
  */
 static int uploadack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)
 {
@@ -73,7 +71,7 @@ static int uploadack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, ai
  * @param conn The icon connection for this session.
  * @param sn The screen name of the person who's icon you are requesting.
  * @param iconcsum The MD5 checksum of the icon you are requesting.
- * @param iconcsumlen Length of the MD5 checksum given above.  Should be 10 bytes.
+ * @param iconcsumlen Length of the MD5 checksum given above. Should be 10 bytes.
  * @return Return 0 if no errors, otherwise return the error number.
  */
 faim_export int aim_bart_request(aim_session_t *sess, const char *sn, fu8_t iconcsumtype, const fu8_t *iconcsum, fu16_t iconcsumlen)
@@ -94,7 +92,7 @@ faim_export int aim_bart_request(aim_session_t *sess, const char *sn, fu8_t icon
 	aimbs_put8(&fr->data, strlen(sn));
 	aimbs_putstr(&fr->data, sn);
 
-	/* Some numbers.  You like numbers, right? */
+	/* Some numbers. You like numbers, right? */
 	aimbs_put8(&fr->data, 0x01);
 	aimbs_put16(&fr->data, 0x0001);
 	aimbs_put8(&fr->data, iconcsumtype);
