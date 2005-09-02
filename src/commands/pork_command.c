@@ -45,19 +45,33 @@
 #include <pork_events.h>
 #include <pork_command.h>
 
-struct command_set command_set[] = {
-	{	command,			array_elem(command),			""			},
-	{	window_command,		array_elem(window_command),		"win "		},
-	{	history_command,	array_elem(history_command),	"history "	},
-	{	input_command,		array_elem(input_command),		"input "	},
-	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	buddy_command,		array_elem(buddy_command),		"buddy "	},
-	{	blist_command,		array_elem(blist_command),		"blist "	},
-	{	timer_command,		array_elem(timer_command),		"timer "	},
-	{	event_command,		array_elem(event_command),		"event "	},
-	{	chat_command,		array_elem(chat_command),		"chat "		},
-	{	file_command,		array_elem(file_command),		"file "		},
-	{	acct_command,		array_elem(acct_command),		"acct "		},
+extern struct command_set main_set;
+extern struct command_set win_set;
+extern struct command_set history_set;
+extern struct command_set input_set;
+extern struct command_set scroll_set;
+extern struct command_set buddy_set;
+extern struct command_set blist_set;
+extern struct command_set timer_set;
+extern struct command_set event_set;
+extern struct command_set chat_set;
+extern struct command_set file_set;
+extern struct command_set acct_set;
+
+struct command_set *command_set[] = {
+	&main_set,
+	&win_set,
+	&history_set,
+	&input_set,
+	&scroll_set,
+	&buddy_set,
+	&blist_set,
+	&timer_set,
+	&event_set,
+	&chat_set,
+	&file_set,
+	&acct_set,
+	NULL
 };
 
 static int cmd_compare(const void *l, const void *r) {
@@ -86,7 +100,7 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 
 	cmd_str = strsep(&str, " \t");
 
-	cmd = bsearch(cmd_str, command_set[set].set, command_set[set].elem,
+	cmd = bsearch(cmd_str, command_set[set]->set, command_set[set]->elem,
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
@@ -126,7 +140,7 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 			}
 		} else {
 			screen_err_msg("Unknown %scommand: %s",
-				command_set[set].type, cmd_str);
+				command_set[set]->type, cmd_str);
 			return (-1);
 		}
 	}
@@ -184,18 +198,21 @@ static int command_send_to_win(struct pork_acct *acct, char *str) {
 		} else
 			chat_send_msg(acct, chat, chat->title, str);
 	}
+
+	return (0);
 }
 
 int command_enter_str(struct pork_acct *acct, char *str) {
 	if (!event_generate(acct->events, EVENT_SEND_LINE,
 		str, acct->refnum))
 	{
-		return (-1);
+		if (str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS)) {
+			run_command(acct, &str[1]);
+		} else {
+			command_send_to_win(acct, str);
+		}
 	}
 
-	if (str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
-		run_command(acct, &str[1]);
-	else
-		command_send_to_win(acct, str);
+	return (0);
 }
 

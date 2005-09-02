@@ -115,10 +115,12 @@ USER_COMMAND(cmd_timer_purge) {
 	}
 }
 
-struct command timer_command[] = {
+static struct command timer_command[] = {
 	{ "add",			cmd_timer_add			},
 	{ "del",			cmd_timer_del			},
 	{ "del_refnum",		cmd_timer_del_refnum	},
 	{ "list",			cmd_timer_list			},
 	{ "purge",			cmd_timer_purge			},
 };
+
+struct command_set timer_set = { timer_command, array_elem(timer_command), "timer " };

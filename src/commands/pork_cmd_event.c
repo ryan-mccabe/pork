@@ -107,10 +107,12 @@ USER_COMMAND(cmd_event_purge) {
 	event_purge(acct->events);
 }
 
-struct command event_command[] = {
+static struct command event_command[] = {
 	{ "add",			cmd_event_add			},
 	{ "del",			cmd_event_del			},
 	{ "del_refnum",		cmd_event_del_refnum	},
 	{ "list",			cmd_event_list			},
 	{ "purge",			cmd_event_purge			},
 };
+
+struct command_set event_set = { event_command, array_elem(event_command), "event " };

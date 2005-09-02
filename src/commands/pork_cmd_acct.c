@@ -70,8 +70,10 @@ USER_COMMAND(cmd_acct_set) {
 	opt_set_var(pref, args, acct);
 }
 
-struct command acct_command[] = {
+static struct command acct_command[] = {
 	{ "list",	cmd_acct_list		},
 	{ "save",	cmd_acct_save		},
 	{ "set",	cmd_acct_set		},
 };
+
+struct command_set acct_set = { acct_command, array_elem(acct_command), "acct " };

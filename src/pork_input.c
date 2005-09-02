@@ -27,7 +27,6 @@
 #include <pork_set.h>
 #include <pork_input_set.h>
 #include <pork_cstr.h>
-#include <pork_event.h>
 #include <pork_input.h>
 
 static inline void input_free(void *param __notused, void *data);
@@ -597,7 +596,6 @@ int input_send(struct pork_acct *acct, struct pork_input *input, char *args) {
 
 	if (recursion == 1 && args == NULL) {
 		return (-1);
-		return;
 	}
 
 	recursion = 1;
@@ -612,7 +610,7 @@ int input_send(struct pork_acct *acct, struct pork_input *input, char *args) {
 			input_history_add(input);
 
 		input_clear_line(input);
-		command_send_str(acct, input_str);
+		command_enter_str(acct, input_str);
 		free(input_str);
 	}
 

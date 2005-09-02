@@ -125,7 +125,6 @@ USER_COMMAND(cmd_input_right) {
 
 USER_COMMAND(cmd_input_send) {
 	input_send(acct, cur_window()->input, args);
-
 }
 
 USER_COMMAND(cmd_input_set) {
@@ -154,7 +153,7 @@ USER_COMMAND(cmd_input_start) {
 	input_home(cur_window()->input);
 }
 
-struct command input_command[] = {
+static struct command input_command[] = {
 	{ "backspace",				cmd_input_bkspace			},
 	{ "clear",					cmd_input_clear				},
 	{ "clear_next_word",		cmd_input_clear_next		},
@@ -175,3 +174,5 @@ struct command input_command[] = {
 	{ "set",					cmd_input_set				},
 	{ "start",					cmd_input_start				},
 };
+
+struct command_set input_set = { input_command, array_elem(input_command), "input " };

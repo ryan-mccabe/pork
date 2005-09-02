@@ -406,7 +406,7 @@ USER_COMMAND(cmd_buddy_warn_anon) {
 	pork_send_warn_anon(acct, args);
 }
 
-struct command buddy_command[] = {
+static struct command buddy_command[] = {
 	{ "add",			cmd_buddy_add			},
 	{ "add_group",		cmd_buddy_add_group		},
 	{ "alias",			cmd_buddy_alias			},
@@ -427,3 +427,5 @@ struct command buddy_command[] = {
 	{ "warn",			cmd_buddy_warn			},
 	{ "warn_anon",		cmd_buddy_warn_anon		},
 };
+
+struct command_set buddy_set = { buddy_command, array_elem(buddy_command), "buddy " };

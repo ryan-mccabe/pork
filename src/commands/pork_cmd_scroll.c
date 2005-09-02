@@ -71,7 +71,7 @@ USER_COMMAND(cmd_scroll_up) {
 	imwindow_scroll_up(cur_window());
 }
 
-struct command scroll_command[] = {
+static struct command scroll_command[] = {
 	{ "by",				cmd_scroll_by			},
 	{ "down",			cmd_scroll_down			},
 	{ "end",			cmd_scroll_end			},
@@ -81,3 +81,4 @@ struct command scroll_command[] = {
 	{ "up",				cmd_scroll_up			},
 };
 
+struct command_set scroll_set = { scroll_command, array_elem(scroll_command), "scroll " };

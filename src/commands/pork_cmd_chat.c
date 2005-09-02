@@ -267,7 +267,7 @@ USER_COMMAND(cmd_chat_who) {
 	chat_who(acct, args);
 }
 
-struct command chat_command[] = {
+static struct command chat_command[] = {
 	{ "ban",				cmd_chat_ban			},
 	{ "ignore",				cmd_chat_ignore			},
 	{ "invite",				cmd_chat_invite			},
@@ -280,3 +280,5 @@ struct command chat_command[] = {
 	{ "unignore",			cmd_chat_unignore		},
 	{ "who",				cmd_chat_who			},
 };
+
+struct command_set chat_set = { chat_command, array_elem(chat_command), "chat " };

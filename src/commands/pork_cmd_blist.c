@@ -314,7 +314,7 @@ USER_COMMAND(cmd_blist_width) {
 	screen_blist_width(blist, new_len);
 }
 
-struct command blist_command[] = {
+static struct command blist_command[] = {
 	{ "add_block",		cmd_blist_add_block		},
 	{ "add_permit",		cmd_blist_add_permit	},
 	{ "away",			cmd_blist_away			},
@@ -340,3 +340,5 @@ struct command blist_command[] = {
 	{ "warn_anon",		cmd_blist_warn_anon		},
 	{ "width",			cmd_blist_width			},
 };
+
+struct command_set blist_set = { blist_command, array_elem(blist_command), "blist " };

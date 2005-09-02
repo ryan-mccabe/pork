@@ -62,9 +62,11 @@ USER_COMMAND(cmd_history_prev) {
 	input_history_prev(cur_window()->input);
 }
 
-struct command history_command[] = {
+static struct command history_command[] = {
 	{ "clear",		cmd_history_clear	},
 	{ "list",		cmd_history_list	},
 	{ "next",		cmd_history_next	},
 	{ "prev",		cmd_history_prev	},
 };
+
+struct command_set history_set = { history_command, array_elem(history_command), "history " };

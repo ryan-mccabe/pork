@@ -140,7 +140,7 @@ USER_COMMAND(cmd_file_send) {
 	transfer_send(acct, dest, args);
 }
 
-struct command file_command[] = {
+static struct command file_command[] = {
 	{ "abort",				cmd_file_cancel		},
 	{ "cancel",				cmd_file_cancel		},
 	{ "get",				cmd_file_get		},
@@ -148,3 +148,5 @@ struct command file_command[] = {
 	{ "resume",				cmd_file_resume		},
 	{ "send",				cmd_file_send		},
 };
+
+struct command_set file_set = { file_command, array_elem(file_command), "file " };

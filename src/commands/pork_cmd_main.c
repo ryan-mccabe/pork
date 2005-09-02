@@ -813,7 +813,7 @@ USER_COMMAND(cmd_complete) {
 	if (end_word < begin_completion_pos) {
 		size_t i;
 
-		for (i = 1 ; i < array_elem(command_set) ; i++) {
+		for (i = 1 ; command_set[i] != NULL ; i++) {
 			if (!strncasecmp(command_set[i]->type, &input_buf[1], end_word)) {
 				elements = command_set[i]->elem;
 				cmd = command_set[i]->set;
@@ -983,3 +983,4 @@ static struct command command[] = {
 	{ "win",		cmd_win				},
 };
 
+struct command_set main_set = { command, array_elem(command), "" };

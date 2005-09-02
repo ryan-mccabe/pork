@@ -288,7 +288,7 @@ USER_COMMAND(cmd_win_unskip) {
 	imwindow_unskip(win);
 }
 
-struct command window_command[] = {
+static struct command win_command[] = {
 	{ "bind",				cmd_win_bind		},
 	{ "bind_next",			cmd_win_bind_next	},
 	{ "clear",				cmd_win_clear		},
@@ -307,3 +307,5 @@ struct command window_command[] = {
 	{ "unignore",			cmd_win_unignore	},
 	{ "unskip",				cmd_win_unskip		},
 };
+
+struct command_set win_set = { win_command, array_elem(win_command), "win " };

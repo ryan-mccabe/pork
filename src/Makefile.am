@@ -19,7 +19,7 @@ AM_CFLAGS = -funsigned-char
 AM_CFLAGS += -DHELP_PATH=\"$(pkgdatadir)/help\" -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
 AM_CFLAGS += $(PERL_CFLAGS) $(DEBUG_CFLAGS)
 
-pork_LDADD = prefs/libporkprefs.a missing/libmissing.a $(aim_lib) $(irc_lib) $(perl_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
+pork_LDADD = prefs/libporkprefs.a commands/libporkcmd.a missing/libmissing.a $(aim_lib) $(irc_lib) $(perl_lib) -lncurses $(PERL_LIBS) $(DEBUG_LIBS)
 
 noinst_HEADERS = \
 	pork.h				\
