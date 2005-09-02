@@ -12,6 +12,7 @@ libporkcmd_a_SOURCES =	\
 	pork_cmd_file.c		\
 	pork_cmd_history.c	\
 	pork_cmd_input.c	\
+	pork_cmd_main.c		\
 	pork_cmd_scroll.c	\
 	pork_cmd_timer.c	\
 	pork_cmd_win.c		\

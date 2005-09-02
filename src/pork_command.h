@@ -35,7 +35,14 @@ struct command {
 	void (*cmd)(struct pork_acct *, char *);
 };
 
+struct command_set {
+	struct command *set;
+	size_t elem;
+	char *type;
+};
+
 int command_enter_str(struct pork_acct *acct, char *str);
+int run_one_command(struct pork_acct *acct, char *str, u_int32_t set);
 int run_mcommand(struct pork_acct *acct, char *str);
 inline int run_command(struct pork_acct *acct, char *str);
 
