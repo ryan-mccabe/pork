@@ -20,6 +20,7 @@
 #define CTRL_KEY(x)		((x) & 0x1f)
 
 struct pref_val;
+struct pork_acct;
 
 struct pork_input {
 	u_int32_t width;
@@ -65,6 +66,7 @@ void input_history_prev(struct pork_input *input);
 void input_history_clear(struct pork_input *input);
 int input_set_buf(struct pork_input *input, char *str);
 int input_set_prompt(struct pork_input *input, char *prompt);
+int input_send(struct pork_acct *acct, struct pork_input *input, char *args);
 char *input_get_buf_str(struct pork_input *input);
 u_int32_t input_get_cursor_pos(struct pork_input *input);
 

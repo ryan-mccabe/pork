@@ -1,4 +1,4 @@
-SUBDIRS = missing perl prefs protocols
+SUBDIRS = missing prefs commands protocols perl
 bin_PROGRAMS = pork
 
 if IRC_SUPPORT
@@ -31,7 +31,6 @@ noinst_HEADERS = \
 	pork_chat.h			\
 	pork_color.h		\
 	pork_command.h		\
-	pork_command_defs.h	\
 	pork_cstr.h			\
 	pork_events.h		\
 	pork_format.h		\
@@ -65,7 +64,6 @@ pork_SOURCES = \
 	pork_buddy_list.c	\
 	pork_chat.c			\
 	pork_color.c		\
-	pork_command.c		\
 	pork_cstr.c			\
 	pork_events.c		\
 	pork_format.c		\

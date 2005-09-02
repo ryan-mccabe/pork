@@ -27,6 +27,7 @@
 #include <pork_set.h>
 #include <pork_input_set.h>
 #include <pork_cstr.h>
+#include <pork_event.h>
 #include <pork_input.h>
 
 static inline void input_free(void *param __notused, void *data);
@@ -579,5 +580,42 @@ int input_set_buf(struct pork_input *input, char *str) {
 	input->cur = len;
 	input->begin_completion = input->cur;
 
+	return (0);
+}
+
+/*
+** Send the input string provided, or the current input buffer, if no string is provided.
+*/
+
+int input_send(struct pork_acct *acct, struct pork_input *input, char *args) {
+	static int recursion;
+
+	/*
+	** This is kind of a hack, but it's necessary if the client
+	** isn't to crash when someone types "/input send"
+	*/
+
+	if (recursion == 1 && args == NULL) {
+		return (-1);
+		return;
+	}
+
+	recursion = 1;
+
+	if (args != NULL)
+		input_set_buf(input, args);
+
+	if (input->len > 0) {
+		char *input_str = xstrdup(input_get_buf_str(input));
+
+		if (args == NULL)
+			input_history_add(input);
+
+		input_clear_line(input);
+		command_send_str(acct, input_str);
+		free(input_str);
+	}
+
+	recursion = 0;
 	return (0);
 }

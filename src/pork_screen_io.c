@@ -258,7 +258,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_start(ap, fmt);
 	__screen_win_msg(win,
 		(ts * MSG_OPT_TIMESTAMP) | (banner * MSG_OPT_BANNER) | (color * MSG_OPT_COLOR),
-		1, fmt, ap);
+		type, fmt, ap);
 	va_end(ap);
 }
 
@@ -287,7 +287,9 @@ inline void screen_nocolor_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	if (!screen.quiet)
-		__screen_win_msg(cur_window(), MSG_OPT_BANNER, 1, fmt, ap);
+	if (!screen.quiet) {
+		__screen_win_msg(cur_window(), MSG_OPT_BANNER,
+			MSG_TYPE_CMD_OUTPUT, fmt, ap);
+	}
 	va_end(ap);
 }

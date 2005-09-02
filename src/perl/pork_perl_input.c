@@ -40,7 +40,6 @@
 #include <pork_bind.h>
 #include <pork_screen.h>
 #include <pork_command.h>
-#include <pork_command_defs.h>
 #include <pork_perl_xs.h>
 #include <pork_perl_macro.h>
 
@@ -58,7 +57,7 @@ XS(PORK_input_send) {
 		XSRETURN_IV(-1);
 
 	INPUT_WIN_REFNUM(1, IV(-1));
-	cmd_input_send(cur_window()->owner, args);
+	command_enter_str(cur_window()->owner, args);
 	XSRETURN_IV(0);
 }
 

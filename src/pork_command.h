@@ -12,7 +12,7 @@
 
 struct pork_acct;
 
-#define USER_COMMAND(x)	void x (struct pork_acct *acct __notused, char *args __notused)
+#define USER_COMMAND(x)	static void x (struct pork_acct *acct __notused, char *args __notused)
 
 enum {
 	CMDSET_MAIN,
@@ -35,6 +35,7 @@ struct command {
 	void (*cmd)(struct pork_acct *, char *);
 };
 
+int command_enter_str(struct pork_acct *acct, char *str);
 int run_mcommand(struct pork_acct *acct, char *str);
 inline int run_command(struct pork_acct *acct, char *str);
 

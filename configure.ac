@@ -355,6 +355,7 @@ AC_OUTPUT([
 	Makefile
 	src/Makefile
 	src/missing/Makefile
+	src/commands/Makefile
 	src/perl/Makefile
 	src/prefs/Makefile
 	src/protocols/Makefile

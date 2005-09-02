@@ -47,7 +47,6 @@
 #include <pork_conf.h>
 #include <pork_msg.h>
 #include <pork_command.h>
-#include <pork_command_defs.h>
 #include <pork_perl.h>
 #include <pork_perl_xs.h>
 
@@ -87,8 +86,13 @@ XS(PORK_connect) {
 	if (items != 0)
 		username = SvPV(ST(0), notused);
 
+	/*
+	FIXME
 	cmd_connect(cur_window()->owner, username);
 	XSRETURN_IV(0);
+	*/
+	
+	XSRETURN_IV(-1);
 }
 
 XS(PORK_disconnect) {

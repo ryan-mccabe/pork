@@ -48,31 +48,31 @@
 
 /* XXX - todo */
 
-static USER_COMMAND(aim_cmd_icon) {
+USER_COMMAND(aim_cmd_icon) {
 }
 
-static USER_COMMAND(aim_cmd_email) {
+USER_COMMAND(aim_cmd_email) {
 }
 
-static USER_COMMAND(aim_cmd_passwd) {
+USER_COMMAND(aim_cmd_passwd) {
 }
 
-static USER_COMMAND(aim_cmd_search) {
+USER_COMMAND(aim_cmd_search) {
 	if (args != NULL)
 		aim_search(acct, args);
 }
 
-static USER_COMMAND(aim_cmd_save) {
+USER_COMMAND(aim_cmd_save) {
 }
 
-static USER_COMMAND(aim_cmd_set) {
+USER_COMMAND(aim_cmd_set) {
 	if (acct == NULL)
 		proto_set(proto_get(PROTO_AIM), NULL, args);
 	else
 		proto_set(acct->proto, acct->proto_prefs, args);
 }
 
-static USER_COMMAND(aim_cmd_idle_mode) {
+USER_COMMAND(aim_cmd_idle_mode) {
 	if (args != NULL && !blank_str(args)) {
 		u_int32_t mode;
 
@@ -88,7 +88,7 @@ static USER_COMMAND(aim_cmd_idle_mode) {
 		acct->username, (acct->report_idle ? "enabled" : "disabled"));
 }
 
-static USER_COMMAND(aim_cmd_privacy_mode) {
+USER_COMMAND(aim_cmd_privacy_mode) {
 	int mode = -1;
 
 	if (args != NULL)

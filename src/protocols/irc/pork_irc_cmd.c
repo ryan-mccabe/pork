@@ -46,14 +46,14 @@
 #include <pork_irc_cmd.h>
 #include <pork_irc_set.h>
 
-static USER_COMMAND(irc_cmd_set) {
+USER_COMMAND(irc_cmd_set) {
 	if (acct == NULL)
 		proto_set(proto_get(PROTO_IRC), NULL, args);
 	else
 		proto_set(acct->proto, acct->proto_prefs, args);
 }
 
-static USER_COMMAND(irc_cmd_ctcp) {
+USER_COMMAND(irc_cmd_ctcp) {
 	char *dest;
 
 	dest = strsep(&args, " ");
@@ -63,17 +63,17 @@ static USER_COMMAND(irc_cmd_ctcp) {
 	irc_ctcp(acct, dest, args);
 }
 
-static USER_COMMAND(irc_cmd_mode) {
+USER_COMMAND(irc_cmd_mode) {
 	if (args != NULL)
 		irc_mode(acct, args);
 }
 
-static USER_COMMAND(irc_cmd_quote) {
+USER_COMMAND(irc_cmd_quote) {
 	if (args != NULL)
 		irc_quote(acct, args);
 }
 
-static USER_COMMAND(irc_cmd_who) {
+USER_COMMAND(irc_cmd_who) {
 	struct imwindow *win = cur_window();
 	if (args != NULL)
 		irc_who(acct, args);
@@ -87,12 +87,12 @@ static USER_COMMAND(irc_cmd_who) {
 	}
 }
 
-static USER_COMMAND(irc_cmd_whowas) {
+USER_COMMAND(irc_cmd_whowas) {
 	if (args != NULL)
 		irc_whowas(acct, args);
 }
 
-static USER_COMMAND(FIXME) {
+USER_COMMAND(FIXME) {
 	screen_err_msg("This command is not implemented yet.");
 }
 

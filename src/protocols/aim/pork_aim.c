@@ -61,7 +61,7 @@
 #include <pork_aim_set.h>
 
 static u_int32_t pork_caps =	AIM_CAPS_CHAT | AIM_CAPS_INTEROPERATE |
-								AIM_CAPS_SENDFILE;
+								AIM_CAPS_SENDFILE | AIM_CAPS_ICHAT;
 
 static char *msgerrreason[] = {
 	"Invalid error",
@@ -903,7 +903,7 @@ static FAIM_CB(aim_recv_evil) {
 	userinfo = va_arg(ap, aim_userinfo_t *);
 	va_end(ap);
 
-	warn_level = (float) warn_level / 10;
+	warn_level = (warn_level / 10.0) + 0.5;
 	if (warn_level <= acct->warn_level) {
 		acct->warn_level = warn_level;
 		return (1);
@@ -1260,7 +1260,7 @@ static FAIM_CB(aim_recv_selfinfo) {
 	info = va_arg(ap, aim_userinfo_t *);
 	va_end(ap);
 
-	acct->warn_level = (float) info->warnlevel / 10;
+	acct->warn_level = (info->warnlevel / 10.0) + 0.5;
 	acct->idle_time = info->idletime;
 
 	return (1);
@@ -1384,6 +1384,7 @@ static FAIM_CB(aim_recv_rate_change) {
 		case AIM_RATE_CODE_LIMIT:
 			aim_conn_setlatency(fr->conn, 10);
 			screen_err_msg("The last message from %s was not sent because you are over the rate limit. Please wait 10 seconds, and then try again", acct->username);
+			aim_conn_setlatency(fr->conn, window_size / 2);
 			break;
 
 		case AIM_RATE_CODE_CLEARLIMIT:
@@ -1995,7 +1996,7 @@ static FAIM_CB(aim_recv_userinfo) {
 	if (userinfo->present & AIM_USERINFO_PRESENT_IDLE)
 		idle_time = userinfo->idletime;
 
-	warn_level = (float) userinfo->warnlevel / 10;
+	warn_level = (userinfo->warnlevel / 10.0) + 0.5;
 
 	if ((userinfo->flags & AIM_FLAG_AWAY) && userinfo->away_len > 0 &&
 		userinfo->away != NULL)
