@@ -22,14 +22,15 @@
 #include <pork_inet.h>
 #include <pork_acct.h>
 #include <pork_proto.h>
-#include <pork_set.h>
 #include <pork_input.h>
+#include <pork_set.h>
+#include <pork_input_set.h>
 #include <pork_bind.h>
 #include <pork_imsg.h>
 #include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_screen.h>
-#include <pork_input_set.h>
+#include <pork_screen_io.h>
 #include <pork_command.h>
 
 USER_COMMAND(cmd_scroll_by) {

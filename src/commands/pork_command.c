@@ -61,36 +61,11 @@
 extern struct sockaddr_storage local_addr;
 extern in_port_t local_port;
 
-inline int run_command(struct pork_acct *acct, char *str) {
-	return (run_one_command(acct, str, CMDSET_MAIN));
-}
+static int cmd_compare(const void *l, const void *r) {
+	char *key = (char *) l;
+	struct command *cmd = (struct command *) r;
 
-int run_mcommand(struct pork_acct *acct, char *str) {
-	int i = 0;
-	char *copystr = xstrdup(str);
-	char *cmdstr = copystr;
-	char *curcmd;
-
-	curcmd = strsep(&cmdstr, ";");
-	if (curcmd == NULL)
-		i = run_one_command(acct, cmdstr, CMDSET_MAIN);
-	else {
-		while (curcmd != NULL && i != -1) {
-			char cmdchars = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
-
-			while (*curcmd == ' ')
-				curcmd++;
-
-			while (*curcmd == cmdchars)
-				curcmd++;
-
-			i = run_one_command(acct, curcmd, CMDSET_MAIN);
-			curcmd = strsep(&cmdstr, ";");
-		}
-	}
-
-	free(copystr);
-	return (i);
+	return (strcasecmp(key, cmd->name));
 }
 
 static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
@@ -161,10 +136,42 @@ static int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 	return (0);
 }
 
+inline int run_command(struct pork_acct *acct, char *str) {
+	return (run_one_command(acct, str, CMDSET_MAIN));
+}
+
+int run_mcommand(struct pork_acct *acct, char *str) {
+	int i = 0;
+	char *copystr = xstrdup(str);
+	char *cmdstr = copystr;
+	char *curcmd;
+
+	curcmd = strsep(&cmdstr, ";");
+	if (curcmd == NULL)
+		i = run_one_command(acct, cmdstr, CMDSET_MAIN);
+	else {
+		while (curcmd != NULL && i != -1) {
+			char cmdchars = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
+
+			while (*curcmd == ' ')
+				curcmd++;
+
+			while (*curcmd == cmdchars)
+				curcmd++;
+
+			i = run_one_command(acct, curcmd, CMDSET_MAIN);
+			curcmd = strsep(&cmdstr, ";");
+		}
+	}
+
+	free(copystr);
+	return (i);
+}
+
 static int command_send_to_win(struct pork_acct *acct, char *str) {
 	struct imwindow *imwindow = cur_window();
 
-	if (args == NULL || !acct->connected)
+	if (str == NULL || !acct->connected)
 		return (-1);
 
 	if (imwindow->type == WIN_TYPE_PRIVMSG)
@@ -206,13 +213,6 @@ static void print_alias(void *data, void *nothing __notused) {
 
 	screen_cmd_output("%s is aliased to %s%s",
 		alias->alias, alias->orig, (alias->args != NULL ? alias->args : ""));
-}
-
-static int cmd_compare(const void *l, const void *r) {
-	char *key = (char *) l;
-	struct command *cmd = (struct command *) r;
-
-	return (strcasecmp(key, cmd->name));
 }
 
 /*
@@ -927,7 +927,6 @@ USER_COMMAND(cmd_set) {
 	opt_set_var(screen.global_prefs, args);
 }
 
-USER_COMMAND(cmd_complete);
 
 /*
 ** The / command set.
@@ -936,6 +935,7 @@ USER_COMMAND(cmd_complete);
 ** order. They have to be like that.
 */
 
+USER_COMMAND(cmd_complete);
 static struct command command[] = {
 	{ "",			cmd_send			},
 	{ "acct",		cmd_acct			},
