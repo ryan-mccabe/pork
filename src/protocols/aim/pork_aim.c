@@ -1065,7 +1065,7 @@ static int parse_im_chan2(	aim_session_t *session,
 
 				oft_info = aim_oft_createinfo(session, args->cookie,
 							userinfo->sn, args->clientip, args->port,
-							0, 0, NULL);
+							0, 0, NULL, AIM_XFER_RECV, AIM_XFER_DIRECT, AIM_XFER_PROXY_NONE);
 				oft_info->verifiedip = xstrdup(args->verifiedip);
 
 				aim_im_sendch2_sendfile_cancel(oft_info->sess, oft_info);
@@ -1091,7 +1091,8 @@ static int parse_im_chan2(	aim_session_t *session,
 			}
 
 			oft_info = aim_oft_createinfo(session, args->cookie, userinfo->sn,
-						args->clientip, args->port, 0, 0, NULL);
+						args->clientip, args->port, 0, 0, NULL, AIM_XFER_SEND,
+						AIM_XFER_DIRECT, AIM_XFER_PROXY_NONE);
 			oft_info->verifiedip = xstrdup(args->verifiedip);
 			xfer->data = oft_info;
 

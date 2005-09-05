@@ -39,17 +39,27 @@
  *
  * @param bs The bstream to write the ICBM header to.
  * @param c c is for cookie, and cookie is for me.
- * @param ch The ICBM channel (1 through 4).
+ * @param channel The ICBM channel (1 through 4).
  * @param sn Null-terminated scrizeen nizame.
  * @return The number of bytes written. It's really not useful.
  */
-static int aim_im_puticbm(aim_bstream_t *bs, const fu8_t *c, fu16_t ch, const char *sn)
+static int aim_im_puticbm(aim_bstream_t *bs, const fu8_t *c, fu16_t channel, const char *sn)
 {
 	aimbs_putraw(bs, c, 8);
-	aimbs_put16(bs, ch);
+	aimbs_put16(bs, channel);
 	aimbs_put8(bs, strlen(sn));
 	aimbs_putstr(bs, sn);
 	return 8+2+1+strlen(sn);
+}
+
+faim_export void aim_icbm_makecookie(fu8_t *cookie)
+{
+	int i;
+
+	/* Should be like "21CBF95" and null terminated */
+	for (i = 0; i < 7; i++)
+		cookie[i] = 0x30 + ((fu8_t)rand() % 10);
+	cookie[7] = '\0';
 }
 
 /*
@@ -233,8 +243,8 @@ faim_export int aim_im_sendch1_ext(aim_session_t *sess, struct aim_sendimext_arg
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	fu8_t ck[8];
-	int i, msgtlvlen;
+	fu8_t cookie[8];
+	int msgtlvlen;
 	static const fu8_t deffeatures[] = { 0x01, 0x01, 0x01, 0x02 };
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0004)))
@@ -282,20 +292,11 @@ faim_export int aim_im_sendch1_ext(aim_session_t *sess, struct aim_sendimext_arg
 	snacid = aim_cachesnac(sess, 0x0004, 0x0006, 0x0000, args->destsn, strlen(args->destsn)+1);
 	aim_putsnac(&fr->data, 0x0004, 0x0006, 0x0000, snacid);
 
-	/*
-	 * Generate a random message cookie
-	 *
-	 * We could cache these like we do SNAC IDs. (In fact, it
-	 * might be a good idea.) In the message error functions,
-	 * the 8byte message cookie is returned as well as the
-	 * SNAC ID.
-	 *
-	 */
-	for (i = 0; i < 8; i++)
-		ck[i] = (fu8_t)rand();
+	/* Generate an ICBM cookie */
+	aim_icbm_makecookie(cookie);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0001, args->destsn);
+	aim_im_puticbm(&fr->data, cookie, 0x0001, args->destsn);
 
 	/* Message TLV (type 0x0002) */
 	aimbs_put16(&fr->data, 0x0002);
@@ -420,10 +421,9 @@ faim_export int aim_im_sendch2_chatinvite(aim_session_t *sess, const char *sn, c
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	int i;
-	aim_msgcookie_t *cookie;
+	aim_msgcookie_t *msgcookie;
 	struct aim_invite_priv *priv;
-	fu8_t ck[8];
+	fu8_t cookie[8];
 	aim_tlvlist_t *otl = NULL, *itl = NULL;
 	fu8_t *hdr;
 	int hdrlen;
@@ -435,8 +435,7 @@ faim_export int aim_im_sendch2_chatinvite(aim_session_t *sess, const char *sn, c
 	if (!sn || !msg || !roomname)
 		return -EINVAL;
 
-	for (i = 0; i < 8; i++)
-		ck[i] = (fu8_t)rand();
+	aim_icbm_makecookie(cookie);
 
 	if (!(fr = aim_tx_new(sess, conn, AIM_FRAMETYPE_FLAP, 0x02, 1152+strlen(sn)+strlen(roomname)+strlen(msg))))
 		return -ENOMEM;
@@ -452,16 +451,13 @@ faim_export int aim_im_sendch2_chatinvite(aim_session_t *sess, const char *sn, c
 		priv->instance = instance;
 	}
 
-	if ((cookie = aim_mkcookie(ck, AIM_COOKIETYPE_INVITE, priv)))
-		aim_cachecookie(sess, cookie);
+	if ((msgcookie = aim_mkcookie(cookie, AIM_COOKIETYPE_INVITE, priv)))
+		aim_cachecookie(sess, msgcookie);
 	else
 		free(priv);
 
 	/* ICBM Header */
-	aimbs_putraw(&fr->data, ck, 8); /* Cookie */
-	aimbs_put16(&fr->data, 0x0002); /* Channel */
-	aimbs_put8(&fr->data, strlen(sn)); /* Screename length */
-	aimbs_putstr(&fr->data, sn); /* Screenname */
+	aim_im_puticbm(&fr->data, cookie, 0x0002, sn);
 
 	/*
 	 * TLV t(0005)
@@ -478,7 +474,7 @@ faim_export int aim_im_sendch2_chatinvite(aim_session_t *sess, const char *sn, c
 	aim_bstream_init(&hdrbs, hdr, hdrlen);
 
 	aimbs_put16(&hdrbs, 0x0000); /* Unknown! */
-	aimbs_putraw(&hdrbs, ck, sizeof(ck)); /* I think... */
+	aimbs_putraw(&hdrbs, cookie, sizeof(cookie)); /* I think... */
 	aimbs_putcaps(&hdrbs, AIM_CAPS_CHAT);
 
 	aim_tlvlist_add_16(&itl, 0x000a, 0x0001);
@@ -511,8 +507,7 @@ faim_export int aim_im_sendch2_icon(aim_session_t *sess, const char *sn, const f
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	fu8_t ck[8];
-	int i;
+	fu8_t cookie[8];
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0004)))
 		return -EINVAL;
@@ -520,8 +515,7 @@ faim_export int aim_im_sendch2_icon(aim_session_t *sess, const char *sn, const f
 	if (!sn || !icon || (iconlen <= 0) || (iconlen >= MAXICONLEN))
 		return -EINVAL;
 
-	for (i = 0; i < 8; i++)
-		ck[i] = (fu8_t)rand();
+	aim_icbm_makecookie(cookie);
 
 	if (!(fr = aim_tx_new(sess, conn, AIM_FRAMETYPE_FLAP, 0x02, 10+8+2+1+strlen(sn)+2+2+2+8+16+2+2+2+2+2+2+2+4+4+4+iconlen+strlen(AIM_ICONIDENT)+2+2)))
 		return -ENOMEM;
@@ -530,7 +524,7 @@ faim_export int aim_im_sendch2_icon(aim_session_t *sess, const char *sn, const f
 	aim_putsnac(&fr->data, 0x0004, 0x0006, 0x0000, snacid);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0002, sn);
+	aim_im_puticbm(&fr->data, cookie, 0x0002, sn);
 
 	/*
 	 * TLV t(0005)
@@ -541,7 +535,7 @@ faim_export int aim_im_sendch2_icon(aim_session_t *sess, const char *sn, const f
 	aimbs_put16(&fr->data, 2+8+16+6+4+4+iconlen+4+4+4+strlen(AIM_ICONIDENT));
 
 	aimbs_put16(&fr->data, 0x0000);
-	aimbs_putraw(&fr->data, ck, 8);
+	aimbs_putraw(&fr->data, cookie, 8);
 	aimbs_putcaps(&fr->data, AIM_CAPS_BUDDYICON);
 
 	/* TLV t(000a) */
@@ -592,9 +586,9 @@ faim_export int aim_im_sendch2_rtfmsg(aim_session_t *sess, struct aim_sendrtfmsg
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	fu8_t ck[8];
+	fu8_t cookie[8];
 	const char rtfcap[] = {"{97B12751-243C-4334-AD22-D6ABF73F1492}"}; /* AIM_CAPS_ICQRTF capability in string form */
-	int i, servdatalen;
+	int servdatalen;
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0004)))
 		return -EINVAL;
@@ -604,9 +598,8 @@ faim_export int aim_im_sendch2_rtfmsg(aim_session_t *sess, struct aim_sendrtfmsg
 
 	servdatalen = 2+2+16+2+4+1+2 + 2+2+4+4+4 + 2+4+2+strlen(args->rtfmsg)+1 + 4+4+4+strlen(rtfcap)+1;
 
-	for (i = 0; i < 8; i++)
-		ck[i] = (fu8_t)rand();
-
+	aim_icbm_makecookie(cookie);
+	
 	if (!(fr = aim_tx_new(sess, conn, AIM_FRAMETYPE_FLAP, 0x02, 10+128+servdatalen)))
 		return -ENOMEM;
 
@@ -614,14 +607,14 @@ faim_export int aim_im_sendch2_rtfmsg(aim_session_t *sess, struct aim_sendrtfmsg
 	aim_putsnac(&fr->data, 0x0004, 0x0006, 0x0000, snacid);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0002, args->destsn);
+	aim_im_puticbm(&fr->data, cookie, 0x0002, args->destsn);
 
 	/* TLV t(0005) - Encompasses everything below. */
 	aimbs_put16(&fr->data, 0x0005);
 	aimbs_put16(&fr->data, 2+8+16 + 2+2+2 + 2+2 + 2+2+servdatalen);
 
 	aimbs_put16(&fr->data, 0x0000);
-	aimbs_putraw(&fr->data, ck, 8);
+	aimbs_putraw(&fr->data, cookie, 8);
 	aimbs_putcaps(&fr->data, AIM_CAPS_ICQSERVERRELAY);
 
 	/* t(000a) l(0002) v(0001) */
@@ -654,12 +647,12 @@ faim_export int aim_im_sendch2_rtfmsg(aim_session_t *sess, struct aim_sendrtfmsg
 	aimbs_putle16(&fr->data, 0x0001);
 	aimbs_putle32(&fr->data, 0);
 	aimbs_putle16(&fr->data, strlen(args->rtfmsg)+1);
-	aimbs_putraw(&fr->data, (fu8_t *)args->rtfmsg, strlen(args->rtfmsg)+1);
+	aimbs_putraw(&fr->data, (const fu8_t *)args->rtfmsg, strlen(args->rtfmsg)+1);
 
 	aimbs_putle32(&fr->data, args->fgcolor);
 	aimbs_putle32(&fr->data, args->bgcolor);
 	aimbs_putle32(&fr->data, strlen(rtfcap)+1);
-	aimbs_putraw(&fr->data, (fu8_t *)rtfcap, strlen(rtfcap)+1);
+	aimbs_putraw(&fr->data, (const fu8_t *)rtfcap, strlen(rtfcap)+1);
 
 	aim_tx_enqueue(sess, fr);
 
@@ -670,14 +663,14 @@ faim_export int aim_im_sendch2_rtfmsg(aim_session_t *sess, struct aim_sendrtfmsg
  * Subtype 0x0006 - Send an "I want to directly connect to you" message
  *
  */
-faim_export int aim_im_sendch2_odcrequest(aim_session_t *sess, fu8_t *cookie, fu8_t usecookie, const char *sn, const fu8_t *ip, fu16_t port)
+faim_export int aim_im_sendch2_odcrequest(aim_session_t *sess, fu8_t *usercookie, fu8_t usecookie, const char *sn, const fu8_t *ip, fu16_t port)
 {
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	fu8_t ck[8];
+	fu8_t cookie[8];
 	aim_tlvlist_t *tl = NULL, *itl = NULL;
-	int hdrlen, i;
+	int hdrlen;
 	fu8_t *hdr;
 	aim_bstream_t hdrbs;
 
@@ -700,18 +693,17 @@ faim_export int aim_im_sendch2_odcrequest(aim_session_t *sess, fu8_t *cookie, fu
 	 *
 	 */
 
-	if (cookie && usecookie) /* allow user-specified cookie */
-		memcpy(ck, cookie, 8);
+	if (usercookie && usecookie) /* allow user-specified cookie */
+		memcpy(cookie, usercookie, 8);
 	else
-		for (i = 0; i < 7; i++)
-			ck[i] = 0x30 + ((fu8_t) rand() % 10);
-	ck[7] = '\0';
+		aim_icbm_makecookie(cookie);
+	cookie[7] = '\0';
 
-	if (cookie && !usecookie)
-		memcpy(cookie, ck, 8);
+	if (usercookie && !usecookie)
+		memcpy(cookie, usercookie, 8);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0002, sn);
+	aim_im_puticbm(&fr->data, cookie, 0x0002, sn);
 
 	aim_tlvlist_add_noval(&tl, 0x0003);
 
@@ -720,7 +712,7 @@ faim_export int aim_im_sendch2_odcrequest(aim_session_t *sess, fu8_t *cookie, fu
 	aim_bstream_init(&hdrbs, hdr, hdrlen);
 
 	aimbs_put16(&hdrbs, 0x0000);
-	aimbs_putraw(&hdrbs, ck, 8);
+	aimbs_putraw(&hdrbs, cookie, 8);
 	aimbs_putcaps(&hdrbs, AIM_CAPS_DIRECTIM);
 
 	aim_tlvlist_add_16(&itl, 0x000a, 0x0001);
@@ -753,55 +745,114 @@ faim_export int aim_im_sendch2_sendfile_ask(aim_session_t *sess, struct aim_oft_
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
 	aim_tlvlist_t *tl=NULL, *subtl=NULL;
-	int i;
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0004)) || !oft_info)
 		return -EINVAL;
 
-	/* XXX - Should be like "21CBF95" and null terminated */
-	for (i = 0; i < 7; i++)
-		oft_info->cookie[i] = 0x30 + ((fu8_t)rand() % 10);
-	oft_info->cookie[7] = '\0';
-
+	/* The cookie must already have been generated by this point */
+	
 	{ /* Create the subTLV chain */
 		fu8_t *buf;
 		int buflen;
 		aim_bstream_t bs;
+		fu8_t ip[4];
+		fu8_t ip_comp[4]; /* The bitwise complement of the ip */
+		char *nexttoken;
+		int i;
 
-		aim_tlvlist_add_16(&subtl, 0x000a, 0x0001);
-		aim_tlvlist_add_noval(&subtl, 0x000f);
+		/* In a stage 2 proxied transfer & a transfer redirect, we send a second "reply request"
+		 * Being the second request for this transfer, its request number is 2
+		 * You can fill in the blank for a stage 3's request number... */
+
+		if((oft_info->send_or_recv == AIM_XFER_RECV && oft_info->stage == AIM_XFER_PROXY_STG2)
+			|| (oft_info->send_or_recv == AIM_XFER_RECV
+				&& oft_info->stage == AIM_XFER_PROXY_STG3)
+			|| oft_info->method == AIM_XFER_REDIR)
+			aim_tlvlist_add_16(&subtl, 0x000a, 0x0002);
+		else if(oft_info->send_or_recv == AIM_XFER_SEND && oft_info->stage == AIM_XFER_PROXY_STG3)
+			aim_tlvlist_add_16(&subtl, 0x000a, 0x0003);
+		else
+			aim_tlvlist_add_16(&subtl, 0x000a, 0x0001);
+
+		/* This is usually necessary, but ruins a redirect and a stg3 proxy request */
+		if(!(oft_info->send_or_recv == AIM_XFER_RECV
+			&& (oft_info->method == AIM_XFER_REDIR || oft_info->stage == AIM_XFER_PROXY_STG3))) {
+			aim_tlvlist_add_noval(&subtl, 0x000f);
+		}
+
+		/* If the following is ever enabled, ensure that it is not sent with a receive redirect
+		 * or stage 3 proxy redirect for a file receive (same conditions for sending 0x000f above) */
 /*		aim_tlvlist_add_raw(&subtl, 0x000e, 2, "en");
 		aim_tlvlist_add_raw(&subtl, 0x000d, 8, "us-ascii");
 		aim_tlvlist_add_raw(&subtl, 0x000c, 24, "Please accept this file."); */
 		/* XXX - Change oft_info->clientip to an array of 4 bytes */
 		if (oft_info->clientip) {
-			fu8_t ip[4];
-			char *nexttoken;
-			int i = 0;
+			i = 0;
 			nexttoken = strtok(oft_info->clientip, ".");
 			while (nexttoken && i<4) {
 				ip[i] = atoi(nexttoken);
+				ip_comp[i] = ~ip[i];
 				nexttoken = strtok(NULL, ".");
 				i++;
 			}
+
+			/* If there is no proxyip, we must fill it in with the clientip */
+			if(!oft_info->proxyip) {
+				aim_tlvlist_add_raw(&subtl, 0x0002, 4, ip);
+				aim_tlvlist_add_raw(&subtl, 0x0016, 4, ip_comp); /* check? value */
+			}
+
 			aim_tlvlist_add_raw(&subtl, 0x0003, 4, ip);
 		}
-		aim_tlvlist_add_16(&subtl, 0x0005, oft_info->port);
 
-		/* TLV t(2711) */
-		buflen = 2+2+4+strlen((char *)oft_info->fh.name)+1;
-		buf = malloc(buflen);
-		aim_bstream_init(&bs, buf, buflen);
-		aimbs_put16(&bs, (oft_info->fh.totfiles > 1) ? 0x0002 : 0x0001);
-		aimbs_put16(&bs, oft_info->fh.totfiles);
-		aimbs_put32(&bs, oft_info->fh.totsize);
+		/* Don't send the proxyip & accompanying info during a receive redirect or stg3 proxy request */
+		if(!(oft_info->send_or_recv == AIM_XFER_RECV
+			&& (oft_info->method == AIM_XFER_REDIR || oft_info->stage == AIM_XFER_PROXY_STG3))) {
+			if (oft_info->proxyip) { /* Generate the proxyip */
+				i = 0;
+				nexttoken = strtok(oft_info->proxyip, ".");
+				while (nexttoken && i<4) {
+					ip[i] = atoi(nexttoken);
+					ip_comp[i] = ~ip[i];
+					nexttoken = strtok(NULL, ".");
+					i++;
+				}
 
-		/* Filename - NULL terminated, for some odd reason */
-		aimbs_putstr(&bs, (char *)oft_info->fh.name);
-		aimbs_put8(&bs, 0x00);
+				aim_tlvlist_add_raw(&subtl, 0x0002, 4, ip);
+				/* This zero-length TLV specifies a proxy will be used */
+				aim_tlvlist_add_noval(&subtl, 0x0010);
 
-		aim_tlvlist_add_raw(&subtl, 0x2711, bs.len, bs.data);
-		free(buf);
+				/* Proxied transfers fail without this next (check?) value */
+				aim_tlvlist_add_raw(&subtl, 0x0016, 4, ip_comp);
+			}
+		}
+
+		/* Don't send the port & its check during a stage 3 proxy request */
+		if(!(oft_info->send_or_recv == AIM_XFER_RECV && oft_info->stage == AIM_XFER_PROXY_STG3)) {
+			aim_tlvlist_add_16(&subtl, 0x0005, oft_info->port);
+			/* Check value? Bitwise complement of the port */
+			aim_tlvlist_add_16(&subtl, 0x0017, ~(oft_info->port));
+		}
+
+		/* winAIM gets mad at us if we send too much info during a send redirect or stg3 proxy request */
+		if(!(oft_info->send_or_recv == AIM_XFER_RECV
+			&& (oft_info->method == AIM_XFER_REDIR || oft_info->stage == AIM_XFER_PROXY_STG3))) {
+			/* TLV t(2711) */
+			buflen = 2+2+4+strlen((char *)oft_info->fh.name)+1;
+	
+			buf = malloc(buflen);
+			aim_bstream_init(&bs, buf, buflen);
+			aimbs_put16(&bs, (oft_info->fh.totfiles > 1) ? 0x0002 : 0x0001);
+			aimbs_put16(&bs, oft_info->fh.totfiles);
+			aimbs_put32(&bs, oft_info->fh.totsize);
+
+			/* Filename - NULL terminated, for some odd reason */
+			aimbs_putstr(&bs, (char *)oft_info->fh.name);
+			aimbs_put8(&bs, 0x00);
+
+			aim_tlvlist_add_raw(&subtl, 0x2711, bs.len, bs.data);
+			free(buf);
+		}
 	}
 
 	{ /* Create the main TLV chain */
@@ -924,14 +975,12 @@ faim_export int aim_im_sendch2_geticqaway(aim_session_t *sess, const char *sn, i
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	int i;
-	fu8_t ck[8];
+	fu8_t cookie[8];
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0004)) || !sn)
 		return -EINVAL;
 
-	for (i = 0; i < 8; i++)
-		ck[i] = (fu8_t)rand();
+	aim_icbm_makecookie(cookie);
 
 	if (!(fr = aim_tx_new(sess, conn, AIM_FRAMETYPE_FLAP, 0x02, 10+8+2+1+strlen(sn) + 4+0x5e + 4)))
 		return -ENOMEM;
@@ -940,7 +989,7 @@ faim_export int aim_im_sendch2_geticqaway(aim_session_t *sess, const char *sn, i
 	aim_putsnac(&fr->data, 0x0004, 0x0006, 0x0000, snacid);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0002, sn);
+	aim_im_puticbm(&fr->data, cookie, 0x0002, sn);
 
 	/* TLV t(0005) - Encompasses almost everything below. */
 	aimbs_put16(&fr->data, 0x0005); /* T */
@@ -949,7 +998,7 @@ faim_export int aim_im_sendch2_geticqaway(aim_session_t *sess, const char *sn, i
 		aimbs_put16(&fr->data, 0x0000);
 
 		/* Cookie */
-		aimbs_putraw(&fr->data, ck, 8);
+		aimbs_putraw(&fr->data, cookie, 8);
 
 		/* Put the 16 byte server relay capability */
 		aimbs_putcaps(&fr->data, AIM_CAPS_ICQSERVERRELAY);
@@ -1029,8 +1078,7 @@ faim_export int aim_im_sendch4(aim_session_t *sess, const char *sn, fu16_t type,
 	aim_conn_t *conn;
 	aim_frame_t *fr;
 	aim_snacid_t snacid;
-	int i;
-	fu8_t ck[8];
+	fu8_t cookie[8];
 
 	if (!sess || !(conn = aim_conn_findbygroup(sess, 0x0002)))
 		return -EINVAL;
@@ -1044,12 +1092,10 @@ faim_export int aim_im_sendch4(aim_session_t *sess, const char *sn, fu16_t type,
 	snacid = aim_cachesnac(sess, 0x0004, 0x0006, 0x0000, NULL, 0);
 	aim_putsnac(&fr->data, 0x0004, 0x0006, 0x0000, snacid);
 
-	/* Cookie */
-	for (i=0; i<8; i++)
-		ck[i] = (fu8_t)rand();
+	aim_icbm_makecookie(cookie);
 
 	/* ICBM header */
-	aim_im_puticbm(&fr->data, ck, 0x0004, sn);
+	aim_im_puticbm(&fr->data, cookie, 0x0004, sn);
 
 	/*
 	 * TLV t(0005)
@@ -1069,7 +1115,7 @@ faim_export int aim_im_sendch4(aim_session_t *sess, const char *sn, fu16_t type,
 	 */
 	aimbs_putle16(&fr->data, type);
 	aimbs_putle16(&fr->data, strlen(message)+1);
-	aimbs_putraw(&fr->data, (fu8_t *)message, strlen(message)+1);
+	aimbs_putraw(&fr->data, (const fu8_t *)message, strlen(message)+1);
 
 	/*
 	 * TLV t(0006) l(0000) v()
@@ -1087,7 +1133,7 @@ faim_export int aim_im_sendch4(aim_session_t *sess, const char *sn, fu16_t type,
  */
 static int outgoingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)
 {
-	int i, ret = 0;
+	int ret = 0;
 	aim_rxcallback_t userfunc;
 	fu8_t cookie[8];
 	fu16_t channel;
@@ -1099,9 +1145,7 @@ static int outgoingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 	fu8_t *msg = NULL;
 	aim_tlv_t *msgblock;
 
-	/* ICBM Cookie. */
-	for (i = 0; i < 8; i++)
-		cookie[i] = aimbs_get8(bs);
+	aim_icbm_makecookie(cookie);
 
 	/* Channel ID */
 	channel = aimbs_get16(bs);
@@ -1139,7 +1183,7 @@ static int outgoingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 		flag1 = aimbs_get16(&mbs);
 		flag2 = aimbs_get16(&mbs);
 
-		msg = aimbs_getraw(&mbs, msglen);
+		msg = (fu8_t *) aimbs_getstr(&mbs, msglen);
 	}
 
 	if ((userfunc = aim_callhandler(sess, rx->conn, snac->family, snac->subtype)))
@@ -1729,6 +1773,10 @@ static void incomingim_ch2_sendfile(aim_session_t *sess, aim_module_t *mod, aim_
 		/* There is sometimes more after the null-terminated filename,
 		 * but I'm unsure of its format. */
 		/* I don't believe him. */
+		/* There is sometimes a null byte inside a unicode filename,
+		 * but as far as I can tell the filename is the last
+		 * piece of data that will be in this message. --Jonathan */
+
 	}
 
 	return;
@@ -1843,8 +1891,16 @@ static int incomingim_ch2(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * 0x0002 - "I will accept this file from you"
 	 * 0x0002 - Also used in ICQ Lite Beta 4.0 URLs
 	 */
+	/*
+	 * This is what I call the request number of the file transfer
+	 * 0x0001 - Initial file transfer request for no proxy or stage 1 proxy
+	 * 0x0002 - "Reply request" for a stage 2 proxy (receiver wants to use proxy)
+	 * 0x0003 - A third request has been sent; applies only to stage 3 proxied transfers
+	 * -- Jonathan
+	 */
+
 	if (aim_tlv_gettlv(list2, 0x000a, 1))
-		(void) 0;
+		args.info.sendfile.reqnum = aim_tlv_get16(list2, 0x000a, 1);
 
 	/*
 	 * Error code.
@@ -1878,16 +1934,19 @@ static int incomingim_ch2(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	 * Maybe means we should connect directly to transfer the file?
 	 * Also used in ICQ Lite Beta 4.0 URLs. Also empty.
 	 */
+	/* I don't think this indicates a direct transfer; this flag is
+	 * also present in a stage 1 proxied file send request -- Jonathan */
+
 	if (aim_tlv_gettlv(list2, 0x000f, 1))
 		(void) 0;
 
 	/*
-	 * Unknown -- no value
-	 *
-	 * Maybe means we should proxy the file transfer through an AIM server?
+	 * Flag meaning we should proxy the file transfer through an AIM server
 	 */
 	if (aim_tlv_gettlv(list2, 0x0010, 1))
-		(void) 0;
+		args.info.sendfile.use_proxy = TRUE;
+	else
+		args.info.sendfile.use_proxy = FALSE;
 
 	if (strlen(proxyip))
 		args.proxyip = (char *)proxyip;
@@ -1985,18 +2044,14 @@ static int incomingim_ch4(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
  */
 static int incomingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)
 {
-	int i, ret = 0;
-	fu8_t cookie[8];
+	int ret = 0;
+	fu8_t *cookie;
 	fu16_t channel;
 	aim_userinfo_t userinfo;
 
 	memset(&userinfo, 0x00, sizeof(aim_userinfo_t));
 
-	/*
-	 * Read ICBM Cookie.
-	 */
-	for (i = 0; i < 8; i++)
-		cookie[i] = aimbs_get8(bs);
+	cookie = aimbs_getraw(bs, 8);
 
 	/*
 	 * Channel ID.
@@ -2041,9 +2096,7 @@ static int incomingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 	 * performance reasons (less memory allocation).
 	 */
 	if (channel == 1) {
-
 		ret = incomingim_ch1(sess, mod, rx, snac, channel, &userinfo, bs, cookie);
-
 	} else if (channel == 2) {
 		aim_tlvlist_t *tlvlist;
 
@@ -2069,6 +2122,7 @@ static int incomingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 	}
 
 	aim_info_free(&userinfo);
+	free(cookie);
 
 	return ret;
 }
@@ -2181,9 +2235,10 @@ static int clientautoresp(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 	aim_rxcallback_t userfunc;
 	fu16_t channel, reason;
 	char *sn;
-	fu8_t *ck, snlen;
+	fu8_t *cookie;
+	fu8_t snlen;
 
-	ck = aimbs_getraw(bs, 8);
+	cookie = aimbs_getraw(bs, 8);
 	channel = aimbs_get16(bs);
 	snlen = aimbs_get8(bs);
 	sn = aimbs_getstr(bs, snlen);
@@ -2193,7 +2248,7 @@ static int clientautoresp(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 		aimbs_get16(bs); /* Unknown */
 		aimbs_get16(bs); /* Unknown */
 		if ((userfunc = aim_callhandler(sess, rx->conn, snac->family, snac->subtype)))
-			ret = userfunc(sess, rx, channel, sn, reason, ck);
+			ret = userfunc(sess, rx, channel, sn, reason, cookie);
 	} else if (channel == 0x0004) { /* ICQ message */
 		switch (reason) {
 			case 0x0003: { /* ICQ status message. Maybe other stuff too, you never know with these people. */
@@ -2249,7 +2304,7 @@ static int clientautoresp(aim_session_t *sess, aim_module_t *mod, aim_frame_t *r
 		} /* end switch */
 	}
 
-	free(ck);
+	free(cookie);
 	free(sn);
 
 	return ret;
@@ -2267,11 +2322,11 @@ static int msgack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_m
 {
 	aim_rxcallback_t userfunc;
 	fu16_t ch;
-	fu8_t *ck;
+	fu8_t *cookie;
 	char *sn;
 	int ret = 0;
 
-	ck = aimbs_getraw(bs, 8);
+	cookie = aimbs_getraw(bs, 8);
 	ch = aimbs_get16(bs);
 	sn = aimbs_getstr(bs, aimbs_get8(bs));
 
@@ -2279,16 +2334,13 @@ static int msgack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_m
 		ret = userfunc(sess, rx, ch, sn);
 
 	free(sn);
-	free(ck);
+	free(cookie);
 
 	return ret;
 }
 
 /*
  * Subtype 0x0014 - Send a mini typing notification (mtn) packet.
- *
- * This is supported by winaim5 and newer, MacAIM bleh and newer,
- * iChat bleh and newer, and Gaim 0.60 and newer.
  *
  */
 faim_export int aim_im_sendmtn(aim_session_t *sess, fu16_t type1, const char *sn, fu16_t type2)
@@ -2341,9 +2393,6 @@ faim_export int aim_im_sendmtn(aim_session_t *sess, fu16_t type1, const char *sn
 
 /*
  * Subtype 0x0014 - Receive a mini typing notification (mtn) packet.
- *
- * This is supported by winaim5 and newer, MacAIM bleh and newer,
- * iChat bleh and newer, and Gaim 0.60 and newer.
  *
  */
 static int mtn_receive(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)

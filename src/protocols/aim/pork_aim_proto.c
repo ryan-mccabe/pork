@@ -452,7 +452,8 @@ static int aim_file_send(struct file_transfer *xfer) {
 
 	oft_info = aim_oft_createinfo(&priv->aim_session, NULL,
 				xfer->peer_username, xfer->laddr_ip, xfer->lport,
-				xfer->file_len, 0, xfer->fname_base);
+				xfer->file_len, 0, xfer->fname_base,
+				AIM_XFER_SEND, AIM_XFER_DIRECT, AIM_XFER_PROXY_NONE);
 
 	oft_info->fh.checksum = aim_oft_checksum_file(xfer->fname_local);
 	oft_info->port = xfer->lport;

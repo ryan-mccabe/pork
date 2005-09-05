@@ -10,8 +10,8 @@
 
 /* Stored in the ->internal of chat connections */
 struct chatconnpriv {
-	char *name;
 	fu16_t exchange;
+	char *name;
 	fu16_t instance;
 };
 
@@ -76,8 +76,8 @@ faim_export int aim_chat_attachname(aim_conn_t *conn, fu16_t exchange, const cha
 	if (!(ccp = malloc(sizeof(struct chatconnpriv))))
 		return -ENOMEM;
 
-	ccp->name = strdup(roomname);
 	ccp->exchange = exchange;
+	ccp->name = strdup(roomname);
 	ccp->instance = instance;
 
 	conn->internal = (void *)ccp;
@@ -92,9 +92,9 @@ faim_internal int aim_chat_readroominfo(aim_bstream_t *bs, struct aim_chat_roomi
 	if (!bs || !outinfo)
 		return 0;
 
+	outinfo->exchange = aimbs_get16(bs);
 	namelen = aimbs_get8(bs);
 	outinfo->name = aimbs_getstr(bs, namelen);
-	outinfo->exchange = aimbs_get16(bs);
 	outinfo->instance = aimbs_get16(bs);
 
 	return 0;

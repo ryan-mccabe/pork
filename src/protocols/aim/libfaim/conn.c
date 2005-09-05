@@ -437,7 +437,6 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 }
 
 /**
- * Allocate and return connection
  *
  * @param sess Session to create connection in
  * @param type Type of connection to create
