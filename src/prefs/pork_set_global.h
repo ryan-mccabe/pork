@@ -86,6 +86,7 @@ enum {
 	OPT_TEXT_BUDDY_ACTIVE,
 	OPT_TEXT_BUDDY_AWAY,
 	OPT_TEXT_BUDDY_IDLE,
+	OPT_TEXT_BUDDY_WIRELESS,
 	OPT_TEXT_NO_NAME,
 	OPT_TEXT_NO_ROOM,
 	OPT_TEXT_TYPING,
@@ -165,6 +166,7 @@ enum {
 #define	DEFAULT_TEXT_BUDDY_ACTIVE			"%G*%x"
 #define DEFAULT_TEXT_BUDDY_AWAY				"%r*%x"
 #define DEFAULT_TEXT_BUDDY_IDLE				"%Y*%x"
+#define DEFAULT_TEXT_BUDDY_WIRELESS			"%b*%x"
 #define DEFAULT_TEXT_NO_NAME				"<not specified>"
 #define DEFAULT_TEXT_NO_ROOM				":(not joined)"
 #define DEFAULT_TEXT_TYPING					"Typing"

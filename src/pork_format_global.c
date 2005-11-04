@@ -918,6 +918,8 @@ static int format_blist_buddy_label(char opt, char *buf, size_t len, va_list ap)
 				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_AWAY);
 			else if (buddy->status == STATUS_IDLE)
 				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_IDLE);
+			else if (buddy->status == STATUS_WIRELESS)
+				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_WIRELESS);
 			else
 				status_text = "%p?%x";
 

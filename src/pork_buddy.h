@@ -14,7 +14,8 @@ enum {
 	STATUS_OFFLINE,
 	STATUS_ACTIVE,
 	STATUS_IDLE,
-	STATUS_AWAY
+	STATUS_AWAY,
+	STATUS_WIRELESS
 };
 
 struct pork_acct;
@@ -48,10 +49,10 @@ struct buddy {
 	u_int32_t signon_time;
 	u_int32_t idle_time;
 	u_int32_t warn_level;
-	u_int32_t status:2;
+	u_int32_t status:4;
+	u_int32_t type:4;
 	u_int32_t notify:1;
 	u_int32_t ignore:1;
-	u_int32_t type:4;
 	u_int32_t last_seen;
 	dlist_t *blist_line;
 };

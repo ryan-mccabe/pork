@@ -157,13 +157,14 @@ static int aim_update_buddy(struct pork_acct *acct __notused,
 	if (userinfo->present & AIM_USERINFO_PRESENT_SESSIONLEN)
 		buddy->idle_time = userinfo->idletime;
 
-	buddy->status = STATUS_ACTIVE;
-
-	if (buddy->idle_time > 0)
-		buddy->status = STATUS_IDLE;
-
-	if (userinfo->flags & AIM_FLAG_AWAY)
+	if (userinfo->flags & AIM_FLAG_WIRELESS)
+		buddy->status = STATUS_WIRELESS;
+	else if (userinfo->flags & AIM_FLAG_AWAY)
 		buddy->status = STATUS_AWAY;
+	else if (buddy->idle_time > 0)
+		buddy->status = STATUS_IDLE;
+	else
+		buddy->status = STATUS_ACTIVE;
 
 	return (0);
 }
