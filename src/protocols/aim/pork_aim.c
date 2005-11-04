@@ -23,7 +23,6 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include <libfaim/faimconfig.h>
 #include <libfaim/aim.h>
 
 #include <pork.h>
@@ -116,7 +115,7 @@ int aim_sock_connect(	const char *ip,
 	struct sockaddr_storage ss;
 	char *addr;
 	char *port;
-	in_port_t port_num = FAIM_LOGIN_PORT;
+	in_port_t port_num;
 
 	port = getenv("AIM_PORT");
 	if (port != NULL) {
@@ -474,7 +473,7 @@ int aim_login(struct pork_acct *acct) {
 
 	server = getenv("AIM_SERVER");
 	if (server == NULL)
-		server = FAIM_LOGIN_SERVER;
+		server = opt_get_str(acct->proto_prefs, AIM_OPT_SERVER);
 
 	acct->connected = 0;
 	screen_win_msg(cur_window(), 1, 1, 0,

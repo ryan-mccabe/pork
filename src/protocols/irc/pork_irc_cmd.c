@@ -92,6 +92,10 @@ USER_COMMAND(irc_cmd_whowas) {
 		irc_whowas(acct, args);
 }
 
+/* This needs to save either user preferences or defaults, or both. */
+USER_COMMAND(irc_cmd_save) {
+}
+
 USER_COMMAND(FIXME) {
 	screen_err_msg("This command is not implemented yet.");
 }
@@ -123,7 +127,7 @@ static struct command irc_command[] = {
 	{ "quote",				irc_cmd_quote	},
 	{ "rehash",				FIXME			},
 	{ "restart",			FIXME			},
-	{ "save",				FIXME			},
+	{ "save",				irc_cmd_save	},
 	{ "server",				FIXME			},
 	{ "set",				irc_cmd_set		},
 	{ "sete",				FIXME			},

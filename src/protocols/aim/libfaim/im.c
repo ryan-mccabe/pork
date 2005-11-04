@@ -52,6 +52,11 @@ static int aim_im_puticbm(aim_bstream_t *bs, const fu8_t *c, fu16_t channel, con
 	return 8+2+1+strlen(sn);
 }
 
+/*
+ * Extracted from aim_im_sendch2_sendfile_ask
+ * Generates a random ICBM cookie in a character array of length 8
+ * and copies it into the variable passed as cookie
+ */
 faim_export void aim_icbm_makecookie(fu8_t *cookie)
 {
 	int i;
@@ -2051,6 +2056,9 @@ static int incomingim(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, a
 
 	memset(&userinfo, 0x00, sizeof(aim_userinfo_t));
 
+	/*
+	 * Read ICBM Cookie.
+	 */
 	cookie = aimbs_getraw(bs, 8);
 
 	/*

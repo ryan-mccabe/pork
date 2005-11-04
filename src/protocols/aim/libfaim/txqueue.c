@@ -8,12 +8,6 @@
 #define FAIM_INTERNAL
 #include <aim.h>
 
-#ifndef _WIN32
-#include <sys/socket.h>
-#else
-#include "win32dep.h"
-#endif
-
 /*
  * Allocate a new tx frame.
  *

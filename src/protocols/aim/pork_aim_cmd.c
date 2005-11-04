@@ -38,7 +38,6 @@
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
-#include <libfaim/faimconfig.h>
 #include <libfaim/aim.h>
 
 #include <pork_aim.h>

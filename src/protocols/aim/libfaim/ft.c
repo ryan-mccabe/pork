@@ -534,8 +534,12 @@ faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, in
  *
  * This is a wrapper for aim_newconn.
  *
- * @param sess The Godly session.
- * @param sn The screen name we're connecting to. I hope it's a girl...
+ * If addr is NULL, the socket is not created, but the connection is 
+ * allocated and setup to connect.
+ *
+ * @param sess The session.
+ * @param sn The screen name we're connecting to.
+ * @param addr Address to connect to.
  * @return The new connection.
  */
 faim_export aim_conn_t *aim_odc_connect(aim_session_t *sess, const char *sn, const char *addr, const fu8_t *cookie)
@@ -926,9 +930,20 @@ faim_export int aim_oft_sendheader(aim_session_t *sess, fu16_t type, struct aim_
 	return 0;
 }
 
+/**
+ * Create a rendezvous "init recv" packet and send it on its merry way.
+ * This is the first packet sent to the proxy server by the second client
+ * involved in this rendezvous proxy session.
+ *
+ * @param sess The session.
+ * @param proxy_info Changable pieces of data for this packet
+ * @return Return 0 if no errors, otherwise return the error number.
+ */
 faim_export int aim_rv_proxy_init_recv(struct aim_rv_proxy_info *proxy_info)
 {
-	//aim_tlvlist_t *tlvlist_sendfile;
+#if 0
+	aim_tlvlist_t *tlvlist_sendfile;
+#endif
 	aim_bstream_t bs;
 	fu8_t *bs_raw;
 	fu16_t packet_len;
@@ -967,24 +982,39 @@ faim_export int aim_rv_proxy_init_recv(struct aim_rv_proxy_info *proxy_info)
 	aimbs_put16(&bs, 16);			/* Length */
 	aimbs_putcaps(&bs, AIM_CAPS_SENDFILE); /* Value */
 
-	// TODO: Use built-in TLV 
-	//aim_tlvlist_add_caps(&tlvlist_sendfile, 0x0001, AIM_CAPS_SENDFILE);
-	//aim_tlvlist_write(&bs, &tlvlist_sendfile);
+	/* TODO: Use built-in TLV */
+#if 0
+	aim_tlvlist_add_caps(&tlvlist_sendfile, 0x0001, AIM_CAPS_SENDFILE);
+	aim_tlvlist_write(&bs, &tlvlist_sendfile);
+#endif
 
 	aim_bstream_rewind(&bs);
 	if (aim_bstream_send(&bs, proxy_info->conn, packet_len) != packet_len)
 		err = errno;
 	proxy_info->conn->lastactivity = time(NULL);
 
-	//aim_tlvlist_free(tlvlist_sendfile);
+#if 0
+	aim_tlvlist_free(tlvlist_sendfile);
+#endif
 	free(bs_raw);
 
 	return err;
 }
 
+/**
+ * Create a rendezvous "init send" packet and send it on its merry way.
+ * This is the first packet sent to the proxy server by the client
+ * first indicating that this will be a proxied connection
+ *
+ * @param sess The session.
+ * @param proxy_info Changable pieces of data for this packet
+ * @return Return 0 if no errors, otherwise return the error number.
+ */
 faim_export int aim_rv_proxy_init_send(struct aim_rv_proxy_info *proxy_info)
 {
-	//aim_tlvlist_t *tlvlist_sendfile;
+#if 0
+	aim_tlvlist_t *tlvlist_sendfile;
+#endif
 	aim_bstream_t bs;
 	fu8_t *bs_raw;
 	fu16_t packet_len;
@@ -1021,16 +1051,20 @@ faim_export int aim_rv_proxy_init_send(struct aim_rv_proxy_info *proxy_info)
 	aimbs_put16(&bs, 16);			/* Length */
 	aimbs_putcaps(&bs, AIM_CAPS_SENDFILE); /* Value */
 
-	// TODO: Use built-in TLV
-	//aim_tlvlist_add_caps(&tlvlist_sendfile, 0x0001, AIM_CAPS_SENDFILE);
-	//aim_tlvlist_write(&bs, &tlvlist_sendfile);
+	/* TODO: Use built-in TLV */
+#if 0
+	aim_tlvlist_add_caps(&tlvlist_sendfile, 0x0001, AIM_CAPS_SENDFILE);
+	aim_tlvlist_write(&bs, &tlvlist_sendfile);
+#endif
 
 	aim_bstream_rewind(&bs);
 	if (aim_bstream_send(&bs, proxy_info->conn, packet_len) != packet_len)
 		err = errno;
 	proxy_info->conn->lastactivity = time(NULL);
 
-	//aim_tlvlist_free(tlvlist_sendfile);
+#if 0
+	aim_tlvlist_free(tlvlist_sendfile);
+#endif
 	free(bs_raw);
 
 	return err;
@@ -1074,6 +1108,15 @@ faim_internal int aim_rxdispatch_rendezvous(aim_session_t *sess, aim_frame_t *fr
 	return ret;
 }
 
+/**
+ * Handle incoming data on a rendezvous proxy connection.  This is similar to
+ * aim_rxdispatch_rendezvous above and should probably be kept with that function.
+ *
+ * @param sess The session.
+ * @param fr The frame allocated for the incoming data.
+ * @return Return 0 if the packet was handled correctly, otherwise return the 
+ *			error number.
+ */
 faim_internal struct aim_rv_proxy_info *aim_rv_proxy_read(aim_session_t *sess, aim_conn_t *conn)
 {
 	aim_bstream_t bs_hdr;

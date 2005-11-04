@@ -48,5 +48,4 @@ noinst_HEADERS = \
 	aim.h \
 	aim_cbtypes.h \
 	aim_internal.h \
-	faimconfig.h \
 	md5.h

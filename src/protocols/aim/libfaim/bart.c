@@ -46,6 +46,8 @@ faim_export int aim_bart_upload(aim_session_t *sess, const fu8_t *icon, fu16_t i
 
 /**
  * Subtype 0x0003 - Acknowledgement for uploading a buddy icon.
+ *
+ * You get this after you upload a buddy icon.
  */
 static int uploadack(aim_session_t *sess, aim_module_t *mod, aim_frame_t *rx, aim_modsnac_t *snac, aim_bstream_t *bs)
 {

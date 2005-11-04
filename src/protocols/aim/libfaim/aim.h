@@ -6,7 +6,6 @@
 #ifndef __AIM_H__
 #define __AIM_H__
 
-#include "faimconfig.h"
 #include "aim_cbtypes.h"
 
 #include <stdio.h>
@@ -32,7 +31,6 @@
 extern "C" {
 #endif
 
-/* XXX adjust these based on autoconf-detected platform */
 typedef unsigned char fu8_t;
 typedef unsigned short fu16_t;
 typedef unsigned int fu32_t;
@@ -44,6 +42,8 @@ typedef fu16_t flap_seqnum_t;
 #if defined(_WIN32) && !defined(WIN32_STATIC)
 /*
  * For a win32 DLL, we define WIN32_INDLL if this file
+ * is included while compiling the DLL. If it's not
+ * defined (it's included in a client app), the symbols
  * will be imported instead of exported.
  */
 #ifdef WIN32_INDLL
@@ -290,7 +290,8 @@ struct client_info_s {
 #define AIM_CONN_TYPE_RENDEZVOUS		0xfffe /* these do not speak FLAP! */
 #define AIM_CONN_TYPE_LISTENER			0xffff /* socket waiting for accept() */
 
-/* Command types for doing a rendezvous proxy login */
+/* Command types for doing a rendezvous proxy login
+ * Thanks to Keith Lea and the Joust project for documenting these commands well */
 #define AIM_RV_PROXY_PACKETVER_DFLT		0x044a
 #define AIM_RV_PROXY_ERROR				0x0001
 #define AIM_RV_PROXY_INIT_SEND			0x0002 /* First command sent when creating a connection */
@@ -313,16 +314,21 @@ struct client_info_s {
 #define AIM_RV_PROXY_SERVER_URL		"ars.oscar.aol.com"
 #define AIM_RV_PROXY_CONNECT_PORT	5190	/* The port we should always connect to */
 
-/* What is the purpose of this transfer? (Who will end up with a new file?) */
+/* What is the purpose of this transfer? (Who will end up with a new file?)
+ * These values are used in oft_info->send_or_recv */
 #define AIM_XFER_SEND			0x0001
 #define AIM_XFER_RECV			0x0002
 
-/* Via what method is the data getting routed? */
+/* Via what method is the data getting routed?
+ * These values are used in oft_info->method */
 #define AIM_XFER_DIRECT			0x0001 /* Direct connection; receiver connects to sender */
 #define AIM_XFER_REDIR			0x0002 /* Redirected connection; sender connects to receiver */
 #define AIM_XFER_PROXY			0x0003 /* Proxied connection */
 
-/* Who requested the proxy? */
+/* Who requested the proxy?
+ * The difference between a stage 2 and stage 3 proxied transfer is that the receiver does the
+ * initial login for a stage 2, but the sender must do it for a stage 3.
+ * These values are used in oft_info->stage */
 #define AIM_XFER_PROXY_NONE		0x0001
 #define AIM_XFER_PROXY_STG1		0x0002 /* Sender requested a proxy be used (stage1) */
 #define AIM_XFER_PROXY_STG2		0x0003 /* Receiver requested a proxy be used (stage2) */
@@ -909,6 +915,7 @@ struct aim_incomingim_ch4_args {
 /* 0x0008 */ faim_export int aim_im_warn(aim_session_t *sess, aim_conn_t *conn, const char *destsn, fu32_t flags);
 /* 0x000b */ faim_export int aim_im_denytransfer(aim_session_t *sess, const char *sender, const fu8_t *cookie, fu16_t code);
 /* 0x0014 */ faim_export int aim_im_sendmtn(aim_session_t *sess, fu16_t type1, const char *sn, fu16_t type2);
+
 faim_export void aim_icbm_makecookie(fu8_t * cookie);
 
 
@@ -974,7 +981,7 @@ struct aim_oft_info {
 	int method; /* What method is being used to transfer this file? DIRECT, REDIR, or PROXY */
 	int stage; /* At what stage was a proxy requested? NONE, STG1, STG2*/
 	int xfer_reffed; /* There are many timers, but we should only ref the xfer once */
-	fu32_t res_bytes; /* The bytes already received for resuming a transfer */  
+	fu32_t res_bytes; /* The bytes already received for resuming a transfer */
 	aim_conn_t *conn;
 	aim_session_t *sess;
 	int success; /* Was the connection successful? Used for timing out the transfer. */
@@ -1401,7 +1408,6 @@ faim_export int aim_icq_getalias(aim_session_t *sess, const char *uin);
 faim_export int aim_icq_getallinfo(aim_session_t *sess, const char *uin);
 faim_export int aim_icq_sendxmlreq(aim_session_t *sess, const char *xml);
 faim_export int aim_icq_sendsms(aim_session_t *sess, const char *name, const char *msg, const char *alias);
-
 
 /* 0x0017 - auth.c */
 faim_export int aim_sendcookie(aim_session_t *, aim_conn_t *, const fu16_t length, const fu8_t *);

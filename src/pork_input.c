@@ -27,6 +27,7 @@
 #include <pork_set.h>
 #include <pork_input_set.h>
 #include <pork_cstr.h>
+#include <pork_command.h>
 #include <pork_input.h>
 
 static inline void input_free(void *param __notused, void *data);
@@ -583,7 +584,8 @@ int input_set_buf(struct pork_input *input, char *str) {
 }
 
 /*
-** Send the input string provided, or the current input buffer, if no string is provided.
+** Send the input string provided, or the current
+** input buffer, if no string is provided.
 */
 
 int input_send(struct pork_acct *acct, struct pork_input *input, char *args) {

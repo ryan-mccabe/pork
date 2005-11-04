@@ -437,6 +437,10 @@ faim_internal aim_conn_t *aim_cloneconn(aim_session_t *sess, aim_conn_t *src)
 }
 
 /**
+ * Opens a new connection to the specified dest host of specified
+ * type, using the proxy settings if available. If @host is %NULL,
+ * the connection is allocated and returned, but no connection
+ * is made.
  *
  * @param sess Session to create connection in
  * @param type Type of connection to create

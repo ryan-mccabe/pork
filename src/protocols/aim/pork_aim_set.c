@@ -29,8 +29,6 @@
 #include <pork_aim_set.h>
 #include <pork_proto.h>
 
-#include <libfaim/faimconfig.h>
-
 static const struct pork_pref aim_pref_list[] = {
 	{	.name = "AUTOSAVE",
 		.type = OPT_TYPE_BOOL,
@@ -72,8 +70,8 @@ static const struct pork_pref aim_pref_list[] = {
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
 	},{	.name = "PORT",
-		.type = OPT_TYPE_STR,
-		.set = opt_set_str
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int
 	},{	.name = "SERVER",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str
@@ -100,7 +98,7 @@ static pref_val_t aim_default_pref_vals[] = {
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR,
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR,
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE,
-	},{	.pref_val.s = DEFAULT_AIM_PORT,
+	},{	.pref_val.i = DEFAULT_AIM_PORT,
 	},{	.pref_val.s = DEFAULT_AIM_SERVER,
 	}
 };

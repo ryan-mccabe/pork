@@ -45,8 +45,8 @@ enum {
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR	"#ffffff"
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR	"#000000"
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE		""
-#define DEFAULT_AIM_PORT						FAIM_LOGIN_SERVER
-#define DEFAULT_AIM_SERVER						"80"
+#define DEFAULT_AIM_PORT						5190
+#define DEFAULT_AIM_SERVER						"login.oscar.aol.com"
 
 #else
 #	warning "included multiple times"
