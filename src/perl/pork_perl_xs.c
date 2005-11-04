@@ -91,7 +91,7 @@ XS(PORK_connect) {
 	cmd_connect(cur_window()->owner, username);
 	XSRETURN_IV(0);
 	*/
-	
+
 	XSRETURN_IV(-1);
 }
 

@@ -1,12 +1,12 @@
 To log into AIM, type /connect <username>, where <username> is your AIM
-screen name.  If you don't have an AIM screen name, you can get one
+screen name. If you don't have an AIM screen name, you can get one
 at http://aim.aol.com.
 
 When you're inside the client, type /help to find out what commands are
-supported.  Type /help <command> to get help on a particular command.
+supported. Type /help <command> to get help on a particular command.
 
-Below are the default key bindings.  All keys can have their bindings
-changed or removed completely.  Enter the commands '/help bind' and
+Below are the default key bindings. All keys can have their bindings
+changed or removed completely. Enter the commands '/help bind' and
 '/help keys' for more information.
 
 Default main key bindings:
@@ -43,8 +43,8 @@ PAGE DOWN		Move the buddy list cursor one page down.
 UP ARROW		Move the buddy list cursor up.
 DOWN ARROW		Move the buddy list cursor down.
 ENTER			Collapse the group the cursor is on, or if the cursor is on a
-                user, open a conversation window with that user (or go to the
-                conversation window, if one already exists).
+				user, open a conversation window with that user (or go to the
+				conversation window, if one already exists).
 TAB				Switch to main input focus.
 CTRL+L			Refresh the buddy list display.
 META+p			Remove the user the cursor is on from the permit list.

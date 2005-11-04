@@ -534,7 +534,7 @@ faim_export aim_conn_t *aim_odc_initiate(aim_session_t *sess, const char *sn, in
  *
  * This is a wrapper for aim_newconn.
  *
- * If addr is NULL, the socket is not created, but the connection is 
+ * If addr is NULL, the socket is not created, but the connection is
  * allocated and setup to connect.
  *
  * @param sess The session.
@@ -949,9 +949,9 @@ faim_export int aim_rv_proxy_init_recv(struct aim_rv_proxy_info *proxy_info)
 	fu16_t packet_len;
 	fu8_t sn_len;
 	int err;
-	
+
 	err = 0;
-	
+
 	if (!proxy_info)
 		return -EINVAL;
 
@@ -1109,12 +1109,12 @@ faim_internal int aim_rxdispatch_rendezvous(aim_session_t *sess, aim_frame_t *fr
 }
 
 /**
- * Handle incoming data on a rendezvous proxy connection.  This is similar to
+ * Handle incoming data on a rendezvous proxy connection. This is similar to
  * aim_rxdispatch_rendezvous above and should probably be kept with that function.
  *
  * @param sess The session.
  * @param fr The frame allocated for the incoming data.
- * @return Return 0 if the packet was handled correctly, otherwise return the 
+ * @return Return 0 if the packet was handled correctly, otherwise return the
  *			error number.
  */
 faim_internal struct aim_rv_proxy_info *aim_rv_proxy_read(aim_session_t *sess, aim_conn_t *conn)
@@ -1124,13 +1124,13 @@ faim_internal struct aim_rv_proxy_info *aim_rv_proxy_read(aim_session_t *sess, a
 	aim_bstream_t bs_body; /* The body (everything but the header) of the packet */
 	fu8_t *body_buf = NULL;
 	fu8_t body_len;
-	
+
 	char str_ip[30] = {""};
 	fu8_t ip_temp[4];
-	
+
 	fu16_t len;
 	struct aim_rv_proxy_info *proxy_info;
-	
+
 	if(!(proxy_info = malloc(sizeof(struct aim_rv_proxy_info))))
 		return NULL;
 
@@ -1192,7 +1192,7 @@ faim_internal struct aim_rv_proxy_info *aim_rv_proxy_read(aim_session_t *sess, a
 			}
 		} else {
 			faimdprintf(sess, 0, "faim: unknown type for aim rendezvous proxy packet\n");
-		}	
+		}
 	} else {
 		faimdprintf(sess, 0, "faim: error reading header of rv proxy packet\n");
 		aim_conn_close(conn);

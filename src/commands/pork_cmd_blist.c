@@ -133,7 +133,7 @@ USER_COMMAND(cmd_blist_goto) {
 		cell = blist_get_cursor(blist);
 		if (cell == NULL || cell->type == TYPE_LIST_CELL || cell->data == NULL)
 			return;
-			
+
 		buddy = cell->data;
 		target = buddy->nname;
 	}

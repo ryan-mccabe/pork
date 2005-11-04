@@ -4,17 +4,17 @@ As of 0.99
 The future. Maybe
 ------------------
 
-- The perl stuff needs to be rewritten (in XS instead of straight C).
-    - Allow expanding perl variables on the input line (maybe with /eval).
+The perl stuff needs to be rewritten (in XS instead of straight C).
+	- Allow expanding perl variables on the input line (maybe with /eval).
 
-- Support making perl and IM protocols loadable plugins (or at least add
-  a configure option to allow them to be compiled that way, if desired).
+Support making perl and IM protocols loadable plugins (or at least add
+a configure option to allow them to be compiled that way, if desired).
 
 ----------------------------------------
 The stuff I really don't feel like doing
 ----------------------------------------
 
-- The documentation is in pretty rough shape. I'd rather write code
-  than documentation, though, so.. I know nobody likes writing
-  documentation, but I'd really be thrilled if someone were willing
-  to do some work on this. Thrilled. Seriously.
+The documentation is in pretty rough shape. I'd rather write code
+than documentation, though, so.. I know nobody likes writing
+documentation, but I'd really be thrilled if someone were willing
+to do some work on this. Thrilled. Seriously.

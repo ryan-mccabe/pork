@@ -34,8 +34,8 @@ GETTING STARTED
 If you've never used pork, you should probably read the 'QUICK_START'
 document. Even if you have used it, it might be useful.
 
-A sample buddy list is provided in the 'examples' directory.  You can
-edit it and copy it to ~/.pork/<screenname>/buddy_list to use it.  Note
+A sample buddy list is provided in the 'examples' directory. You can
+edit it and copy it to ~/.pork/<screenname>/buddy_list to use it. Note
 that any alphabetic characters in <screenname> must be lowercase and
 that there should be no space characters in <screenname>.
 

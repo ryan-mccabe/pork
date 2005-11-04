@@ -8,18 +8,18 @@ Please follow the style of coding used throughout the program.
 
 Below I attempt to explain what that style is, but I'm sure
 there will be a lot of questions that aren't answered by this document.
-Look at the source to answer those questions.  If you're using some
+Look at the source to answer those questions. If you're using some
 bizarre construction that's not used at all in the source, I probably
 wouldn't have used it.
 
-This document isn't an exposition of how one ought to write C code.  It's an
-explanation of how I write C code.  I like it when the source code for
-my programs is consistent.  If it makes you want to barf, fine, but if you're
+This document isn't an exposition of how one ought to write C code. It's an
+explanation of how I write C code. I like it when the source code for
+my programs is consistent. If it makes you want to barf, fine, but if you're
 submitting patches for this program, please follow the guidelines.
 
 If you send me patches in some wildly different style (especially that
 wretched GNU indenting style), unless it's a really great patch, I'll
-probably ignore it.  Even if it's a really great patch, I might ignore it.
+probably ignore it. Even if it's a really great patch, I might ignore it.
 
 I know this is all very pedantic, but I think keeping the code looking
 consistent is valuable: it makes for code that's easier to read and maintain.
@@ -36,10 +36,10 @@ Tabs should be tabs, not spaces (i.e., do not expand tabs).
 SPACING AND LINE LENGTH
 --------------------------------------------------------------------------------
 
-Lines shouldn't be longer than 80 characters if it can be avoided.  Sometimes
-it can't.  That's fine.
+Lines shouldn't be longer than 80 characters if it can be avoided. Sometimes
+it can't. That's fine.
 
-Spacing should be employed generously.  It makes code easier to read.
+Spacing should be employed generously. It makes code easier to read.
 
 Insert spaces after all punctuation (i.e., after ',', before and after ';' in
 for statements, before and after '=' and comparison operators).
@@ -50,7 +50,7 @@ For example:
 	if (variable <= 10)
 	for (i = 0 ; i < 100 ; i++)
 
-Insert spaces before and after built-in operators.  For example;
+Insert spaces before and after built-in operators. For example;
 	int i = j + 5;
 	function(i % 5, param2);
 
@@ -58,11 +58,11 @@ Insert spaces before and after built-in operators.  For example;
 VARIABLES
 --------------------------------------------------------------------------------
 
-No variables named as such: 'thisIsItsName'.  Call it 'this_is_its_name'
+No variables named as such: 'thisIsItsName'. Call it 'this_is_its_name'
 instead.
 
-No variables having names that begin with "my".  For example, 'my_value'.
-Please try to declare meaningful variable names.  Try to make variables' names
+No variables having names that begin with "my". For example, 'my_value'.
+Please try to declare meaningful variable names. Try to make variables' names
 descriptive of their functional role.
 
 When declaring variables, declare one variable per line; don't write:
@@ -75,7 +75,7 @@ instead write:
 
 Declare variables in the innermost scope possible.
 
-In a block, after variable declarations, insert a blank line.  For example,
+In a block, after variable declarations, insert a blank line. For example,
 ... {
 	int i;
 	int j;
@@ -133,7 +133,7 @@ static inline add_numbers(	int param1,
 {
 }
 
-Note the spacing after each parameter.  I don't like things like:
+Note the spacing after each parameter. I don't like things like:
 
 static int add_numbers(int param1,int param2)
 
@@ -143,7 +143,7 @@ Declare functions static unless there's a reason not to.
 KEYWORDS:
 --------------------------------------------------------------------------------
 
-Please write keywords as follows: keyword (expression).  Note the spacing.
+Please write keywords as follows: keyword (expression). Note the spacing.
 
 For example,
 
@@ -179,7 +179,7 @@ For example:
 			arg1, arg2);
 	}
 
-The same goes for things like nested for or while loops.  For example:
+The same goes for things like nested for or while loops. For example:
 
 	for (i = 0 ; i < 100 ; i++) {
 		for (j = 0 ; j < 100 ; j++)
@@ -190,7 +190,7 @@ The same goes for things like nested for or while loops.  For example:
 THE TERNARY OPERATOR, "?:"
 --------------------------------------------------------------------------------
 
-Please don't use this operator gratuitously.  Use it only in places such that
+Please don't use this operator gratuitously. Use it only in places such that
 not using it would force you to declare a new variable to hold a temporary
 value.
 
@@ -222,11 +222,11 @@ COMPARISONS
 
 When you're checking whether a pointer is or isn't NULL, please write
 
-	if (pointer == NULL)  or if (pointer != NULL)
+	if (pointer == NULL) or if (pointer != NULL)
 
 instead of
 
-	if (!pointer)         or if (pointer)
+	if (!pointer) or if (pointer)
 
 If you're checking whether an integer value is equal to zero, please use
 
@@ -236,7 +236,7 @@ instead of
 
 	if (!integer_val)
 
-The same goes for character values.  If you testing whether a character is
+The same goes for character values. If you testing whether a character is
 equal to ascii 0, write:
 
 	if (char == '\0')
@@ -338,14 +338,14 @@ If you want an 8-bit integer, use int8_t, and u_int8_t for an unsigned
 int16_t for 16-bit integers, u_int16_t for unsigned 16-bit integers. (not short)
 int64_t for 64-bit integers, u_int64_t for unsigned 64-bit integers. (not long)
 
-u_int32_t for unsigned 32-bit integers.  I'm ok with 'int' for general stuff.
-	- If it really matters that it be a 32-bit value and not something else,
-      use 'int32_t'.
+u_int32_t for unsigned 32-bit integers. I'm ok with 'int' for general stuff.
+	- 	If it really matters that it be a 32-bit value and not
+		something else, use 'int32_t'.
 
 The char type is fine when you're dealing with ASCII character values
 and strings.
 
-In general, don't hide types behind typedefs.  I know the above seems to
+In general, don't hide types behind typedefs. I know the above seems to
 contradict this, but I think, for example, 'int16_t' is more descriptive
 of what kind of values the variable can hold than, for example, 'short'.
 This is especially true as it relates to the 'long' type, which will be a
@@ -357,7 +357,7 @@ I break this rule myself in a few places, but in general, I try to follow it.
 SAFETY (SECURITY)
 --------------------------------------------------------------------------------
 
-In this program, never use sprintf.  Always use snprintf instead. And
+In this program, never use sprintf. Always use snprintf instead. And
 check its return value. If it's less than 0 or greater than or equal
 to the size of the space it's writing to, there's an error.
 
@@ -367,20 +367,20 @@ Never use str(n?)cat, use xstrncat instead. And check its return value.
 No exceptions.
 
 Don't improperly use format strings in functions that take a variable number
-of arguments.  In particular, never do things like:
+of arguments. In particular, never do things like:
 
 	char buffer[size];
 
 	fill_buffer(buffer, sizeof(buffer));
 	*printf(buffer);
 
-The above is wrong and leads to security problems.  Do:
+The above is wrong and leads to security problems. Do:
 	char buffer[size];
 
 	fill_buffer(buffer, sizeof(buffer));
 	*printf("%s", buffer);
 
 These are just two of classes of sources of errors that tend to become
-security problems.  If I notice you making mistakes like these (or making
+security problems. If I notice you making mistakes like these (or making
 other mistakes that could lead to security holes), I'll delete your patch
 right off.

@@ -136,7 +136,7 @@ sub acro_im_handler {
 
 					$players[$num_players++] = \$players_round{$user};
 					PORK::send_msg($user,
-						"Your acro is set to: $acro.  You are player number $num_players.");
+						"Your acro is set to: $acro. You are player number $num_players.");
 				}
 			} else {
 				PORK::send_msg($user, "Invalid acro: $acro.");
@@ -263,7 +263,7 @@ sub acro_timeup_vote {
 	my @standings;
 
 	PORK::chat_send($chatroom,
-		"[acro] TIME UP!  Results for $cur_round_num");
+		"[acro] TIME UP! Results for $cur_round_num");
 
 	for ($i = 1 ; $i <= $num_players ; $i++) {
 		my $num_votes = ${$players[$i - 1]}->{'votes'};
@@ -331,13 +331,13 @@ sub acro_timeup {
 	if ($num_players < 2) {
 		if ($not_enough_players > 0) {
 			PORK::chat_send($chatroom,
-				"[acro] Nobody wants to play.  GAME OVER.");
+				"[acro] Nobody wants to play. GAME OVER.");
 			acro_game_over();
 			return;
 		}
 
 		PORK::chat_send($chatroom,
-			"[acro] Not enough players.  Extending $cur_round_tl seconds.");
+			"[acro] Not enough players. Extending $cur_round_tl seconds.");
 
 		$not_enough_players++;
 		$timer_refnum = PORK::timer_add($cur_round_tl, 1, "perl acro_halftime");
@@ -346,7 +346,7 @@ sub acro_timeup {
 	}
 
 	PORK::chat_send($chatroom,
-		"[acro] TIME UP!  Submissions for Round $cur_round_num");
+		"[acro] TIME UP! Submissions for Round $cur_round_num");
 
 	for ($i = 1 ; $i <= $num_players ; $i++) {
 		select(undef, undef, undef, 0.70);
@@ -358,7 +358,7 @@ sub acro_timeup {
 	select(undef, undef, undef, 0.60);
 
 	PORK::chat_send($chatroom,
-		"[acro] You have $voting_time seconds to vote.  Send me an IM of the form 'acro < 1 - $num_players >' to vote.");
+		"[acro] You have $voting_time seconds to vote. Send me an IM of the form 'acro < 1 - $num_players >' to vote.");
 
 	$game_state++;
 	$timer_refnum = PORK::timer_add($voting_time / 2, 1,
@@ -442,7 +442,7 @@ sub acro_new_round {
 	$cur_round_num++;
 
 	PORK::chat_send($chatroom,
-		"[$cur_round_num/$rounds] The acro for this round is $cur_round_acro.  You have $cur_round_tl seconds.  Send me an IM of the form 'acro < YOUR ACRO >' to play.");
+		"[$cur_round_num/$rounds] The acro for this round is $cur_round_acro. You have $cur_round_tl seconds. Send me an IM of the form 'acro < YOUR ACRO >' to play.");
 
 	$timer_refnum = PORK::timer_add($cur_round_tl / 2, 1, "perl acro_halftime");
 }

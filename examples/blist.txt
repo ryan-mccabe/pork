@@ -8,7 +8,7 @@ i 1
 ## users in the group.
 g test group1
 
-## "buddies" start with b.  b is for buddy.
+## "buddies" start with b. b is for buddy.
 b test g1b1
 b test g1b2
 g test group2

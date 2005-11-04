@@ -8,7 +8,7 @@ noinst_HEADERS = \
 	pork_perl_xs.h
 
 if COMPILE_PERL
-libporkperl_a_SOURCES  = \
+libporkperl_a_SOURCES = \
 		pork_perl.c \
 		pork_perl_xs.c \
 		pork_perl_blist.c \
@@ -21,5 +21,5 @@ libporkperl_a_SOURCES  = \
 		pork_perl_transfer.c \
 		pork_perl_win.c
 else
-libporkperl_a_SOURCES  = pork_perl_stub.c
+libporkperl_a_SOURCES = pork_perl_stub.c
 endif
