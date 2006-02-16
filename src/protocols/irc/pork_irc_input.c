@@ -1102,7 +1102,7 @@ static int irc_handler_313(struct pork_acct *acct, struct irc_input *in) {
 			buf, sizeof(buf), in->tokens[3], in->args);
 	if (ret < 1)
 		return (-1);
-	screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
+	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
 	return (0);
 }
@@ -1422,7 +1422,7 @@ static int irc_handler_333(struct pork_acct *acct, struct irc_input *in) {
 	else
 		win = cur_window();
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_TOPIC_INFO,
 			buf, sizeof(buf), in->tokens[3], in->tokens[4], timebuf);
 	if (ret < 1)
 		return (-1);
