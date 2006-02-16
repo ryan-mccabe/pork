@@ -18,7 +18,7 @@
 ** Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 ** 02111-1307 USA.
 **
-** Code cleanup Copyright (C) 2001-2004 Ryan McCabe <odin@numb.org>
+** Code cleanup Copyright (C) 2001-2006 Ryan McCabe <ryan@numb.org>
 */
 
 #include <config.h>

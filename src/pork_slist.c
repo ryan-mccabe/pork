@@ -1,6 +1,6 @@
 /*
 ** pork_slist.c - an ncurses scrolling list widget
-** Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2002-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This widget is more akin to what GUI development toolkits call
 ** 'trees' than to a list, I think.

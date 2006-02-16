@@ -1,6 +1,6 @@
 /*
 ** pork_aim_proto.c - AIM OSCAR interface to pork.
-** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2005-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This file is heavily based on src/protocols/oscar/oscar.c from gaim,
 ** which is more or less to say that chunks of code have been mostly

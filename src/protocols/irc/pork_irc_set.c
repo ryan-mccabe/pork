@@ -1,6 +1,6 @@
 /*
 ** pork_irc_set.c - /irc set support
-** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -53,10 +53,22 @@ static const struct pork_pref irc_pref_list[] = {
 	},{	.name = "FORMAT_CHAT_CREATED",
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
+	},{	.name = "FORMAT_CHAT_TOPIC",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "FORMAT_CHAT_TOPIC_INFO",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
 	},{	.name = "FORMAT_CTCP_REPLY",
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
+	},{	.name = "FORMAT_CTCP_REPLY_PING",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
 	},{	.name = "FORMAT_CTCP_REQUEST",
+		.type = OPT_TYPE_FORMAT,
+		.set = opt_set_format,
+	},{	.name = "FORMAT_KILL",
 		.type = OPT_TYPE_FORMAT,
 		.set = opt_set_format,
 	},{	.name = "FORMAT_USER_MODE",
@@ -124,17 +136,22 @@ static pref_val_t irc_default_pref_vals[] = {
 	},{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_ALL,
 	},{	.pref_val.b = DEFAULT_IRC_CTCP_BLOCK_LEAKS,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CHAT_CREATED,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CHAT_TOPIC,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CHAT_TOPIC_INFO,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REPLY,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REPLY_PING,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_CTCP_REQUEST,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_KILLED,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_USER_MODE,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_USERS,
 	},{ .pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_AWAY,
 	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_CHANNELS,
 	},{ .pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_IDLE,
-	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_IRCNAME
-	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_NICK
-	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_OPERATOR
-	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_SERVER
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_IRCNAME,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_NICK,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_OPERATOR,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_SERVER,
+	},{	.pref_val.s = DEFAULT_IRC_FORMAT_WHOIS_SIGNON,
 	},{	.pref_val.s = DEFAULT_IRC_IRCHOST,
 	},{	.pref_val.s = DEFAULT_IRC_IRCNAME,
 	},{	.pref_val.i = DEFAULT_IRC_IRCPORT,

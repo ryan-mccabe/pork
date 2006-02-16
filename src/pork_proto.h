@@ -1,6 +1,6 @@
 /*
 ** pork_proto.h
-** Copyright (C) 2003-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2003-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -103,6 +103,7 @@ struct pork_proto {
 	int (*ping)(struct pork_acct *, char *str);
 	int (*keepalive)(struct pork_acct *);
 	int (*change_nick)(struct pork_acct *acct, char *nick);
+	int (*fill_format_str)(struct pork_acct *acct, int type, char *buf, size_t len, ...);
 };
 
 int proto_init(void);

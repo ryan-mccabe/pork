@@ -1,6 +1,6 @@
 /*
 ** pork_swindow.c - an ncurses scrolling window widget
-** Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2002-2006 Ryan McCabe <ryan@numb.org>
 **
 ** I've tried to keep this code independent from the rest of the program
 ** so that it might be useful outside of this particular program.

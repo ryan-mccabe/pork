@@ -1,6 +1,6 @@
 /*
 ** pork_irc.c
-** Copyright (C) 2003-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2003-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -40,6 +40,7 @@
 
 #include <pork_irc.h>
 #include <pork_irc_set.h>
+#include <pork_irc_format.h>
 #include <pork_irc_dcc.h>
 #include <pork_irc_cmd.h>
 
@@ -871,6 +872,8 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->file_recv_data = irc_recv_data;
 	proto->file_abort = irc_file_abort;
 	proto->file_send = irc_file_send;
+
+	proto->fill_format_str = irc_fill_format_str;
 
 	irc_cmd_setup(proto);
 	return (0);

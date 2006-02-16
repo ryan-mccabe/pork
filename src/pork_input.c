@@ -1,6 +1,6 @@
 /*
 ** pork_input.c - line editing and history
-** Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2002-2006 Ryan McCabe <ryan@numb.org>
 **
 ** I've tried to keep the input handler code independent of everything else
 ** so that it might be useful outside this particular program.

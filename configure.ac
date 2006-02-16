@@ -1,4 +1,4 @@
-dnl Copyright (C) 2002-2005 Ryan McCabe <ryan@numb.org> (GPL v2)
+dnl Copyright (C) 2002-2006 Ryan McCabe <ryan@numb.org> (GPL v2)
 
 AC_INIT(pork, 0.99.9, ryan@numb.org)
 AM_INIT_AUTOMAKE(pork, 0.99.9)

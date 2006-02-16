@@ -1,4 +1,5 @@
-# Copyright (C) 2004-2005 Ryan McCabe <ryan@numb.org> (GPL v2)
+# Copyright (C) 2004-2006 Ryan McCabe <ryan@numb.org> (GPL v2)
+# This is very useful.
 
 sub wh {
 	my $maxlen = 0;

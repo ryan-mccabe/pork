@@ -6,8 +6,6 @@
 # Appends a line displaying what's playing in xmms to your profile
 # every 30 seconds, and whenever the profile is changed.
 #
-# I'm a C programmer, not a Perl programmer, and it probably shows.
-#
 
 my $xmms_info = "/tmp/xmms-info";
 my $timer_refnum;

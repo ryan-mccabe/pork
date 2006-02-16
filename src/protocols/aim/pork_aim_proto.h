@@ -1,7 +1,7 @@
 
 /*
 ** pork_aim_proto.h - AIM OSCAR protocol interface to pork.
-** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2005-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,

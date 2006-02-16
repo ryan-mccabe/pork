@@ -1,6 +1,6 @@
 /*
 ** pork_chat.h
-** Copyright (C) 2003-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2003-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -109,6 +109,8 @@ int chat_user_left(	struct pork_acct *acct,
 					char *user,
 					int silent);
 
+
+int chat_update_topic(struct chatroom *chat, char *topic);
 int chat_got_topic(	struct pork_acct *acct,
 					struct chatroom *chat,
 					char *set_by,

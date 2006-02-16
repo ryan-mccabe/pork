@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2004-2005 Ryan McCabe <ryan@numb.org> (GPLv2)
+# Copyright (C) 2004-2006 Ryan McCabe <ryan@numb.org> (GPLv2)
 #
 
 use strict;

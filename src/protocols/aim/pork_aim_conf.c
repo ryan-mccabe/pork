@@ -1,6 +1,6 @@
 /*
 ** pork_aim_conf.c - /aim save support.
-** Copyright (C) 2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2005-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,

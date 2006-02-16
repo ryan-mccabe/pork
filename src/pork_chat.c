@@ -1,6 +1,6 @@
 /*
 ** pork_chat.c
-** Copyright (C) 2003-2005 Ryan McCabe <ryan@numb.org>
+** Copyright (C) 2003-2006 Ryan McCabe <ryan@numb.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License, version 2,
@@ -777,19 +777,25 @@ int chat_set_topic(struct pork_acct *acct, struct chatroom *chat, char *topic) {
 	return (ret);
 }
 
+int chat_update_topic(struct chatroom *chat, char *topic) {
+	if (topic == NULL)
+		topic = "\0";
+	free(chat->topic);
+	chat->topic = xstrdup(topic);
+}
+
 int chat_got_topic(	struct pork_acct *acct,
 					struct chatroom *chat,
 					char *set_by,
 					char *topic)
 {
-	free(chat->topic);
-	chat->topic = xstrdup(topic);
-
+	chat_update_topic(chat, topic);
 	if (!event_generate(acct->events, EVENT_RECV_CHAT_TOPIC,
 		chat->title, set_by, topic, acct->refnum))
 	{
 		char buf[4096];
 		int ret;
+		int code;
 
 		ret = fill_format_str(OPT_FORMAT_CHAT_TOPIC, buf, sizeof(buf),
 				acct, chat, chat->title, set_by, NULL, topic);
