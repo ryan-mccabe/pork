@@ -23,12 +23,32 @@
 #include <pork_set.h>
 #include <pork_proto.h>
 #include <pork_acct.h>
+#include <pork_input.h>
+#include <pork_bind.h>
+#include <pork_screen.h>
 
 #include <pork_format.h>
 #include <pork_irc_set.h>
+#include <pork_set_global.h>
 #include <pork_irc_format.h>
 
 static int format_irc_chat_info(char c, char *buf, size_t len, va_list ap) {
+	char *chat_name = va_arg(ap, char *);
+	char *msg = va_arg(ap, char *);
+	int ret;
+
+	switch (c) {
+        case 'T':
+            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+            break;
+
+		case 'n':
+			break;
+
+		case 'm':
+			break;
+	}
+		
 	return (-1);
 }
 
@@ -57,13 +77,10 @@ static int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
 };
 
 int irc_fill_format_str(struct pork_acct *acct, int type, char *buf, size_t len, ...) {
-	va_list ap;
 	int ret;
 
-	va_start(ap, len);
 	ret = fill_format_string(type, buf, len, acct->proto_prefs,
 			irc_format_handler[IRC_OPT_FORMAT_OFFSET - type]);
-	va_end(ap);
 
 	return (ret);
 }

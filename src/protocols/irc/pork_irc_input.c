@@ -278,7 +278,9 @@ static int irc_handler_ctcp_version(struct pork_acct *acct,
 	int ret;
 	char *p;
 
-	/* leak */
+	if (!opt_get_bool(acct->proto_prefs, IRC_OPT_CTCP_BLOCK_LEAKS))
+		return (0);
+
 	ret = snprintf(buf, sizeof(buf),
 			"\x01%s %s %s - %s\x01", in->cmd,
 			PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_WEBSITE);
@@ -303,7 +305,9 @@ static int irc_handler_ctcp_time(	struct pork_acct *acct,
 	time_t time_now = time(NULL);
 	char *p;
 
-	/* leak */
+	if (!opt_get_bool(acct->proto_prefs, IRC_OPT_CTCP_BLOCK_LEAKS))
+		return (0);
+
 	if (date_to_str(time_now, tbuf, sizeof(tbuf)) == -1)
 		return (-1);
 
@@ -326,7 +330,9 @@ static int irc_handler_ctcp_echo(	struct pork_acct *acct,
 	int ret;
 	char *p;
 
-	/* leak */
+	if (!opt_get_bool(acct->proto_prefs, IRC_OPT_CTCP_BLOCK_LEAKS))
+		return (0);
+
 	if (in->args == NULL)
 		return (-1);
 
@@ -772,7 +778,7 @@ static int irc_handler_353(struct pork_acct *acct, struct irc_input *in) {
 	buf[offset - 1] = '\0';
 
 	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USERS,
-			fmt_buf, sizeof(fmt_buf), buf, in->tokens[4]);
+			fmt_buf, sizeof(fmt_buf), in->tokens[4], buf);
 	if (ret < 1)
 		return (-1);
 	screen_print_str(win, fmt_buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
@@ -904,7 +910,8 @@ static int irc_handler_privmsg(struct pork_acct *acct, struct irc_input *in) {
 			host[-1] = '\0';
 
 		ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REQUEST,
-				buf, sizeof(buf), in->tokens[0], in->tokens[2], in->cmd, in->args);
+				buf, sizeof(buf), in->tokens[0], in->tokens[2],
+				in->cmd, in->args);
 		if (ret < 1)
 			return (-1);
 
@@ -1102,7 +1109,7 @@ static int irc_handler_313(struct pork_acct *acct, struct irc_input *in) {
 			buf, sizeof(buf), in->tokens[3], in->args);
 	if (ret < 1)
 		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
+	screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
 	return (0);
 }
@@ -1127,6 +1134,7 @@ static int irc_handler_314(struct pork_acct *acct, struct irc_input *in) {
 			buf, sizeof(buf), in->args);
 	if (ret < 1)
 		return (-1);
+
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 	return (0);
 }
@@ -1175,11 +1183,13 @@ static int irc_handler_332(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
-	return (ret);
+	return (0);
 }
 
 static int irc_handler_221(struct pork_acct *acct, struct irc_input *in) {
-	char *p;
+	char *mode;
+	int ret;
+	char buf[2048];
 
 	if (in->num_tokens < 4) {
 		debug("invalid input from server: %s", in->orig);
@@ -1191,23 +1201,24 @@ static int irc_handler_221(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	p = str_from_tok(in->orig, 4);
+	mode = str_from_tok(in->orig, 4);
 
-	//fmt = opt_get_str(acct->proto_pref, IRC_OPT_FORMAT_UMODE);
-	screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_STATUS,
-		"Mode for %%c%s%%W:%%x %s", acct->username, p);
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
+			buf, sizeof(buf), in->tokens[2], mode);
+	if (ret > 0)
+		screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_STATUS);
 
-	if (*p == '+')
-		p++;
-	xstrncpy(acct->umode, p, sizeof(acct->umode));
-
-	return (0);
+	if (*mode == '+')
+		mode++;
+	ret = xstrncpy(acct->umode, mode, sizeof(acct->umode));
+	return (ret);
 }
 
 static int irc_handler_324(struct pork_acct *acct, struct irc_input *in) {
 	struct chatroom *chat;
 	struct imwindow *win;
-	char *chan;
+	char buf[2048];
+	int ret = 0;
 	char *p;
 
 	if (in->num_tokens < 5) {
@@ -1221,15 +1232,13 @@ static int irc_handler_324(struct pork_acct *acct, struct irc_input *in) {
 	else
 		win = cur_window();
 
-	chan = irc_text_filter(in->tokens[3]);
-
 	p = str_from_tok(in->orig, 5);
 	str_trim(p);
-	
-	/* XXX */
-	screen_win_msg(win, 1, 0, 1, MSG_TYPE_CHAT_STATUS,
-		"Mode for %%c%s%%W:%%x %s", chan, p);
-	free(chan);
+
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_MODE,
+			buf, sizeof(buf), in->tokens[3], p);
+	if (ret < 1)
+		return (-1);
 
 	if (chat != NULL) {
 		struct irc_chan_data *data = chat->data;
@@ -1269,7 +1278,7 @@ static int irc_handler_324(struct pork_acct *acct, struct irc_input *in) {
 		}
 	}
 
-	return (0);
+	return (ret);
 }
 
 static int irc_handler_329(struct pork_acct *acct, struct irc_input *in) {
@@ -1305,6 +1314,7 @@ static int irc_handler_329(struct pork_acct *acct, struct irc_input *in) {
 			buf, sizeof(buf), in->tokens[3], timebuf);
 	if (ret < 1)
 		return (-1);
+
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CHAT_STATUS);
 	return (0);
 }
@@ -1358,7 +1368,7 @@ static int irc_handler_302(struct pork_acct *acct, struct irc_input *in) {
 }
 
 static int irc_handler_321(struct pork_acct *acct, struct irc_input *in) {
-	/* XXX - make this line up. */
+	/* XXX - make this line-up. */
 	screen_win_msg(cur_window(), 0, 1, 0, MSG_TYPE_CHAT_STATUS,
 		"Channel\t\t\tUsers\t\tTopic");
 	return (0);
@@ -1384,7 +1394,7 @@ static int irc_handler_322(struct pork_acct *acct, struct irc_input *in) {
 	title_q = irc_text_filter(in->tokens[3]);
 	topic_q = irc_text_filter(in->args);
 
-	/* make this line up */
+	/* XXX - make this line-up */
 	screen_win_msg(win, 0, 1, 1, MSG_TYPE_CHAT_STATUS,
 		"%s\t\t\t%s\t\t%s", title_q, in->tokens[4], topic_q);
 
@@ -1422,10 +1432,11 @@ static int irc_handler_333(struct pork_acct *acct, struct irc_input *in) {
 	else
 		win = cur_window();
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_TOPIC_INFO,
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
 			buf, sizeof(buf), in->tokens[3], in->tokens[4], timebuf);
 	if (ret < 1)
 		return (-1);
+
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CHAT_STATUS);
 	return (0);
 }
@@ -1517,10 +1528,10 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 
 	/* CTCP REPLY */
 	if (in->args[0] == 0x01) {
+		char buf[2048];
+
 		p = strrchr(&in->args[1], 0x01);
 		if (p != NULL) {
-			char *msg;
-
 			*p++ = '\0';
 
 			in->cmd = &in->args[1];
@@ -1537,14 +1548,16 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 			else if (host != NULL)
 				host[-1] = '\0';
 
-			msg = irc_text_filter(in->args);
-			/* XXX */
-			//fmt = opt_get_str(acct->proto_prefs, IRC_OPT_FORMAT_CTCP_REPLY);
-			screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_NOTICE_RECV,
-				"%%YCTCP REPLY %%G%s %%D[%%x%s %s%%D]%%x from %%C%s%%D(%%c%s%%D)%%x",
-				acct->username, in->cmd, msg, in->tokens[0], host);
+			/* Unknown CTCP reply */
+			ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REPLY,
+					buf, sizeof(buf), in->tokens[0], in->tokens[2], host,
+					in->cmd, in->args);
 
-			free(msg);
+			if (ret < 1)
+				return (-1);
+
+			screen_print_str(cur_window(), buf,
+				(size_t) ret, MSG_TYPE_NOTICE_RECV);
 			return (0);
 		}
 	}
@@ -1576,6 +1589,8 @@ static int irc_handler_user_mode(struct pork_acct *acct, struct irc_input *in) {
 	char *p = in->args;
 	char c;
 	int mode;
+	int ret;
+	char buf[2048];
 
 	if (in->args[0] != '+' && in->args[0] != '-') {
 		debug("invalid input from server: %s", in->orig);
@@ -1617,10 +1632,12 @@ static int irc_handler_user_mode(struct pork_acct *acct, struct irc_input *in) {
 		}
 	}
 
-	/* XXX */
-	//fmt = opt_get_str(acct->proto_prefs, IRC_OPT_FORMAT_USER_MODE);
-	screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_STATUS,
-		"Mode %%c%s%%W:%%x %s", acct->username, in->args);
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
+			buf, sizeof(buf), acct->username, in->args);
+	if (ret < 1)
+		return (-1);
+
+	screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_STATUS);
 	return (0);
 }
 
@@ -1916,36 +1933,26 @@ static int irc_handler_topic(struct pork_acct *acct, struct irc_input *in) {
 }
 
 static int irc_handler_kill(struct pork_acct *acct, struct irc_input *in) {
-	char *reason;
 	char *userhost;
+	int ret;
+	char buf[2048];
 
 	if (in->num_tokens < 3) {
 		debug("invalid input from server: %s", in->orig);
 		return (-1);
 	}
 
-	if (in->args == NULL)
-		reason = xstrdup("No reason given");
-	else
-		reason = irc_text_filter(in->args);
-
-	//fmt = opt_get_str(acct->proto_prefs, IRC_OPT_FORMAT_KILL);
-
 	userhost = strchr(in->tokens[0], '!');
 	if (userhost != NULL) {
 		*userhost++ = '\0';
-		/* XXX */
-		screen_win_msg(cur_window(), 1, 1, 1, MSG_TYPE_SIGNOFF,
-			"You have been killed by %%c%s %%D(%%c%s%%D)%%x (%s)",
-			in->tokens[0], userhost, reason);
-	} else {
-		/* XXX */
-		screen_win_msg(cur_window(), 1, 1, 1, MSG_TYPE_SIGNOFF,
-			"You have been killed by %%c%s%%x (%s)",
-			in->tokens[0], reason);
 	}
 
-	free(reason);
+	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_KILLED,
+			buf, sizeof(buf), in->tokens[0], userhost, in->args);
+	if (ret < 1)
+		return (-1);
+
+	screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_SIGNOFF);
 	return (0);
 }
 
@@ -1976,20 +1983,25 @@ static int irc_handler_ping_reply(struct pork_acct *acct, struct irc_input *in)
 		gettimeofday(&tv, NULL);
 		timediff = (tv.tv_sec - sec) + ((tv.tv_usec - usec) / 1000000.0);
 
-		/* XXX */
 		if (timediff >= 0) {
 			char *host;
+			int ret;
+			char buf[2048];
 
 			host = strchr(in->tokens[0], '!');
 			if (host == NULL)
 				return (-1);
 			*host++ = '\0';
 
-			//fmt = opt_get_str(acct->proto_prefs, IRC_OPT_FORMAT_CTCP_REPLY_PING);
-			/* XXX */
-			screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_NOTICE_RECV,
-				"%%YCTCP REPLY %%G%s %%D[%%xPING %f seconds%%D]%%x from %%C%s%%D(%%c%s%%D)%%x",
-				acct->username, timediff, in->tokens[0], host);
+			ret = acct->proto->fill_format_str(acct,
+					IRC_OPT_FORMAT_CTCP_REPLY_PING, buf, sizeof(buf),
+					acct->username, in->tokens[2], host, timediff);
+
+			if (ret < 1)
+				return (-1);
+
+			screen_print_str(cur_window(), buf, (size_t) ret,
+				MSG_TYPE_NOTICE_RECV);
 			return (1);
 		}
 	}
