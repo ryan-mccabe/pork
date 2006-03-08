@@ -20,6 +20,7 @@ enum {
 	IRC_OPT_CTCP_BLOCK_ALL,
 	IRC_OPT_CTCP_BLOCK_LEAKS,
 	IRC_OPT_FORMAT_CHAT_CREATED,
+	IRC_OPT_FORMAT_CHAT_MODE,
 	IRC_OPT_FORMAT_CHAT_TOPIC,
 	IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
 	IRC_OPT_FORMAT_CTCP_REPLY,
@@ -58,7 +59,7 @@ enum {
 #define DEFAULT_IRC_FORMAT_CTCP_REPLY		"%YCTCP REPLY %G%s %D[%x$K $M%D]%x from %C$D%D(%c$H%%D)"
 #define DEFAULT_IRC_FORMAT_CTCP_REPLY_PING	""
 #define DEFAULT_IRC_FORMAT_CTCP_REQUEST		"%WCTCP%M $K %D[%x$M%D]%x from %C$D%D(%c$H%D)%x to %W$N"
-#define DEFAULT_IRC_FORMAT_KILLED			"You have been killed by %c$S %D(%c$U%D)%x ($R)"
+#define DEFAULT_IRC_FORMAT_KILLED			"%c$N%x has been killed by %c$S %D(%c$U%D)%x ($R)"
 #define DEFAULT_IRC_FORMAT_USER_MODE		"Mode %c$N%W:%x $M"
 #define DEFAULT_IRC_FORMAT_USERS			"Users on %c$C%W:%x $L"
 #define DEFAULT_IRC_FORMAT_WHOIS_AWAY		"%D-%m-%M--%Ca%cway%W:%x $M"
