@@ -41,39 +41,35 @@ static int format_irc_chat_info(char c, char *buf, size_t len, va_list ap) {
         case 'T':
             ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
             break;
-
-		case 'n':
-			break;
-
-		case 'm':
-			break;
 	}
 		
 	return (-1);
 }
 
-static int format_irc_ctcp(char c, char *buf, size_t len, va_list ap) {
-	return (-1);
-}
-
-static int format_irc_umode(char c, char *buf, size_t len, va_list ap) {
-	return (-1);
-}
-
-static int format_irc_users(char c, char *buf, size_t len, va_list ap) {
-	return (-1);
-}
-
-static int format_irc_whois(char c, char *buf, size_t len, va_list ap) {
+static int format_irc_fixme(char c, char *buf, size_t len, va_list ap) {
 	return (-1);
 }
 
 static int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
-	format_irc_chat_info,
-	format_irc_ctcp,
-	format_irc_umode,
-	format_irc_users,
-	format_irc_whois,
+	format_irc_fixme,			/* format_irc_chat_created, */
+	format_irc_fixme,			/* format_irc_chat_info, */
+	format_irc_fixme,			/* format_irc_chat_mode, */
+	format_irc_fixme,			/* format_irc_chat_topic, */
+	format_irc_fixme,			/* format_irc_chat_topic_info, */
+	format_irc_fixme,			/* format_irc_ctcp_reply, */
+	format_irc_fixme,			/* format_irc_ctcp_reply_ping, */
+	format_irc_fixme,			/* format_irc_ctcp_request, */
+	format_irc_fixme,			/* format_irc_killed, */
+	format_irc_fixme,			/* format_irc_user_mode, */
+	format_irc_fixme,			/* format_irc_users, */
+	format_irc_fixme,			/* format_irc_whois_away, */
+	format_irc_fixme,			/* format_irc_whois_channels, */
+	format_irc_fixme,			/* format_irc_whois_idle, */
+	format_irc_fixme,			/* format_irc_whois_ircname, */
+	format_irc_fixme,			/* format_irc_whois_nick, */
+	format_irc_fixme,			/* format_irc_whois_operator, */
+	format_irc_fixme,			/* format_irc_whois_server, */
+	format_irc_fixme			/* format_irc_whois_signon */
 };
 
 int irc_fill_format_str(struct pork_acct *acct, int type, char *buf, size_t len, ...) {
