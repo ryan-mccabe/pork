@@ -43,6 +43,7 @@ int status_init(void) {
 	if (win == NULL)
 		return (-1);
 
+	nodelay(win, 1);
 	set_default_win_opts(win);
 	screen.status_bar = win;
 	return (0);

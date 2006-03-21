@@ -782,6 +782,7 @@ int chat_update_topic(struct chatroom *chat, char *topic) {
 		topic = "\0";
 	free(chat->topic);
 	chat->topic = xstrdup(topic);
+	return (0);
 }
 
 int chat_got_topic(	struct pork_acct *acct,
@@ -795,7 +796,6 @@ int chat_got_topic(	struct pork_acct *acct,
 	{
 		char buf[4096];
 		int ret;
-		int code;
 
 		ret = fill_format_str(OPT_FORMAT_CHAT_TOPIC, buf, sizeof(buf),
 				acct, chat, chat->title, set_by, NULL, topic);

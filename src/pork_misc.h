@@ -10,7 +10,8 @@
 #ifndef __PORK_MISC_H
 #define __PORK_MISC_H
 
-#define NUSER_LEN	128
+#define NUSER_LEN		128
+#define META_KEYCODE	0x1b
 
 int initialize_environment(void);
 void set_default_win_opts(WINDOW *win);

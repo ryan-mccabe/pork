@@ -72,6 +72,7 @@ void color_init(void) {
 **
 ** In addition, the following codes are also available:
 ** x = clear all attributes
+** 0 = invisible
 **
 ** Highlighting modes:
 **		1 = bold		2 = reverse		3 = underline
@@ -161,12 +162,12 @@ static inline int color_get_code(char code) {
 }
 
 static inline int color_get_highlighting(char code) {
-	static const int colors[] = { A_BOLD, A_REVERSE, A_UNDERLINE, A_BLINK, A_STANDOUT, A_DIM };
+	static const int colors[] = { A_INVIS, A_BOLD, A_REVERSE, A_UNDERLINE, A_BLINK, A_STANDOUT, A_DIM };
 
-	if (code < '1' || code > '6')
+	if (code < '0' || code > '6')
 		return (-1);
 
-	return (colors[code - '1']);
+	return (colors[code - '0']);
 }
 
 int color_get_str(attr_t attr, char *buf, size_t len) {
@@ -193,6 +194,13 @@ int color_get_str(attr_t attr, char *buf, size_t len) {
 
 	if (bgcol != 0) {
 		ret = snprintf(&buf[i], len - i, ",%c", color_codes[bgcol]);
+		if (ret < 0 || (size_t) ret >= len - i)
+			return (-1);
+		i += ret;
+	}
+
+	if (attr & A_INVIS) {
+		ret = snprintf(&buf[i], len - i, "%%0");
 		if (ret < 0 || (size_t) ret >= len - i)
 			return (-1);
 		i += ret;

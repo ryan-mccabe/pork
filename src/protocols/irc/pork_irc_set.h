@@ -20,6 +20,7 @@ enum {
 	IRC_OPT_CTCP_BLOCK_ALL,
 	IRC_OPT_CTCP_BLOCK_LEAKS,
 	IRC_OPT_FORMAT_CHAT_CREATED,
+#define IRC_OPT_FORMAT_OFFSET IRC_OPT_FORMAT_CHAT_CREATED
 	IRC_OPT_FORMAT_CHAT_MODE,
 	IRC_OPT_FORMAT_CHAT_TOPIC,
 	IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
@@ -29,7 +30,6 @@ enum {
 	IRC_OPT_FORMAT_KILLED,
 	IRC_OPT_FORMAT_USER_MODE,
 	IRC_OPT_FORMAT_USERS,
-	IRC_OPT_FORMAT_WHOIS_AWAY,
 	IRC_OPT_FORMAT_WHOIS_CHANNELS,
 	IRC_OPT_FORMAT_WHOIS_IDLE,
 	IRC_OPT_FORMAT_WHOIS_IRCNAME,
@@ -47,29 +47,28 @@ enum {
 	IRC_NUM_OPTS
 };
 
-#define IRC_OPT_FORMAT_OFFSET IRC_OPT_FORMAT_CHAT_CREATED
-
 #define DEFAULT_IRC_AUTOSAVE				0
 #define DEFAULT_IRC_CTCP_BLOCK_ALL			0
 #define DEFAULT_IRC_CTCP_BLOCK_LEAKS		0
-#define DEFAULT_IRC_FORMAT_CHAT_CREATED		"%c$C%x created%W:%x $T"
+
+#define DEFAULT_IRC_FORMAT_CHAT_CREATED		"%c$C%x created%W:%x $t"
 #define DEFAULT_IRC_FORMAT_CHAT_MODE		"Mode for %c$C%W:%x $M"
 #define DEFAULT_IRC_FORMAT_CHAT_TOPIC		"Topic for %c$C%W:%x $M"
-#define DEFAULT_IRC_FORMAT_CHAT_TOPIC_INFO	"Topic for %c$C%x set by %c$N%x at $T"
-#define DEFAULT_IRC_FORMAT_CTCP_REPLY		"%YCTCP REPLY %G$N %D[%x$K $M%D]%x from %C$D%D(%c$H%%D)"
-#define DEFAULT_IRC_FORMAT_CTCP_REPLY_PING	"%YCTCP REPLY %G$N %D[%xPING $T%D] from %C$D%D(%c$H%D)"
-#define DEFAULT_IRC_FORMAT_CTCP_REQUEST		"%WCTCP%M $K %D[%x$M%D]%x from %C$D%D(%c$H%D)%x to %W$N"
+#define DEFAULT_IRC_FORMAT_CHAT_TOPIC_INFO	"Topic for %c$C%x set by %c$U%x at $t"
+#define DEFAULT_IRC_FORMAT_CTCP_REPLY		"%YCTCP REPLY %G$D %D[%x$A $M%D]%x from %C$S%D(%c$H%%D)"
+#define DEFAULT_IRC_FORMAT_CTCP_REPLY_PING	"%YCTCP REPLY %G$D %D[%xPING $t%D] from %C$S%D(%c$S%D)"
+#define DEFAULT_IRC_FORMAT_CTCP_REQUEST		"%WCTCP%M $A %D[%x$M%D]%x from %C$S%D(%c$H%D)%x to %W$D"
 #define DEFAULT_IRC_FORMAT_KILLED			"%c$N%x has been killed by %c$S %D(%c$U%D)%x ($R)"
 #define DEFAULT_IRC_FORMAT_USER_MODE		"Mode %c$N%W:%x $M"
-#define DEFAULT_IRC_FORMAT_USERS			"Users on %c$C%W:%x $L"
-#define DEFAULT_IRC_FORMAT_WHOIS_AWAY		"%D-%m-%M--%Ca%cway%W:%x $M"
-#define DEFAULT_IRC_FORMAT_WHOIS_CHANNELS	"%Cc%channels%W:%x $C"
-#define DEFAULT_IRC_FORMAT_WHOIS_IRCNAME	"%D-%Ci%crcname%W:%x $N"
-#define DEFAULT_IRC_FORMAT_WHOIS_IDLE		"%D-%m-%M--%Ci%cdle%W:%x $T"
-#define DEFAULT_IRC_FORMAT_WHOIS_NICK		"%D-%m-%M-%W$N%M-%D(%c$I%W@%c$H%D)%M-%m-%D-"
-#define DEFAULT_IRC_FORMAT_WHOIS_OPERATOR	"%Co%cperator%W:%x $N $M"
-#define DEFAULT_IRC_FORMAT_WHOIS_SERVER		"%D-%m-%Cs%cerver%W:%x $S %D(%x$X%D)"
-#define DEFAULT_IRC_FORMAT_WHOIS_SIGNON		"%D-%m-%Cs%cignon%W:%x $T"
+#define DEFAULT_IRC_FORMAT_USERS			"Users on %c$C%W:%x $M"
+#define DEFAULT_IRC_FORMAT_WHOIS_CHANNELS	"%Cc%channels%W:%x $M"
+#define DEFAULT_IRC_FORMAT_WHOIS_IRCNAME	"%D-%Ci%crcname%W:%x $M"
+#define DEFAULT_IRC_FORMAT_WHOIS_IDLE		"%D-%m-%M--%Ci%cdle%W:%x $t"
+
+#define DEFAULT_IRC_FORMAT_WHOIS_NICK		"%D-%m-%M-%W$U%M-%D(%c$I%W@%c$H%D)%M-%m-%D-"
+#define DEFAULT_IRC_FORMAT_WHOIS_OPERATOR	"%Co%cperator%W:%x $U $M"
+#define DEFAULT_IRC_FORMAT_WHOIS_SERVER		"%D-%m-%Cs%cerver%W:%x $S %D(%x$M%D)"
+#define DEFAULT_IRC_FORMAT_WHOIS_SIGNON		"%D-%m-%Cs%cignon%W:%x $t"
 #define	DEFAULT_IRC_IRCHOST					NULL
 #define DEFAULT_IRC_IRCNAME					"pork: http://dev.ojnk.net"
 #define DEFAULT_IRC_IRCPORT					6667

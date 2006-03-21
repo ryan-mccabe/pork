@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
+#include <time.h>
+#include <sys/time.h>
 #include <ncurses.h>
 
 #include <pork.h>
@@ -32,12 +34,21 @@
 #include <pork_set_global.h>
 #include <pork_irc_format.h>
 
-static int format_irc_chat_info(char c, char *buf, size_t len, va_list ap) {
-	char *chat_name = va_arg(ap, char *);
-	char *msg = va_arg(ap, char *);
+static int format_irc_args1(char c, char *buf, size_t len, va_list ap) {
 	int ret;
+	char *arg = va_arg(ap, char *);
 
 	switch (c) {
+		case '1':
+		case 'M':
+		case 'C':
+		case 't':
+			if (arg == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg, len);
+			break;
+
         case 'T':
             ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
             break;
@@ -46,30 +57,198 @@ static int format_irc_chat_info(char c, char *buf, size_t len, va_list ap) {
 	return (-1);
 }
 
-static int format_irc_fixme(char c, char *buf, size_t len, va_list ap) {
+static int format_irc_args2(char c, char *buf, size_t len, va_list ap) {
+	int ret;
+	char *arg1 = va_arg(ap, char *);
+	char *arg2 = va_arg(ap, char *);
+
+	switch (c) {
+		case '1':
+		case 'C':
+		case 'S':
+		case 'U':
+		case 'N':
+			if (arg1 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg1, len);
+			break;
+
+		case '2':
+		case 'M':
+		case 't':
+			if (arg2 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg2, len);
+			break;
+
+        case 'T':
+            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+            break;
+	}
+		
+	return (-1);
+}
+
+static int format_irc_args3(char c, char *buf, size_t len, va_list ap) {
+	int ret;
+	char *arg1 = va_arg(ap, char *);
+	char *arg2 = va_arg(ap, char *);
+	char *arg3 = va_arg(ap, char *);
+
+	switch (c) {
+		case '1':
+		case 'U':
+		case 'C':
+			if (arg1 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg1, len);
+			break;
+
+		case '2':
+		case 'H':
+			if (arg2 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg2, len);
+			break;
+
+		case '3':
+			if (arg3 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg3, len);
+			break;
+
+        case 'T':
+            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+            break;
+	}
+		
+	return (-1);
+}
+
+static int format_irc_args4(char c, char *buf, size_t len, va_list ap) {
+	int ret;
+	char *arg1 = va_arg(ap, char *);
+	char *arg2 = va_arg(ap, char *);
+	char *arg3 = va_arg(ap, char *);
+	char *arg4 = va_arg(ap, char *);
+
+	switch (c) {
+		case '1':
+			if (arg1 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg1, len);
+			break;
+
+		case '2':
+			if (arg2 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg2, len);
+			break;
+
+		case '3':
+			if (arg3 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg3, len);
+			break;
+
+		case '4':
+			if (arg4 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg4, len);
+			break;
+
+        case 'T':
+            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+            break;
+	}
+		
+	return (-1);
+}
+
+static int format_irc_args5(char c, char *buf, size_t len, va_list ap) {
+	int ret;
+	char *arg1 = va_arg(ap, char *);
+	char *arg2 = va_arg(ap, char *);
+	char *arg3 = va_arg(ap, char *);
+	char *arg4 = va_arg(ap, char *);
+	char *arg5 = va_arg(ap, char *);
+
+	switch (c) {
+		case 'D':
+		case '1':
+			if (arg1 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg1, len);
+			break;
+
+		case '2':
+		case 'S':
+			if (arg2 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg2, len);
+			break;
+
+		case '3':
+		case 'H':
+			if (arg3 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg3, len);
+			break;
+
+		case '4':
+		case 'A':
+			if (arg4 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg4, len);
+			break;
+
+		case '5':
+		case 'M':
+			if (arg5 == NULL)
+				ret = -1;
+			else
+				ret = xstrncpy(buf, arg5, len);
+			break;
+
+        case 'T':
+            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+            break;
+	}
+		
 	return (-1);
 }
 
 static int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
-	format_irc_fixme,			/* format_irc_chat_created, */
-	format_irc_fixme,			/* format_irc_chat_info, */
-	format_irc_fixme,			/* format_irc_chat_mode, */
-	format_irc_fixme,			/* format_irc_chat_topic, */
-	format_irc_fixme,			/* format_irc_chat_topic_info, */
-	format_irc_fixme,			/* format_irc_ctcp_reply, */
-	format_irc_fixme,			/* format_irc_ctcp_reply_ping, */
-	format_irc_fixme,			/* format_irc_ctcp_request, */
-	format_irc_fixme,			/* format_irc_killed, */
-	format_irc_fixme,			/* format_irc_user_mode, */
-	format_irc_fixme,			/* format_irc_users, */
-	format_irc_fixme,			/* format_irc_whois_away, */
-	format_irc_fixme,			/* format_irc_whois_channels, */
-	format_irc_fixme,			/* format_irc_whois_idle, */
-	format_irc_fixme,			/* format_irc_whois_ircname, */
-	format_irc_fixme,			/* format_irc_whois_nick, */
-	format_irc_fixme,			/* format_irc_whois_operator, */
-	format_irc_fixme,			/* format_irc_whois_server, */
-	format_irc_fixme			/* format_irc_whois_signon */
+	format_irc_args2,			/* format_irc_chat_created, */
+	format_irc_args1,			/* format_irc_chat_mode, */
+	format_irc_args2,			/* format_irc_chat_topic, */
+	format_irc_args3,			/* format_irc_chat_topic_info, */
+	format_irc_args5,			/* format_irc_ctcp_reply, */
+	format_irc_args4,			/* format_irc_ctcp_reply_ping, */
+	format_irc_args4,			/* format_irc_ctcp_request, */
+	format_irc_args4,			/* format_irc_killed, */
+	format_irc_args2,			/* format_irc_user_mode, */
+	format_irc_args2,			/* format_irc_users, */
+	format_irc_args1,			/* format_irc_whois_channels, */
+	format_irc_args1,			/* format_irc_whois_idle, */
+	format_irc_args1,			/* format_irc_whois_ircname, */
+	format_irc_args3,			/* format_irc_whois_nick, */
+	format_irc_args2,			/* format_irc_whois_operator, */
+	format_irc_args2,			/* format_irc_whois_server, */
+	format_irc_args1			/* format_irc_whois_signon */
 };
 
 int irc_fill_format_str(struct pork_acct *acct, int type, char *buf, size_t len, ...) {

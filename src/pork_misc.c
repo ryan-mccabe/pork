@@ -69,7 +69,7 @@ int wgetinput(WINDOW *win) {
 	int c;
 	int meta_cnt = 0;
 
-	while ((c = wgetch(win)) == 0x1b)
+	while ((c = wgetch(win)) == META_KEYCODE)
 		meta_cnt++;
 
 	if (meta_cnt > 15)

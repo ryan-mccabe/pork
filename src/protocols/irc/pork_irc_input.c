@@ -1548,7 +1548,7 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 			else if (host != NULL)
 				host[-1] = '\0';
 
-			/* Unknown CTCP reply */
+			/* Unhandled CTCP reply */
 			ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REPLY,
 					buf, sizeof(buf), in->tokens[0], in->tokens[2], host,
 					in->cmd, in->args);
