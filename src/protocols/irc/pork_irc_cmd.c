@@ -60,23 +60,23 @@ USER_COMMAND(irc_cmd_ctcp) {
 	if (dest == NULL || args == NULL)
 		return;
 
-	irc_ctcp(acct, dest, args);
+	irc_send_ctcp(acct->data, dest, args);
 }
 
 USER_COMMAND(irc_cmd_mode) {
 	if (args != NULL)
-		irc_mode(acct, args);
+		irc_send_mode(acct->data, args);
 }
 
 USER_COMMAND(irc_cmd_quote) {
 	if (args != NULL)
-		irc_quote(acct, args);
+		irc_quote(acct->data, args);
 }
 
 USER_COMMAND(irc_cmd_who) {
 	struct imwindow *win = cur_window();
 	if (args != NULL)
-		irc_who(acct, args);
+		irc_send_who(acct->data, args);
 
 	if (args == NULL && win->type == WIN_TYPE_CHAT) {
 		if (win->data != NULL) {
@@ -87,9 +87,33 @@ USER_COMMAND(irc_cmd_who) {
 	}
 }
 
+USER_COMMAND(irc_cmd_wii) {
+	if (args != NULL) {
+		char buf[IRC_OUT_BUFLEN];
+		char *p;
+		int ret;
+
+		p = strchr(args, ' ');
+		if (*p != NULL)
+			*p = '\0';
+
+		ret = snprintf(buf, sizeof(buf), "WHOIS %s %s", args, args);
+		if (ret > 1 && (size_t) ret < sizeof(buf))
+			irc_send_raw(acct->data, buf);
+	}
+}
+
 USER_COMMAND(irc_cmd_whowas) {
 	if (args != NULL)
-		irc_whowas(acct, args);
+		irc_send_whowas(acct->data, args);
+}
+
+USER_COMMAND(irc_cmd_kill) {
+	if (args != NULL) {
+		char *user = strsep(&args, " ");
+		if (user != NULL)
+			irc_send_kill(acct->data, user, args);
+	}
 }
 
 /* This needs to save either user preferences or defaults, or both. */
@@ -109,7 +133,7 @@ static struct command irc_command[] = {
 	{ "dline",				FIXME			},
 	{ "hash",				FIXME			},
 	{ "ison",				FIXME			},
-	{ "kill",				FIXME			},
+	{ "kill",				irc_cmd_kill	},
 	{ "kline",				FIXME			},
 	{ "knock",				FIXME			},
 	{ "gline",				FIXME			},
@@ -146,9 +170,9 @@ static struct command irc_command[] = {
 	{ "users",				FIXME			},
 	{ "version",			FIXME			},
 	{ "wallops",			FIXME			},
-	{ "wii",				FIXME			},
 	{ "who",				irc_cmd_who		},
 	{ "whowas",				irc_cmd_whowas	},
+	{ "wii",				irc_cmd_wii		},
 };
 
 void irc_cmd_setup(struct pork_proto *proto) {

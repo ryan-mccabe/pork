@@ -160,17 +160,13 @@ int irc_connect(struct pork_acct *acct,
 }
 
 int irc_send_raw(struct irc_session *session, char *str) {
+	char buf[IRC_OUT_BUFLEN];
 	int ret;
-	char *buf;
-	size_t len;
 
-	len = strlen(str) + 3;
-	buf = xmalloc(len);
-	snprintf(buf, len, "%s\r\n", str);
-
-	ret = irc_send(session, buf, len - 1);
-	free(buf);
-	return (ret);
+	ret = snprintf(buf, sizeof(buf), "%s\r\n", str);
+	if (ret < 1 || (size_t) ret >= sizeof(buf))
+		return (-1);
+	return (irc_send(session, buf, ret));
 }
 
 int irc_send_mode(struct irc_session *session, char *mode_str) {
@@ -431,11 +427,26 @@ int irc_send_notice(struct irc_session *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_kick(struct irc_session *session, char *chan, char *nick, char *msg) {
+int irc_send_kick(	struct irc_session *session,
+					char *chan,
+					char *nick,
+					char *msg)
+{
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
 	ret = snprintf(buf, sizeof(buf), "KICK %s %s :%s\r\n", chan, nick, msg);
+	if (ret < 0 || (size_t) ret >= sizeof(buf))
+		return (-1);
+
+	return (irc_send(session, buf, ret));
+}
+
+int irc_send_kill(struct irc_session *session, char *nick, char *msg) {
+	char buf[IRC_OUT_BUFLEN];
+	int ret;
+
+	ret = snprintf(buf, sizeof(buf), "KILL %s :%s\r\n", nick, msg);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 

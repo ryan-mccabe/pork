@@ -109,6 +109,7 @@ int irc_send_whois(struct irc_session *session, char *dest);
 int irc_send_whowas(struct irc_session *session, char *dest);
 int irc_send_nick(struct irc_session *session, char *nick);
 int irc_send_kick(struct irc_session *session, char *chan, char *nick, char *reason);
+int irc_send_kill(struct irc_session *session, char *nick, char *msg);
 int irc_send_part(struct irc_session *session, char *chan);
 int irc_send_ping(struct irc_session *session, char *str);
 int irc_send_quit(struct irc_session *session, char *reason);
@@ -124,11 +125,6 @@ char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
 int irc_chanmode_has_arg(struct irc_session *session, char mode);
 int irc_input_dispatch(struct irc_session *session);
 char *irc_text_filter(char *str);
-
-inline int irc_mode(struct pork_acct *acct, char *str);
-inline int irc_ctcp(struct pork_acct *acct, char *dest, char *msg);
-inline int irc_whowas(struct pork_acct *acct, char *dest);
-inline int irc_who(struct pork_acct *acct, char *str);;
 int irc_quote(struct pork_acct *acct, char *str);
 
 int irc_callback_init(struct irc_session *session);

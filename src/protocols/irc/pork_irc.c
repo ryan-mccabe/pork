@@ -787,27 +787,6 @@ static int irc_rejoin(struct pork_acct *acct, struct chatroom *chat) {
 	return (irc_send_join(acct->data, chat->title, chan_key));
 }
 
-inline int irc_mode(struct pork_acct *acct, char *str) {
-	return (irc_send_mode(acct->data, str));
-}
-
-inline int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
-	return (irc_send_ctcp(acct->data, dest, msg));
-}
-
-inline int irc_whowas(struct pork_acct *acct, char *dest) {
-	char *p;
-
-	while ((p = strsep(&dest, ",")) != NULL)
-		irc_send_whowas(acct->data, p);
-
-	return (0);
-}
-
-inline int irc_who(struct pork_acct *acct, char *str) {
-	return (irc_send_who(acct->data, str));
-}
-
 int irc_quote(struct pork_acct *acct, char *str) {
 	char *p = str;
 
