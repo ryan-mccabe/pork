@@ -35,7 +35,7 @@
 #include <pork_irc_format.h>
 
 static int format_irc_args1(char c, char *buf, size_t len, va_list ap) {
-	int ret;
+	int ret = -1;
 	char *arg = va_arg(ap, char *);
 
 	switch (c) {
@@ -43,22 +43,23 @@ static int format_irc_args1(char c, char *buf, size_t len, va_list ap) {
 		case 'M':
 		case 'C':
 		case 't':
-			if (arg == NULL)
-				ret = -1;
-			else
+			if (arg != NULL)
 				ret = xstrncpy(buf, arg, len);
 			break;
 
-        case 'T':
-            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-            break;
+case 'T':
+			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+			break;
 	}
-		
-	return (-1);
+
+	if (ret < 0 || (size_t) ret >= len)
+		return (-1);
+
+	return (0);
 }
 
 static int format_irc_args2(char c, char *buf, size_t len, va_list ap) {
-	int ret;
+	int ret = -1;
 	char *arg1 = va_arg(ap, char *);
 	char *arg2 = va_arg(ap, char *);
 
@@ -68,31 +69,30 @@ static int format_irc_args2(char c, char *buf, size_t len, va_list ap) {
 		case 'S':
 		case 'U':
 		case 'N':
-			if (arg1 == NULL)
-				ret = -1;
-			else
+			if (arg1 != NULL)
 				ret = xstrncpy(buf, arg1, len);
 			break;
 
 		case '2':
 		case 'M':
 		case 't':
-			if (arg2 == NULL)
-				ret = -1;
-			else
+			if (arg2 != NULL)
 				ret = xstrncpy(buf, arg2, len);
 			break;
 
-        case 'T':
-            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-            break;
+		case 'T':
+			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+			break;
 	}
-		
-	return (-1);
+
+	if (ret < 0 || (size_t) ret >= len)
+		return (-1);
+
+	return (0);
 }
 
 static int format_irc_args3(char c, char *buf, size_t len, va_list ap) {
-	int ret;
+	int ret = -1;
 	char *arg1 = va_arg(ap, char *);
 	char *arg2 = va_arg(ap, char *);
 	char *arg3 = va_arg(ap, char *);
@@ -101,37 +101,34 @@ static int format_irc_args3(char c, char *buf, size_t len, va_list ap) {
 		case '1':
 		case 'U':
 		case 'C':
-			if (arg1 == NULL)
-				ret = -1;
-			else
+			if (arg1 != NULL)
 				ret = xstrncpy(buf, arg1, len);
 			break;
 
 		case '2':
 		case 'H':
-			if (arg2 == NULL)
-				ret = -1;
-			else
+			if (arg2 != NULL)
 				ret = xstrncpy(buf, arg2, len);
 			break;
 
 		case '3':
-			if (arg3 == NULL)
-				ret = -1;
-			else
+			if (arg3 != NULL)
 				ret = xstrncpy(buf, arg3, len);
 			break;
 
-        case 'T':
-            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-            break;
+		case 'T':
+			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+			break;
 	}
-		
-	return (-1);
+
+	if (ret < 0 || (size_t) ret >= len)
+		return (-1);
+
+	return (0);
 }
 
 static int format_irc_args4(char c, char *buf, size_t len, va_list ap) {
-	int ret;
+	int ret = -1;
 	char *arg1 = va_arg(ap, char *);
 	char *arg2 = va_arg(ap, char *);
 	char *arg3 = va_arg(ap, char *);
@@ -139,43 +136,38 @@ static int format_irc_args4(char c, char *buf, size_t len, va_list ap) {
 
 	switch (c) {
 		case '1':
-			if (arg1 == NULL)
-				ret = -1;
-			else
+			if (arg1 != NULL)
 				ret = xstrncpy(buf, arg1, len);
 			break;
 
 		case '2':
-			if (arg2 == NULL)
-				ret = -1;
-			else
+			if (arg2 != NULL)
 				ret = xstrncpy(buf, arg2, len);
 			break;
 
 		case '3':
-			if (arg3 == NULL)
-				ret = -1;
-			else
+			if (arg3 != NULL)
 				ret = xstrncpy(buf, arg3, len);
 			break;
 
 		case '4':
-			if (arg4 == NULL)
-				ret = -1;
-			else
+			if (arg4 != NULL)
 				ret = xstrncpy(buf, arg4, len);
 			break;
 
-        case 'T':
-            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-            break;
+		case 'T':
+			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+			break;
 	}
-		
-	return (-1);
+
+	if (ret < 0 || (size_t) ret >= len)
+		return (-1);
+
+	return (0);
 }
 
 static int format_irc_args5(char c, char *buf, size_t len, va_list ap) {
-	int ret;
+	int ret = -1;
 	char *arg1 = va_arg(ap, char *);
 	char *arg2 = va_arg(ap, char *);
 	char *arg3 = va_arg(ap, char *);
@@ -185,53 +177,46 @@ static int format_irc_args5(char c, char *buf, size_t len, va_list ap) {
 	switch (c) {
 		case 'D':
 		case '1':
-			if (arg1 == NULL)
-				ret = -1;
-			else
+			if (arg1 != NULL)
 				ret = xstrncpy(buf, arg1, len);
 			break;
 
 		case '2':
 		case 'S':
-			if (arg2 == NULL)
-				ret = -1;
-			else
+			if (arg2 != NULL)
 				ret = xstrncpy(buf, arg2, len);
 			break;
 
 		case '3':
 		case 'H':
-			if (arg3 == NULL)
-				ret = -1;
-			else
+			if (arg3 != NULL)
 				ret = xstrncpy(buf, arg3, len);
 			break;
 
 		case '4':
 		case 'A':
-			if (arg4 == NULL)
-				ret = -1;
-			else
+			if (arg4 != NULL)
 				ret = xstrncpy(buf, arg4, len);
 			break;
 
 		case '5':
 		case 'M':
-			if (arg5 == NULL)
-				ret = -1;
-			else
+			if (arg5 != NULL)
 				ret = xstrncpy(buf, arg5, len);
 			break;
 
-        case 'T':
-            ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-            break;
+		case 'T':
+			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
+			break;
 	}
-		
-	return (-1);
+
+	if (ret < 0 || (size_t) ret >= len)
+		return (-1);
+
+	return (0);
 }
 
-static int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
+int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
 	format_irc_args2,			/* format_irc_chat_created, */
 	format_irc_args1,			/* format_irc_chat_mode, */
 	format_irc_args2,			/* format_irc_chat_topic, */
@@ -250,12 +235,3 @@ static int (*const irc_format_handler[])(char, char *, size_t, va_list) = {
 	format_irc_args2,			/* format_irc_whois_server, */
 	format_irc_args1			/* format_irc_whois_signon */
 };
-
-int irc_fill_format_str(struct pork_acct *acct, int type, char *buf, size_t len, ...) {
-	int ret;
-
-	ret = fill_format_string(type, buf, len, acct->proto_prefs,
-			irc_format_handler[IRC_OPT_FORMAT_OFFSET - type]);
-
-	return (ret);
-}

@@ -340,6 +340,10 @@ if test "$have_struct_addrinfo" = "yes"; then
 	AC_DEFINE(HAVE_STRUCT_ADDRINFO, 1, [Define to 1 if you have struct addrinfo])
 fi
 
+if test -n "$DEBUG_CFLAGS$DEBUG_LIBS"; then
+	CFLAGS="$(echo $CFLAGS | sed 's/-O[[1-9]]*/-O0/g' | sed 's/-g[[0-9]]*/-g3/g')"
+fi
+
 AC_SUBST(LIBS)
 AC_SUBST(PERL_CFLAGS)
 AC_SUBST(CFLAGS)

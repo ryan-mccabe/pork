@@ -787,7 +787,7 @@ static int irc_rejoin(struct pork_acct *acct, struct chatroom *chat) {
 	return (irc_send_join(acct->data, chat->title, chan_key));
 }
 
-int irc_quote(struct pork_acct *acct, char *str) {
+int irc_quote(struct irc_session *session, char *str) {
 	char *p = str;
 
 	if (str == NULL)
@@ -801,7 +801,7 @@ int irc_quote(struct pork_acct *acct, char *str) {
 		return (-1);
 	}
 
-	return (irc_send_raw(acct->data, str));
+	return (irc_send_raw(session, str));
 }
 
 int irc_proto_init(struct pork_proto *proto) {
@@ -851,8 +851,6 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->file_recv_data = irc_recv_data;
 	proto->file_abort = irc_file_abort;
 	proto->file_send = irc_file_send;
-
-	proto->fill_format_str = irc_fill_format_str;
 
 	irc_cmd_setup(proto);
 	return (0);

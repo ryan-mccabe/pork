@@ -125,7 +125,7 @@ char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
 int irc_chanmode_has_arg(struct irc_session *session, char mode);
 int irc_input_dispatch(struct irc_session *session);
 char *irc_text_filter(char *str);
-int irc_quote(struct pork_acct *acct, char *str);
+int irc_quote(struct irc_session *session, char *str);
 
 int irc_callback_init(struct irc_session *session);
 int irc_callback_clear(struct irc_session *session);

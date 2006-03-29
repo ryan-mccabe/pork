@@ -44,11 +44,13 @@
 #include <pork_msg.h>
 #include <pork_opt.h>
 #include <pork_set.h>
+#include <pork_format.h>
 #include <pork_missing.h>
 
 #include <pork_irc.h>
 #include <pork_irc_dcc.h>
 #include <pork_irc_set.h>
+#include <pork_irc_format.h>
 
 static struct irc_input *irc_tokenize(char *buf) {
 	struct irc_input *in = xcalloc(1, sizeof(*in));
@@ -777,7 +779,7 @@ static int irc_handler_353(struct pork_acct *acct, struct irc_input *in) {
 
 	buf[offset - 1] = '\0';
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USERS,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_USERS,
 			fmt_buf, sizeof(fmt_buf), in->tokens[4], buf);
 	if (ret < 1)
 		return (-1);
@@ -909,7 +911,7 @@ static int irc_handler_privmsg(struct pork_acct *acct, struct irc_input *in) {
 		} else if (host != NULL)
 			host[-1] = '\0';
 
-		ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REQUEST,
+		ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REQUEST,
 				buf, sizeof(buf), in->tokens[0], in->tokens[2],
 				in->cmd, in->args);
 		if (ret < 1)
@@ -976,14 +978,14 @@ static int irc_handler_311(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_NICK,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_NICK,
 			buf, sizeof(buf), in->tokens[3], in->tokens[4], in->tokens[5]);
 	if (ret < 1)
 		return (-1);
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
 	if (in->args != NULL) {
-		ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IRCNAME,
+		ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IRCNAME,
 				buf, sizeof(buf), in->args);
 		if (ret < 1)
 			return (-1);
@@ -1002,7 +1004,7 @@ static int irc_handler_319(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_CHANNELS,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_CHANNELS,
 			buf, sizeof(buf), in->args);
 	if (ret < 1)
 		return (-1);
@@ -1020,7 +1022,7 @@ static int irc_handler_312(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SERVER,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SERVER,
 			buf, sizeof(buf), in->tokens[4], in->args);
 	if (ret < 1)
 		return (-1);
@@ -1051,7 +1053,7 @@ static int irc_handler_317(struct pork_acct *acct, struct irc_input *in) {
 
 	time_to_str_full(idle_time, timebuf, sizeof(timebuf));
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IDLE,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IDLE,
 			buf, sizeof(buf), timebuf);
 	if (ret > 0)
 		screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
@@ -1071,7 +1073,7 @@ static int irc_handler_317(struct pork_acct *acct, struct irc_input *in) {
 	if (p != NULL)
 		*p = '\0';
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SIGNON,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SIGNON,
 			buf, sizeof(buf), timebuf);
 	if (ret < 1)
 		return (-1);
@@ -1087,7 +1089,7 @@ static int irc_handler_301(struct pork_acct *acct, struct irc_input *in) {
 	if (in->args == NULL)
 		return (-1);
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SIGNON,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_SIGNON,
 			buf, sizeof(buf), in->args);
 	if (ret < 1)
 		return (-1);
@@ -1105,7 +1107,7 @@ static int irc_handler_313(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_OPERATOR,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_OPERATOR,
 			buf, sizeof(buf), in->tokens[3], in->args);
 	if (ret < 1)
 		return (-1);
@@ -1124,13 +1126,13 @@ static int irc_handler_314(struct pork_acct *acct, struct irc_input *in) {
 		return (-1);
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_NICK,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_NICK,
 			buf, sizeof(buf), in->tokens[3], in->tokens[4], in->tokens[5]);
 	if (ret < 1)
 		return (-1);
 	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IRCNAME,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_WHOIS_IRCNAME,
 			buf, sizeof(buf), in->args);
 	if (ret < 1)
 		return (-1);
@@ -1177,7 +1179,7 @@ static int irc_handler_332(struct pork_acct *acct, struct irc_input *in) {
 	} else
 		win = cur_window();
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC,
 			buf, sizeof(buf), in->tokens[3], in->args);
 	if (ret < 1)
 		return (-1);
@@ -1203,7 +1205,7 @@ static int irc_handler_221(struct pork_acct *acct, struct irc_input *in) {
 
 	mode = str_from_tok(in->orig, 4);
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
 			buf, sizeof(buf), in->tokens[2], mode);
 	if (ret > 0)
 		screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_STATUS);
@@ -1235,7 +1237,7 @@ static int irc_handler_324(struct pork_acct *acct, struct irc_input *in) {
 	p = str_from_tok(in->orig, 5);
 	str_trim(p);
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_MODE,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CHAT_MODE,
 			buf, sizeof(buf), in->tokens[3], p);
 	if (ret < 1)
 		return (-1);
@@ -1310,7 +1312,7 @@ static int irc_handler_329(struct pork_acct *acct, struct irc_input *in) {
 	else
 		win = cur_window();
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_CREATED,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CHAT_CREATED,
 			buf, sizeof(buf), in->tokens[3], timebuf);
 	if (ret < 1)
 		return (-1);
@@ -1432,7 +1434,7 @@ static int irc_handler_333(struct pork_acct *acct, struct irc_input *in) {
 	else
 		win = cur_window();
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CHAT_TOPIC_INFO,
 			buf, sizeof(buf), in->tokens[3], in->tokens[4], timebuf);
 	if (ret < 1)
 		return (-1);
@@ -1549,7 +1551,7 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 				host[-1] = '\0';
 
 			/* Unhandled CTCP reply */
-			ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REPLY,
+			ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_CTCP_REPLY,
 					buf, sizeof(buf), in->tokens[0], in->tokens[2], host,
 					in->cmd, in->args);
 
@@ -1632,7 +1634,7 @@ static int irc_handler_user_mode(struct pork_acct *acct, struct irc_input *in) {
 		}
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_USER_MODE,
 			buf, sizeof(buf), acct->username, in->args);
 	if (ret < 1)
 		return (-1);
@@ -1947,7 +1949,7 @@ static int irc_handler_kill(struct pork_acct *acct, struct irc_input *in) {
 		*userhost++ = '\0';
 	}
 
-	ret = acct->proto->fill_format_str(acct, IRC_OPT_FORMAT_KILLED,
+	ret = irc_fill_format_str(acct, IRC_OPT_FORMAT_KILLED,
 			buf, sizeof(buf), in->tokens[0], userhost, in->args);
 	if (ret < 1)
 		return (-1);
@@ -1993,7 +1995,7 @@ static int irc_handler_ping_reply(struct pork_acct *acct, struct irc_input *in)
 				return (-1);
 			*host++ = '\0';
 
-			ret = acct->proto->fill_format_str(acct,
+			ret = irc_fill_format_str(acct,
 					IRC_OPT_FORMAT_CTCP_REPLY_PING, buf, sizeof(buf),
 					acct->username, in->tokens[2], host, timediff);
 

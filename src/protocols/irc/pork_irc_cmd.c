@@ -94,7 +94,7 @@ USER_COMMAND(irc_cmd_wii) {
 		int ret;
 
 		p = strchr(args, ' ');
-		if (*p != NULL)
+		if (p != NULL)
 			*p = '\0';
 
 		ret = snprintf(buf, sizeof(buf), "WHOIS %s %s", args, args);
