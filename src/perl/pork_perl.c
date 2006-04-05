@@ -264,10 +264,10 @@ int execute_perl(char *function, char **args) {
 		size_t notused;
 		char *err_msg = SvPV(ERRSV, notused);
 
-		screen_err_msg("Perl error: %s", err_msg);
+		screen_err_msg(_("Perl error: %s"), err_msg);
 		(void) POPs;
 	} else if (count != 1) {
-		screen_err_msg("Perl error: expected 1 value from %s, got %d",
+		screen_err_msg(_("Perl error: expected 1 value from %s, got %d"),
 			function, count);
 	} else {
 		ret_value = POPi;

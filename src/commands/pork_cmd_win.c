@@ -42,27 +42,27 @@ USER_COMMAND(cmd_win_bind) {
 
 	if (args == NULL || blank_str(args)) {
 		if (imwindow->owner != NULL && imwindow->owner->username != NULL) {
-			screen_cmd_output("This window is bound to account %s [refnum %u]",
+			screen_cmd_output(_("This window is bound to account %s [refnum %u]"),
 				imwindow->owner->username, imwindow->owner->refnum);
 		} else
-			screen_cmd_output("This window is bound to no account");
+			screen_cmd_output(_("This window is bound to no account"));
 
 		return;
 	}
 
 	if (str_to_uint(args, &refnum) == -1) {
-		screen_err_msg("Bad account refnum: %s", args);
+		screen_err_msg(_("Bad account refnum: %s"), args);
 		return;
 	}
 
 	ret = imwindow_bind_acct(imwindow, refnum);
 	if (ret == -1) {
 		if (imwindow->type == WIN_TYPE_CHAT)
-			screen_err_msg("You can't rebind chat windows");
+			screen_err_msg(_("You can't rebind chat windows"));
 		else
-			screen_err_msg("Account refnum %s doesn't exist", args);
+			screen_err_msg(_("Account refnum %s doesn't exist"), args);
 	} else {
-		screen_cmd_output("This window is now bound to account %s [refnum %u]",
+		screen_cmd_output(_("This window is now bound to account %s [refnum %u]"),
 			imwindow->owner->username, imwindow->owner->refnum);
 	}
 }
@@ -82,7 +82,7 @@ USER_COMMAND(cmd_win_close) {
 
 USER_COMMAND(cmd_win_dump) {
 	if (args == NULL || blank_str(args)) {
-		screen_err_msg("No output file specified");
+		screen_err_msg(_("No output file specified"));
 	} else {
 		char buf[4096];
 
@@ -102,13 +102,13 @@ USER_COMMAND(cmd_win_ignore) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Bad window refnum: %s", args);
+			screen_err_msg(_("Bad window refnum: %s"), args);
 			return;
 		}
 
 		win = imwindow_find_refnum(refnum);
 		if (win == NULL) {
-			screen_err_msg("No window with refnum %u", refnum);
+			screen_err_msg(_("No window with refnum %u"), refnum);
 			return;
 		}
 	} else
@@ -121,9 +121,9 @@ USER_COMMAND(cmd_win_list) {
 	dlist_t *cur;
 	static const char *win_types[] = { "Status", "Conv", "Chat" };
 
-	screen_cmd_output("Window List:");
+	screen_cmd_output(_("Window List:"));
 
-	screen_cmd_output("REFNUM\t\tNAME\t\tTYPE\t\tTARGET");
+	screen_cmd_output(_("REFNUM\t\tNAME\t\tTYPE\t\tTARGET"));
 	cur = screen.window_list;
 	do {
 		struct imwindow *imwindow = cur->data;
@@ -148,7 +148,7 @@ USER_COMMAND(cmd_win_rename) {
 	struct imwindow *win = cur_window();
 
 	if (args == NULL)
-		screen_cmd_output("Window %u has name \"%s\"", win->refnum, win->name);
+		screen_cmd_output(_("Window %u has name \"%s\""), win->refnum, win->name);
 	else
 		imwindow_rename(win, args);
 }
@@ -157,12 +157,12 @@ USER_COMMAND(cmd_win_renumber) {
 	u_int32_t num;
 
 	if (args == NULL || blank_str(args)) {
-		screen_cmd_output("This is window %u", cur_window()->refnum);
+		screen_cmd_output(_("This is window %u"), cur_window()->refnum);
 		return;
 	}
 
 	if (str_to_uint(args, &num) != 0) {
-		screen_err_msg("Bad window number: %s", args);
+		screen_err_msg(_("Bad window number: %s"), args);
 		return;
 	}
 
@@ -190,13 +190,13 @@ USER_COMMAND(cmd_win_set) {
 		args += 7;
 		refnum_str = strsep(&args, " ");
 		if (refnum_str == NULL || str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Invalid window refnum: %s", args);
+			screen_err_msg(_("Invalid window refnum: %s"), args);
 			return;
 		}
 
 		win = imwindow_find_refnum(refnum);
 		if (win == NULL) {
-			screen_err_msg("No window with refnum %u exists", refnum);
+			screen_err_msg(_("No window with refnum %u exists"), refnum);
 			return;
 		}
 
@@ -216,13 +216,13 @@ USER_COMMAND(cmd_win_skip) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Bad window refnum: %s", args);
+			screen_err_msg(_("Bad window refnum: %s"), args);
 			return;
 		}
 
 		win = imwindow_find_refnum(refnum);
 		if (win == NULL) {
-			screen_err_msg("No window with refnum %u", refnum);
+			screen_err_msg(_("No window with refnum %u"), refnum);
 			return;
 		}
 	} else
@@ -238,12 +238,12 @@ USER_COMMAND(cmd_win_swap) {
 		return;
 
 	if (str_to_uint(args, &num) != 0) {
-		screen_err_msg("Invalid window refnum: %s", args);
+		screen_err_msg(_("Invalid window refnum: %s"), args);
 		return;
 	}
 
 	if (screen_goto_window(num) != 0)
-		screen_err_msg("No such window: %s", args);
+		screen_err_msg(_("No such window: %s"), args);
 }
 
 USER_COMMAND(cmd_win_unignore) {
@@ -253,13 +253,13 @@ USER_COMMAND(cmd_win_unignore) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Bad window refnum: %s", args);
+			screen_err_msg(_("Bad window refnum: %s"), args);
 			return;
 		}
 
 		win = imwindow_find_refnum(refnum);
 		if (win == NULL) {
-			screen_err_msg("No window with refnum %u", refnum);
+			screen_err_msg(_("No window with refnum %u"), refnum);
 			return;
 		}
 	} else
@@ -275,13 +275,13 @@ USER_COMMAND(cmd_win_unskip) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Bad window refnum: %s", args);
+			screen_err_msg(_("Bad window refnum: %s"), args);
 			return;
 		}
 
 		win = imwindow_find_refnum(refnum);
 		if (win == NULL) {
-			screen_err_msg("No window with refnum %u", refnum);
+			screen_err_msg(_("No window with refnum %u"), refnum);
 			return;
 		}
 	} else

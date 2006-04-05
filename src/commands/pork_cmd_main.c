@@ -52,13 +52,13 @@ static void print_binding(void *data, void *nothing __notused) {
 	char key_name[64];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
-	screen_cmd_output("%s is bound to %s", key_name, binding->binding);
+	screen_cmd_output(_("%s is bound to %s"), key_name, binding->binding);
 }
 
 static void print_alias(void *data, void *nothing __notused) {
 	struct alias *alias = data;
 
-	screen_cmd_output("%s is aliased to %s%s",
+	screen_cmd_output(_("%s is aliased to %s%s"),
 		alias->alias, alias->orig, (alias->args != NULL ? alias->args : ""));
 }
 
@@ -81,11 +81,11 @@ USER_COMMAND(cmd_alias) {
 		struct alias *lalias = alias_find(&screen.alias_hash, alias);
 
 		if (lalias != NULL) {
-			screen_cmd_output("%s is aliased to %s%s",
+			screen_cmd_output(_("%s is aliased to %s%s"),
 				lalias->alias, lalias->orig,
 				(lalias->args != NULL ? lalias->args : ""));
 		} else
-			screen_err_msg("There is no alias for %s", alias);
+			screen_err_msg(_("There is no alias for %s"), alias);
 
 		return;
 	}
@@ -94,7 +94,7 @@ USER_COMMAND(cmd_alias) {
 		struct alias *lalias = alias_find(&screen.alias_hash, alias);
 
 		if (lalias != NULL) {
-			screen_cmd_output("%s is aliased to %s%s",
+			screen_cmd_output(_("%s is aliased to %s%s"),
 				lalias->alias, lalias->orig,
 				(lalias->args != NULL ? lalias->args : ""));
 
@@ -102,7 +102,7 @@ USER_COMMAND(cmd_alias) {
 		}
 	}
 
-	screen_err_msg("Error adding alias for %s", alias);
+	screen_err_msg(_("Error adding alias for %s"), alias);
 }
 
 USER_COMMAND(cmd_auto) {
@@ -144,7 +144,7 @@ USER_COMMAND(cmd_bind) {
 		else if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
 			target_binds = &screen.binds.main;
 		else {
-			screen_err_msg("Bad bind flag: %s", key_str);
+			screen_err_msg(_("Bad bind flag: %s"), key_str);
 			return;
 		}
 
@@ -158,7 +158,7 @@ USER_COMMAND(cmd_bind) {
 
 	key = bind_get_keycode(key_str);
 	if (key == -1) {
-		screen_err_msg("Bad keycode: %s", key_str);
+		screen_err_msg(_("Bad keycode: %s"), key_str);
 		return;
 	}
 
@@ -177,9 +177,9 @@ USER_COMMAND(cmd_bind) {
 	if (func == NULL) {
 		binding = bind_find(target_binds, key);
 		if (binding != NULL)
-			screen_cmd_output("%s is bound to %s", key_str, binding->binding);
+			screen_cmd_output(_("%s is bound to %s"), key_str, binding->binding);
 		else
-			screen_cmd_output("%s is not bound", key_str);
+			screen_cmd_output(_("%s is not bound"), key_str);
 
 		return;
 	}
@@ -187,11 +187,11 @@ USER_COMMAND(cmd_bind) {
 	bind_add(target_binds, key, func);
 	binding = bind_find(target_binds, key);
 	if (binding != NULL) {
-		screen_cmd_output("%s is bound to %s", key_str, binding->binding);
+		screen_cmd_output(_("%s is bound to %s"), key_str, binding->binding);
 		return;
 	}
 
-	screen_err_msg("Error binding %s", key_str);
+	screen_err_msg(_("Error binding %s"), key_str);
 }
 
 USER_COMMAND(cmd_connect) {
@@ -209,7 +209,7 @@ USER_COMMAND(cmd_connect) {
 
 		protocol = proto_get_num(args);
 		if (protocol == -1) {
-			screen_err_msg("Invalid protocol: %s", args);
+			screen_err_msg(_("Invalid protocol: %s"), args);
 			return;
 		}
 
@@ -238,7 +238,7 @@ USER_COMMAND(cmd_disconnect) {
 		char *refnum = strsep(&args, " ");
 
 		if (str_to_uint(refnum, &dest) == -1) {
-			screen_err_msg("Bad account refnum: %s", refnum);
+			screen_err_msg(_("Bad account refnum: %s"), refnum);
 			return;
 		}
 
@@ -248,13 +248,13 @@ USER_COMMAND(cmd_disconnect) {
 
 	node = pork_acct_find(dest);
 	if (node == NULL) {
-		screen_err_msg("Account refnum %u is not logged in", dest);
+		screen_err_msg(_("Account refnum %u is not logged in"), dest);
 		return;
 	}
 
 	acct = node->data;
 	if (!acct->can_connect) {
-		screen_err_msg("You cannot sign %s off", acct->username);
+		screen_err_msg(_("You cannot sign %s off"), acct->username);
 		return;
 	}
 
@@ -271,18 +271,18 @@ USER_COMMAND(cmd_help) {
 		char buf[8192];
 
 		if (pork_help_get_cmds("main", buf, sizeof(buf)) != -1) {
-			screen_cmd_output("Help for the following commands is available:");
+			screen_cmd_output(_("Help for the following commands is available:"));
 			screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT,
 				"\t%s", buf);
 		} else
-			screen_err_msg("Error: Can't find the help files");
+			screen_err_msg(_("Error: Can't find the help files"));
 
 		return;
 	}
 
 	section = strsep(&args, " ");
 	if (section == NULL) {
-		screen_err_msg("Error: Can't find the help files");
+		screen_err_msg(_("Error: Can't find the help files"));
 		return;
 	}
 
@@ -290,7 +290,7 @@ USER_COMMAND(cmd_help) {
 		char buf[8192];
 
 		if (pork_help_print("main", section) == -1) {
-			screen_err_msg("Help: Error: No such command or section: %s",
+			screen_err_msg(_("Help: Error: No such command or section: %s"),
 				section);
 		} else {
 			struct imwindow *win = cur_window();
@@ -299,14 +299,14 @@ USER_COMMAND(cmd_help) {
 				screen_win_msg(win, 0, 0, 1, MSG_TYPE_CMD_OUTPUT, " ");
 				strtoupper(section);
 				screen_win_msg(win, 0, 0, 1, MSG_TYPE_CMD_OUTPUT,
-					"%%W%s COMMANDS", section);
+					_("%%W%s COMMANDS"), section);
 				screen_win_msg(win, 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "\t%s", buf);
-				screen_cmd_output("Type /help %s <command> for the help text for a particular %s command.", section, section);
+				screen_cmd_output(_("Type /help %s <command> for the help text for a particular %s command."), section, section);
 			}
 		}
 	} else {
 		if (pork_help_print(section, args) == -1) {
-			screen_err_msg("Help: Error: No such command in section %s",
+			screen_err_msg(_("Help: Error: No such command in section %s"),
 				section);
 		}
 	}
@@ -317,7 +317,7 @@ USER_COMMAND(cmd_idle) {
 
 	if (args != NULL && !blank_str(args)) {
 		if (str_to_uint(args, &idle_secs) != 0) {
-			screen_err_msg("Invalid time specification: %s", args);
+			screen_err_msg(_("Invalid time specification: %s"), args);
 			return;
 		}
 	}
@@ -332,16 +332,16 @@ USER_COMMAND(cmd_laddr) {
 		if (get_hostname(&local_addr, buf, sizeof(buf)) != 0)
 			xstrncpy(buf, "0.0.0.0", sizeof(buf));
 
-		screen_cmd_output("New connections will use the local address %s", buf);
+		screen_cmd_output(_("New connections will use the local address %s"), buf);
 		return;
 	}
 
 	if (get_addr(args, &local_addr) != 0) {
-		screen_err_msg("Invalid local address: %s", args);
+		screen_err_msg(_("Invalid local address: %s"), args);
 		return;
 	}
 
-	screen_cmd_output("New connections will use the local address %s", args);
+	screen_cmd_output(_("New connections will use the local address %s"), args);
 }
 
 USER_COMMAND(cmd_lastlog) {
@@ -394,25 +394,25 @@ USER_COMMAND(cmd_load) {
 
 	expand_path(args, buf, sizeof(buf));
 	if (read_conf(acct, buf) != 0)
-		screen_err_msg("Error reading %s: %s", buf, strerror(errno));
+		screen_err_msg(_("Error reading %s: %s"), buf, strerror(errno));
 
 	screen_set_quiet(quiet);
 }
 
 USER_COMMAND(cmd_lport) {
 	if (args == NULL) {
-		screen_cmd_output("New connections will use local port %u",
+		screen_cmd_output(_("New connections will use local port %u"),
 			ntohs(local_port));
 		return;
 	}
 
 	if (get_port(args, &local_port) != 0) {
-		screen_err_msg("Error: Invalid local port: %s", args);
+		screen_err_msg(_("Error: Invalid local port: %s"), args);
 		return;
 	}
 
 	local_port = htons(local_port);
-	screen_cmd_output("New connections will use local port %s", args);
+	screen_cmd_output(_("New connections will use local port %s"), args);
 }
 
 USER_COMMAND(cmd_me) {
@@ -475,9 +475,9 @@ USER_COMMAND(cmd_save) {
 #if 0
 	FIXME
 	if (save_global_config() == 0)
-		screen_cmd_output("Your configuration has been saved");
+		screen_cmd_output(_("Your configuration has been saved"));
 	else
-		screen_err_msg("There was an error saving your configuration");
+		screen_err_msg(_("There was an error saving your configuration"));
 #endif
 }
 
@@ -493,7 +493,7 @@ USER_COMMAND(cmd_send) {
 		struct chatroom *chat = imwindow->data;
 
 		if (chat == NULL) {
-			screen_err_msg("%s is not a member of %s",
+			screen_err_msg(_("%s is not a member of %s"),
 				acct->username, imwindow->target);
 		} else
 			chat_send_msg(acct, chat, chat->title, args);
@@ -516,7 +516,7 @@ USER_COMMAND(cmd_unbind) {
 		else if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
 			target_binds = &screen.binds.main;
 		else {
-			screen_err_msg("Bad unbind flag: %s", binding);
+			screen_err_msg(_("Bad unbind flag: %s"), binding);
 			return;
 		}
 
@@ -528,14 +528,14 @@ USER_COMMAND(cmd_unbind) {
 
 	c = bind_get_keycode(binding);
 	if (c == -1) {
-		screen_err_msg("Bad keycode: %s", binding);
+		screen_err_msg(_("Bad keycode: %s"), binding);
 		return;
 	}
 
 	if (bind_remove(target_binds, c) == -1)
-		screen_cmd_output("There is no binding for %s", binding);
+		screen_cmd_output(_("There is no binding for %s"), binding);
 	else
-		screen_cmd_output("Binding for %s removed", binding);
+		screen_cmd_output(_("Binding for %s removed"), binding);
 }
 
 USER_COMMAND(cmd_unalias) {
@@ -543,9 +543,9 @@ USER_COMMAND(cmd_unalias) {
 		return;
 
 	if (alias_remove(&screen.alias_hash, args) == -1)
-		screen_cmd_output("No such alias: %s", args);
+		screen_cmd_output(_("No such alias: %s"), args);
 	else
-		screen_cmd_output("Alias %s removed", args);
+		screen_cmd_output(_("Alias %s removed"), args);
 }
 
 USER_COMMAND(cmd_nick) {
@@ -675,7 +675,7 @@ USER_COMMAND(cmd_perl_load) {
 	expand_path(args, buf, sizeof(buf));
 	ret = perl_load_file(buf);
 	if (ret != 0)
-		screen_err_msg("Error: The file %s couldn't be loaded", buf);
+		screen_err_msg(_("Error: The file \"%s\" couldn't be loaded"), buf);
 }
 
 USER_COMMAND(cmd_ping) {
@@ -936,8 +936,8 @@ USER_COMMAND(cmd_complete) {
 /*
 ** The / command set.
 **
-** Note that the "struct command" arrays are arranged in alphabetical
-** order. They have to be like that.
+** Note that the struct command arrays must be arranged in alphabetical
+** order.
 */
 
 static struct command command[] = {

@@ -50,9 +50,9 @@ USER_COMMAND(cmd_event_add) {
 	}
 
 	if (event_add(events, event_type, args, &refnum) != 0)
-		screen_err_msg("Error adding handler for %s", event_type);
+		screen_err_msg(_("Error adding handler for %s"), event_type);
 	else {
-		screen_cmd_output("Event handler %s installed for %s (refnum %u)",
+		screen_cmd_output(_("Event handler %s installed for %s (refnum %u)"),
 			args, event_type, refnum);
 	}
 }
@@ -71,16 +71,16 @@ USER_COMMAND(cmd_event_del) {
 	ret = event_del_type(acct->events, event_type, args);
 	if (ret == 0) {
 		if (args == NULL) {
-			screen_cmd_output("Successfully removed handler %s for %s",
+			screen_cmd_output(_("Successfully removed handler %s for %s"),
 				event_type, args);
 		} else
-			screen_cmd_output("Successfully removed all handlers for %s", args);
+			screen_cmd_output(_("Successfully removed all handlers for %s"), args);
 	} else {
 		if (args == NULL) {
-			screen_err_msg("Error removing handler %s for %s",
+			screen_err_msg(_("Error removing handler %s for %s"),
 				event_type, args);
 		} else
-			screen_err_msg("Error removing all handlers for %s", args);
+			screen_err_msg(_("Error removing all handlers for %s"), args);
 	}
 }
 
@@ -91,14 +91,14 @@ USER_COMMAND(cmd_event_del_refnum) {
 		return;
 
 	if (str_to_uint(args, &refnum) != 0) {
-		screen_err_msg("Invalid event refnum: %s", args);
+		screen_err_msg(_("Invalid event refnum: %s"), args);
 		return;
 	}
 
 	if (event_del_refnum(acct->events, refnum) != 0)
-		screen_err_msg("Error deleting event refnum %s", args);
+		screen_err_msg(_("Error deleting event refnum %s"), args);
 	else
-		screen_cmd_output("Event refnum %s was removed", args);
+		screen_cmd_output(_("Event refnum %s was removed"), args);
 }
 
 USER_COMMAND(cmd_event_list) {

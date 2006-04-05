@@ -55,18 +55,18 @@ USER_COMMAND(cmd_file_cancel) {
 	}
 
 	if (str_to_uint(args, &refnum) != 0) {
-		screen_err_msg("Invalid file transfer refnum: %s", args);
+		screen_err_msg(_("Invalid file transfer refnum: %s"), args);
 		return;
 	}
 
 	xfer = transfer_find_refnum(acct, refnum);
 	if (xfer == NULL) {
-		screen_err_msg("Invalid file transfer refnum: %s", args);
+		screen_err_msg(_("Invalid file transfer refnum: %s"), args);
 		return;
 	}
 
 	if (transfer_cancel_local(xfer) != 0)
-		screen_err_msg("Error canceling file transfer %s", args);
+		screen_err_msg(_("Error canceling file transfer %s"), args);
 }
 
 USER_COMMAND(cmd_file_list) {
@@ -108,13 +108,13 @@ USER_COMMAND(cmd_file_get) {
 	}
 
 	if (str_to_uint(refnum_str, &refnum) != 0) {
-		screen_err_msg("Invalid file transfer refnum: %s", refnum_str);
+		screen_err_msg(_("Invalid file transfer refnum: %s"), refnum_str);
 		return;
 	}
 
 	xfer = transfer_find_refnum(acct, refnum);
 	if (xfer == NULL) {
-		screen_err_msg("Invalid file transfer refnum: %s", refnum_str);
+		screen_err_msg(_("Invalid file transfer refnum: %s"), refnum_str);
 		return;
 	}
 
@@ -135,7 +135,7 @@ USER_COMMAND(cmd_file_send) {
 
 	dest = strsep(&args, " ");
 	if (dest == NULL || args == NULL) {
-		screen_err_msg("You must specify a user and a filename");
+		screen_err_msg(_("You must specify a user and a file name"));
 		return;
 	}
 

@@ -72,7 +72,7 @@ inline void input_bkspace(struct pork_input *input) {
 }
 
 /*
-** Add the character "c" at the cursor position.
+** Add the character @c at the cursor position.
 */
 
 inline void input_insert(struct pork_input *input, int c) {
@@ -94,7 +94,7 @@ inline void input_insert(struct pork_input *input, int c) {
 }
 
 /*
-** Insert the string "str" at the cursor position.
+** Insert the string @str at the cursor position.
 */
 
 inline void input_insert_str(struct pork_input *input, char *str) {
@@ -155,8 +155,8 @@ inline void input_clear_to_end(struct pork_input *input) {
 }
 
 /*
-** Deletes "num" characters starting at the current cursor
-** position. If "num" is negative, it deletes from the cursor
+** Deletes @num characters starting at the current cursor
+** position. If @num is negative, it deletes from the cursor
 ** back, otherwise it deletes from the cursor forward.
 */
 
@@ -521,7 +521,7 @@ inline u_int32_t input_get_cursor_pos(struct pork_input *input) {
 }
 
 /*
-** Set the input prompt to the string specified by "prompt"
+** Set the input prompt to the string specified by @prompt
 */
 
 int input_set_prompt(struct pork_input *input, char *prompt) {
@@ -593,7 +593,7 @@ int input_send(struct pork_acct *acct, struct pork_input *input, char *args) {
 
 	/*
 	** This is kind of a hack, but it's necessary if the client
-	** isn't to crash when someone types "/input send"
+	** isn't to crash when someone types '/input send'
 	*/
 
 	if (recursion == 1 && args == NULL) {

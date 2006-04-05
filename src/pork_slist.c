@@ -7,7 +7,7 @@
 **
 ** This could be improved and made more useful for other purposes
 ** (it's fine for what this program needs right now) by supporting
-** "hidden" nodes, so that nodes don't have to be deleted from the list
+** 'hidden' nodes, so that nodes don't have to be deleted from the list
 ** in order to not be displayed.
 **
 ** This program is free software; you can redistribute it and/or modify

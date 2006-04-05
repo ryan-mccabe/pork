@@ -51,7 +51,7 @@ int get_options(int argc, char *const argv[]) {
 		switch (opt) {
 			case 'H':
 				if (get_addr(optarg, &local_addr) != 0) {
-					fprintf(stderr, "Error: Invalid local address: %s\n",
+					fprintf(stderr, _("Error: Invalid local address: %s\n"),
 						optarg);
 					return (-1);
 				}
@@ -61,7 +61,8 @@ int get_options(int argc, char *const argv[]) {
 
 			case 'p':
 				if (get_port(optarg, &local_port) != 0) {
-					fprintf(stderr, "Error: Invalid local port: %s\n", optarg);
+					fprintf(stderr, _("Error: Invalid local port: %s\n"),
+						optarg);
 					return (-1);
 				}
 
@@ -75,10 +76,10 @@ int get_options(int argc, char *const argv[]) {
 				break;
 
 			case 'v':
-				printf("%s version %s (%s)\n", PACKAGE, VERSION,
+				printf(_("%s version %s (%s)\n"), PACKAGE, VERSION,
 					PACKAGE_EXTRAVERSION);
 
-				printf("Written by %s <%s>\n", PACKAGE_AUTHOR,
+				printf(_("Written by %s <%s>\n"), PACKAGE_AUTHOR,
 					PACKAGE_BUGREPORT);
 				printf("%s\n", PACKAGE_WEBSITE);
 				exit(0);

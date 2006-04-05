@@ -76,15 +76,15 @@ USER_COMMAND(aim_cmd_idle_mode) {
 		u_int32_t mode;
 
 		if (str_to_uint(args, &mode) != 0) {
-			screen_err_msg("Invalid number: %s", args);
+			screen_err_msg(_("Invalid number: %s"), args);
 			return;
 		}
 
 		aim_report_idle(acct, mode);
 	}
 
-	screen_cmd_output("The reporting of idle time for %s is %s",
-		acct->username, (acct->report_idle ? "enabled" : "disabled"));
+	screen_cmd_output(_("The reporting of idle time for %s is %s"),
+		acct->username, (acct->report_idle ? _("enabled") : _("disabled")));
 }
 
 USER_COMMAND(aim_cmd_privacy_mode) {
@@ -94,7 +94,7 @@ USER_COMMAND(aim_cmd_privacy_mode) {
 		str_to_int(args, &mode);
 
 	mode = aim_set_privacy_mode(acct, mode);
-	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
+	screen_cmd_output(_("Privacy mode for %s is %d"), acct->username, mode);
 }
 
 static struct command aim_command[] = {

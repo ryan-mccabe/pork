@@ -96,7 +96,7 @@ static void resize_display(void) {
 
 	if (ioctl(1, TIOCGWINSZ, &size) != 0) {
 		debug("ioctl: %s", strerror(errno));
-		pork_exit(-1, NULL, "Fatal error getting screen size\n");
+		pork_exit(-1, NULL, _("Fatal error getting screen size\n"));
 	}
 
 	screen_resize(size.ws_row, size.ws_col);
@@ -108,7 +108,7 @@ static void sigwinch_handler(int sig __notused) {
 }
 
 static void generic_signal_handler(int sig) {
-	pork_exit(sig, NULL, "Caught signal %d. Exiting\n", sig);
+	pork_exit(sig, NULL, _("Caught signal %d. Exiting\n"), sig);
 }
 
 void keyboard_input(int fd __notused,
@@ -142,7 +142,7 @@ void keyboard_input(int fd __notused,
 			acct->proto->set_idle_time(acct, 0);
 		acct->marked_idle = 0;
 		screen_win_msg(cur_window(), 1, 1, 0,
-			MSG_TYPE_UNIDLE, "%s is no longer marked idle", acct->username);
+			MSG_TYPE_UNIDLE, _("%s is no longer marked idle"), acct->username);
 	}
 
 	bind_exec(acct, imwindow->active_binds, key);
@@ -155,12 +155,12 @@ int main(int argc, char **argv) {
 	int ret;
 
 	if (get_options(argc, argv) != 0) {
-		fprintf(stderr, "Fatal: Error getting options.\n");
+		fprintf(stderr, _("Fatal: Error getting options.\n"));
 		exit(-1);
 	}
 
 	if (initialize_environment() != 0) {
-		fprintf(stderr, "Fatal: Error initializing the terminal.\n");
+		fprintf(stderr, _("Fatal: Error initializing the terminal.\n"));
 		exit(-1);
 	}
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
 	perl_init();
 
 	if (screen_init(LINES, COLS) == -1)
-		pork_exit(-1, NULL, "Fatal: Error initializing the terminal.\n");
+		pork_exit(-1, NULL, _("Fatal: Error initializing the terminal.\n"));
 
 	signal(SIGWINCH, sigwinch_handler);
 	signal(SIGTERM, generic_signal_handler);
@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
 	screen_set_quiet(0);
 
 	if (ret != 0)
-		screen_err_msg("Error reading the global configuration.");
+		screen_err_msg(_("Error reading the global configuration."));
 
 	status_draw(screen.null_acct);
 	screen_draw_input();

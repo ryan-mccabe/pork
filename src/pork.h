@@ -10,6 +10,10 @@
 #ifndef __PORK_H
 #define __PORK_H
 
+#ifndef _
+	#define _(x) (x)
+#endif
+
 #ifdef HAVE___ATTRIBUTE__
 	#define __used		__attribute__((used))
 	#define __notused	__attribute__((unused))

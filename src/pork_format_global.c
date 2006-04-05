@@ -266,11 +266,11 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		/* Disconnect / reconnect status */
 		case 'D':
 			if (acct->reconnecting)
-				ret = xstrncpy(buf, "reconnecting", len);
+				ret = xstrncpy(buf, _("reconnecting"), len);
 			else if (acct->disconnected)
-				ret = xstrncpy(buf, "disconnected", len);
+				ret = xstrncpy(buf, _("disconnected"), len);
 			else
-				ret = xstrncpy(buf, "connected", len);
+				ret = xstrncpy(buf, _("connected"), len);
 			break;
 
 		/* Screen name */
@@ -351,16 +351,16 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		case '!':
 			if (acct->disconnected) {
 				if (acct->reconnecting)
-					ret = xstrncpy(buf, "reconnecting", len);
+					ret = xstrncpy(buf, _("reconnecting"), len);
 				else
-					ret = xstrncpy(buf, "disconnected", len);
+					ret = xstrncpy(buf, _("disconnected"), len);
 			} else if (acct->connected) {
 				if (acct->away_msg != NULL)
-					ret = xstrncpy(buf, "away", len);
+					ret = xstrncpy(buf, _("away"), len);
 				else
-					ret = xstrncpy(buf, "online", len);
+					ret = xstrncpy(buf, _("online"), len);
 			} else
-				ret = xstrncpy(buf, "not connected", len);
+				ret = xstrncpy(buf, _("not connected"), len);
 			break;
 
 		/* Protocol */

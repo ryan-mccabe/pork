@@ -81,7 +81,7 @@ static struct irc_input *irc_tokenize(char *buf) {
 		in->tokens[i++] = p;
 
 	if (i < 1) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		free(in->orig);
 		free(in);
 		return (NULL);
@@ -191,14 +191,14 @@ static int irc_handler_err_msg(struct pork_acct *acct, struct irc_input *in) {
 	char *str;
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	str = irc_text_filter(in->tokens[3]);
 
 	if (in->args == NULL)
-		msg = xstrdup("Unknown error");
+		msg = xstrdup(_("Unknown error"));
 	else
 		msg = irc_text_filter(in->args);
 
@@ -218,7 +218,7 @@ static int irc_handler_dcc(struct pork_acct *acct, struct irc_input *in) {
 	cmd = strsep(&p, " ");
 
 	if (cmd == NULL || p == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -354,7 +354,7 @@ static int irc_handler_print_arg(struct pork_acct *acct, struct irc_input *in) {
 	char *str;
 
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -413,12 +413,12 @@ static ssize_t irc_read_data(int sock, char *buf, size_t len) {
 			if (errno == EINTR)
 				continue;
 
-			debug("sock err: %d:%s", sock, strerror(errno));
+			debug("read: %d:%s", sock, strerror(errno));
 			return (-1);
 		}
 
 		if (ret == 0) {
-			debug("sock err: %d:%s", sock, strerror(errno));
+			debug("read: %d:%s", sock, strerror(errno));
 			return (-1);
 		}
 
@@ -461,7 +461,7 @@ int irc_input_dispatch(struct irc_session *session) {
 		in = irc_tokenize(cur);
 
 		if (in == NULL) {
-			debug("invalid input from server: %s", cur);
+			debug("invalid input from server: \"%s\"", cur);
 			continue;
 		}
 
@@ -492,7 +492,7 @@ int irc_input_dispatch(struct irc_session *session) {
 
 static int irc_handler_001(struct pork_acct *acct, struct irc_input *in) {
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -523,7 +523,7 @@ static int irc_handler_print_num(struct pork_acct *acct, struct irc_input *in) {
 	char *str;
 
 	if (in->args == NULL || in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -542,7 +542,7 @@ static int irc_handler_print_tok(struct pork_acct *acct, struct irc_input *in) {
 	u_int32_t off = 0;
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -575,7 +575,7 @@ static int irc_handler_315(struct pork_acct *acct, struct irc_input *in) {
 	struct irc_chan_data *irc_data;
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -592,7 +592,7 @@ static int irc_handler_352(struct pork_acct *acct, struct irc_input *in) {
 	int silent = 0;
 
 	if (in->num_tokens < 9 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -654,13 +654,13 @@ static int irc_handler_367(struct pork_acct *acct, struct irc_input *in) {
 	char *str;
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	str = str_from_tok(in->orig, 4);
 	if (str == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -679,7 +679,7 @@ static int irc_handler_433(struct pork_acct *acct, struct irc_input *in) {
 	}
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -710,7 +710,7 @@ static int irc_handler_353(struct pork_acct *acct, struct irc_input *in) {
 	struct imwindow *win = NULL;
 
 	if (in->num_tokens < 5 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -877,7 +877,7 @@ static int irc_handler_privmsg(struct pork_acct *acct, struct irc_input *in) {
 	char *host;
 
 	if (in->num_tokens < 3 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -961,7 +961,7 @@ no_ctcp:
 
 static int irc_handler_ping(struct pork_acct *acct, struct irc_input *in) {
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -974,7 +974,7 @@ static int irc_handler_311(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->num_tokens < 6) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1000,7 +1000,7 @@ static int irc_handler_319(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1018,7 +1018,7 @@ static int irc_handler_312(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->num_tokens < 5) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1042,12 +1042,12 @@ static int irc_handler_317(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->num_tokens < 6) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	if (str_to_uint(in->tokens[4], &idle_time) != 0) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1059,7 +1059,7 @@ static int irc_handler_317(struct pork_acct *acct, struct irc_input *in) {
 		screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CMD_OUTPUT);
 
 	if (str_to_uint(in->tokens[5], &temp) != 0) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1103,7 +1103,7 @@ static int irc_handler_313(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1122,7 +1122,7 @@ static int irc_handler_314(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 6) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1145,7 +1145,7 @@ static int irc_handler_nick(struct pork_acct *acct, struct irc_input *in) {
 	char *p;
 
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1168,7 +1168,7 @@ static int irc_handler_332(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->num_tokens < 4 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1194,7 +1194,7 @@ static int irc_handler_221(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1224,7 +1224,7 @@ static int irc_handler_324(struct pork_acct *acct, struct irc_input *in) {
 	char *p;
 
 	if (in->num_tokens < 5) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1292,17 +1292,17 @@ static int irc_handler_329(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 5) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	if (str_to_int(in->tokens[4], &time_set) == -1) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	if (date_to_str((time_t) time_set, timebuf, sizeof(timebuf)) == -1) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1326,7 +1326,7 @@ static int irc_handler_302(struct pork_acct *acct, struct irc_input *in) {
 	char *tok;
 
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1383,7 +1383,7 @@ static int irc_handler_322(struct pork_acct *acct, struct irc_input *in) {
 	char *topic_q;
 
 	if (in->num_tokens < 5) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1414,17 +1414,17 @@ static int irc_handler_333(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 6) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	if (str_to_int(in->tokens[5], &time_set) == -1) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
 	if (date_to_str((time_t) time_set, timebuf, sizeof(timebuf)) == -1) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1506,7 +1506,7 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 	int ret = 0;
 
 	if (in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1516,7 +1516,7 @@ static int irc_handler_notice(struct pork_acct *acct, struct irc_input *in) {
 	}
 
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1595,7 +1595,7 @@ static int irc_handler_user_mode(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->args[0] != '+' && in->args[0] != '-') {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1792,7 +1792,7 @@ static int irc_handler_chan_mode(struct pork_acct *acct, struct irc_input *in) {
 
 static int irc_handler_mode(struct pork_acct *acct, struct irc_input *in) {
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1804,7 +1804,7 @@ static int irc_handler_mode(struct pork_acct *acct, struct irc_input *in) {
 
 			args = str_from_tok(in->orig, 4);
 			if (args == NULL) {
-				debug("invalid input from server: %s", in->orig);
+				debug("invalid input from server: \"%s\"", in->orig);
 				return (-1);
 			}
 
@@ -1816,7 +1816,7 @@ static int irc_handler_mode(struct pork_acct *acct, struct irc_input *in) {
 	}
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1828,7 +1828,7 @@ static int irc_handler_quit(struct pork_acct *acct, struct irc_input *in) {
 	char *p;
 
 	if (in->num_tokens < 2) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1853,7 +1853,7 @@ static int irc_handler_part(struct pork_acct *acct, struct irc_input *in) {
 	int ret = 0;
 
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1879,7 +1879,7 @@ static int irc_handler_kick(struct pork_acct *acct, struct irc_input *in) {
 	int ret;
 
 	if (in->num_tokens < 4) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1891,7 +1891,7 @@ static int irc_handler_kick(struct pork_acct *acct, struct irc_input *in) {
 
 	p = strchr(in->tokens[0], '!');
 	if (p == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 	*p++ = '\0';
@@ -1917,7 +1917,7 @@ static int irc_handler_topic(struct pork_acct *acct, struct irc_input *in) {
 	struct chatroom *chat;
 
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1940,7 +1940,7 @@ static int irc_handler_kill(struct pork_acct *acct, struct irc_input *in) {
 	char buf[2048];
 
 	if (in->num_tokens < 3) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 
@@ -1962,7 +1962,7 @@ static int irc_handler_invite(struct pork_acct *acct, struct irc_input *in) {
 	char *p;
 
 	if (in->num_tokens < 3 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
+		debug("invalid input from server: \"%s\"", in->orig);
 		return (-1);
 	}
 

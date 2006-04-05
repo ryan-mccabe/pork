@@ -172,7 +172,7 @@ int pork_set_away(struct pork_acct *acct, char *msg) {
 
 	if (acct->proto->set_away != NULL) {
 		if (acct->proto->set_away(acct, msg) == -1) {
-			screen_err_msg("An error occurred while setting %s away",
+			screen_err_msg(_("An error occurred while setting %s away"),
 				acct->username);
 
 			return (-1);
@@ -180,7 +180,7 @@ int pork_set_away(struct pork_acct *acct, char *msg) {
 	}
 
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_AWAY,
-		"%s is now away", acct->username);
+		_("%s is now away"), acct->username);
 	return (0);
 }
 
@@ -189,7 +189,7 @@ int pork_set_back(struct pork_acct *acct) {
 		return (0);
 
 	if (acct->away_msg == NULL) {
-		screen_err_msg("%s is not away", acct->username);
+		screen_err_msg(_("%s is not away"), acct->username);
 		return (-1);
 	}
 
@@ -198,7 +198,7 @@ int pork_set_back(struct pork_acct *acct) {
 
 	if (acct->proto->set_back != NULL) {
 		if (acct->proto->set_back(acct) == -1) {
-			screen_err_msg("An error occurred while setting %s unaway",
+			screen_err_msg(_("An error occurred while setting %s unaway"),
 				acct->username);
 
 			return (-1);
@@ -209,7 +209,7 @@ int pork_set_back(struct pork_acct *acct) {
 	memset(&acct->autoreply, 0, sizeof(acct->autoreply));
 
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_BACK,
-		"%s is no longer away", acct->username);
+		_("%s is no longer away"), acct->username);
 	return (0);
 }
 
@@ -220,7 +220,7 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 		if (acct->proto->send_msg != NULL) {
 			ret = acct->proto->send_msg(acct, dest, msg);
 			if (ret == -1) {
-				screen_err_msg("Error: the last message to %s could not be sent",
+				screen_err_msg(_("Error: the last message to %s could not be sent"),
 					dest);
 			} else {
 				struct imwindow *win;
@@ -270,8 +270,8 @@ int pork_set_profile(struct pork_acct *acct, char *profile) {
 
 	if (ret == 0) {
 		screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
-			"Profile for %s was %s", acct->username,
-			(profile == NULL ? "cleared" : "set"));
+			_("Profile for %s was %s"), acct->username,
+			(profile == NULL ? _("cleared") : _("set")));
 	}
 
 	return (ret);
@@ -290,7 +290,7 @@ int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	time_to_str_full(seconds, timebuf, sizeof(timebuf));
 
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
-		"%s's idle time set to %s", acct->username, timebuf);
+		_("%s's idle time set to %s"), acct->username, timebuf);
 
 	return (0);
 }

@@ -174,7 +174,7 @@ void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
 
 	written = fwrite(buf, 1, (size_t) ret, xfer->fp);
 	if (written != ret) {
-		screen_err_msg("Error writing file %s: %s",
+		screen_err_msg(_("Error writing file %s: %s"),
 			xfer->fname_local, strerror(errno));
 		transfer_lost(xfer);
 		return;
@@ -207,7 +207,7 @@ void transfer_send_data(int fd __notused, u_int32_t cond __notused, void *data)
 
 	sent = sock_write(xfer->sock, buf, ret);
 	if (sent != ret) {
-		screen_err_msg("Error sending data for file %s: %s",
+		screen_err_msg(_("Error sending data for file %s: %s"),
 			xfer->fname_local, strerror(errno));
 		transfer_lost(xfer);
 		return;
@@ -246,7 +246,7 @@ int transfer_recv_complete(struct file_transfer *xfer) {
 		xfer->acct->proto->file_recv_complete(xfer) == -1)
 	{
 		screen_err_msg(
-			"There was an error finishing transfer refnum %u for %s from %s",
+			_("There was an error finishing transfer refnum %u for %s from %s"),
 			xfer->refnum, xfer->fname_local, xfer->peer_username);
 
 		transfer_abort(xfer);
@@ -271,7 +271,7 @@ int transfer_send_complete(struct file_transfer *xfer) {
 		xfer->acct->proto->file_send_complete(xfer) == -1)
 	{
 		screen_err_msg(
-			"There was an error finishing transfer refnum %u for %s to %s",
+			_("There was an error finishing transfer refnum %u for %s to %s"),
 			xfer->refnum, xfer->fname_local, xfer->peer_username);
 
 		transfer_abort(xfer);
@@ -358,7 +358,7 @@ static int transfer_find_filename(struct file_transfer *xfer, char *filename) {
 		return (-EEXIST);
 
 	if (tries > 0) {
-		screen_err_msg("%s already exists -- using %s instead",
+		screen_err_msg(_("%s already exists -- using %s instead"),
 			fname_orig, buf);
 	}
 
@@ -380,13 +380,13 @@ int transfer_get(struct file_transfer *xfer, char *filename) {
 	int ret;
 
 	if (transfer_find_filename(xfer, filename) == -1) {
-		screen_err_msg("Error finding a suitable filename. Specify one explictly");
+		screen_err_msg(_("Error finding a suitable filename. Specify one explictly"));
 		return (-1);
 	}
 
 	ret = xfer->acct->proto->file_accept(xfer);
 	if (ret == -1) {
-		screen_err_msg("Error accepting %s", xfer->fname_local);
+		screen_err_msg(_("Error accepting %s"), xfer->fname_local);
 		transfer_lost(xfer);
 		return (-1);
 	}
@@ -465,26 +465,26 @@ int transfer_send(struct pork_acct *acct, char *dest, char *filename) {
 		return (-1);
 
 	if (expand_path(filename, buf, sizeof(buf)) == -1) {
-		screen_err_msg("Error: The path is too long");
+		screen_err_msg(_("Error: The path is too long"));
 		return (-1);
 	}
 
 	fp = fopen(buf, "r");
 	if (fp == NULL) {
 		debug("fopen: %s: %s", buf, strerror(errno));
-		screen_err_msg("Error: Cannot open %s for reading", buf);
+		screen_err_msg(_("Error: Cannot open %s for reading"), buf);
 		return (-1);
 	}
 
 	if (file_get_size(fp, &len) != 0) {
-		screen_err_msg("Error: Cannot determine the size of %s", buf);
+		screen_err_msg(_("Error: Cannot determine the size of %s"), buf);
 		fclose(fp);
 		return (-1);
 	}
 
 	xfer = transfer_new(acct, dest, TRANSFER_DIR_SEND, buf, len);
 	if (xfer == NULL) {
-		screen_err_msg("Error sending %s to %s -- aborting", buf, dest);
+		screen_err_msg(_("Error sending %s to %s -- aborting"), buf, dest);
 		fclose(fp);
 		return (-1);
 	}
@@ -657,7 +657,7 @@ int transfer_cancel_remote(struct file_transfer *xfer) {
 }
 
 char *transfer_status_str(struct file_transfer *xfer) {
-	static char *file_status[] = { "WAITING", "ACTIVE", "COMPLETE" };
+	static char *file_status[] = { _("WAITING"), _("ACTIVE"), _("COMPLETE") };
 
 	return (file_status[xfer->status]);
 }

@@ -35,8 +35,8 @@ size_t dlist_len(dlist_t *head) {
 }
 
 /*
-** Add a node containing the data specified in "data"
-** to the head of the list specified by "head"
+** Add a node containing the data specified in @data
+** to the head of the list specified by @head
 */
 
 dlist_t *dlist_add_head(dlist_t *head, void *data) {
@@ -53,8 +53,8 @@ dlist_t *dlist_add_head(dlist_t *head, void *data) {
 }
 
 /*
-** Add a node containing the data specified in "data"
-** to the list specified by "head" after the node "node"
+** Add a node containing the data specified in @data
+** to the list specified by @head after the node @node
 */
 
 dlist_t *dlist_add_after(dlist_t *head, dlist_t *node, void *data) {
@@ -74,7 +74,7 @@ dlist_t *dlist_add_after(dlist_t *head, dlist_t *node, void *data) {
 
 /*
 ** Return the last node in the list
-** specified by "head"
+** specified by @head
 */
 
 dlist_t *dlist_tail(dlist_t *head) {
@@ -90,8 +90,8 @@ dlist_t *dlist_tail(dlist_t *head) {
 }
 
 /*
-** Add a node containing the data specified in "data"
-** to the tail of the list specified by "head"
+** Add a node containing the data specified in @data
+** to the tail of the list specified by @head
 */
 
 dlist_t *dlist_add_tail(dlist_t *head, void *data) {
@@ -123,7 +123,7 @@ void *dlist_remove_head(dlist_t **list_head) {
 }
 
 /*
-** Remove "node" from the list pointed to by "head"
+** Remove @node from the list pointed to by @head
 */
 
 dlist_t *dlist_remove(dlist_t *head, dlist_t *node) {
@@ -142,7 +142,7 @@ dlist_t *dlist_remove(dlist_t *head, dlist_t *node) {
 }
 
 /*
-** Destroy the list pointed to by "head", run the "cleanup"
+** Destroy the list pointed to by @head, run the @cleanup
 ** function on the data in each node, if it's specified.
 */
 
@@ -172,9 +172,9 @@ static int dlist_default_compare(void *l, void *r) {
 }
 
 /*
-** Find the node in the list specified by "head"
-** whose data field is "data". Use the function
-** comp() to determine if the fields are the same.
+** Find the node in the list specified by @head
+** whose data field is @data. Use the function
+** @comp to determine if the fields are the same.
 */
 
 dlist_t *dlist_find(dlist_t *head, void *data, int (*comp)(void *, void *)) {
@@ -192,8 +192,8 @@ dlist_t *dlist_find(dlist_t *head, void *data, int (*comp)(void *, void *)) {
 }
 
 /*
-** Iterate through the list specified by "head", calling
-** the function func(node, "data") for each node.
+** Iterate through the list specified by @head, calling
+** the function @func on each node.
 */
 
 void dlist_iterate(dlist_t *head, void (*func)(void *, void *), void *data) {

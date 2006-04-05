@@ -63,31 +63,31 @@ static u_int32_t pork_caps =	AIM_CAPS_CHAT | AIM_CAPS_INTEROPERATE |
 								AIM_CAPS_SENDFILE | AIM_CAPS_ICHAT;
 
 static char *msgerrreason[] = {
-	"Invalid error",
-	"Invalid SNAC",
-	"Rate to host",
-	"Rate to client",
-	"Not logged in",
-	"Service unavailable",
-	"Service not defined",
-	"Obsolete SNAC",
-	"Not supported by host",
-	"Not supported by client",
-	"Refused by client",
-	"Reply too big",
-	"Responses lost",
-	"Request denied",
-	"Busted SNAC payload",
-	"Insufficient rights",
-	"In local permit/deny",
-	"Sender's warning level is too high",
-	"Receiver's warning level is too high",
-	"User temporarily unavailable",
-	"No match",
-	"List overflow",
-	"Request ambiguous",
-	"Queue full",
-	"Not while on AOL"
+	_("Invalid error"),
+	_("Invalid SNAC"),
+	_("Rate to host"),
+	_("Rate to client"),
+	_("Not logged in"),
+	_("Service unavailable"),
+	_("Service not defined"),
+	_("Obsolete SNAC"),
+	_("Not supported by host"),
+	_("Not supported by client"),
+	_("Refused by client"),
+	_("Reply too big"),
+	_("Responses lost"),
+	_("Request denied"),
+	_("Busted SNAC payload"),
+	_("Insufficient rights"),
+	_("In local permit/deny"),
+	_("Sender's warning level is too high"),
+	_("Receiver's warning level is too high"),
+	_("User temporarily unavailable"),
+	_("No match"),
+	_("List overflow"),
+	_("Request ambiguous"),
+	_("Queue full"),
+	_("Not while on AOL")
 };
 
 
@@ -132,13 +132,13 @@ int aim_sock_connect(	const char *ip,
 		*port++ = '\0';
 
 		if (get_port(port, &port_num) != 0) {
-			screen_err_msg("Error: Invalid port: %s", port);
+			screen_err_msg(_("Error: Invalid port: %s"), port);
 			goto err_out;
 		}
 	}
 
 	if (get_addr(addr, &ss) != 0) {
-		screen_err_msg("Error: Invalid host: %s", addr);
+		screen_err_msg(_("Error: Invalid host: %s"), addr);
 		goto err_out;
 	}
 
@@ -226,7 +226,7 @@ static void aim_print_info(	char *user,
 static inline void aim_disconnected_chat(	struct pork_acct *acct,
 											struct chatroom *chat)
 {
-	chat_forced_leave(acct, chat->title, "the server", "disconnected");
+	chat_forced_leave(acct, chat->title, _("the server"), _("disconnected"));
 }
 
 void aim_listen_conn_event(int sock, u_int32_t cond, void *data) {
@@ -348,13 +348,13 @@ void aim_connected(int sock, u_int32_t cond __notused, void *data) {
 	ret = sock_is_error(sock);
 	if (ret != 0) {
 		close(sock);
-		screen_err_msg("network error: %s: %s", acct->username, strerror(ret));
+		screen_err_msg(_("network error: %s: %s"), acct->username, strerror(ret));
 
 		switch (conn->type) {
 			case AIM_CONN_TYPE_CHATNAV:
 				aim_kill_pending_chats(acct);
 				aim_conn_kill(session, &conn);
-				screen_err_msg("%s is unable to connect to the chatnav server",
+				screen_err_msg(_("%s is unable to connect to the chatnav server"),
 					acct->username);
 				break;
 
@@ -362,13 +362,13 @@ void aim_connected(int sock, u_int32_t cond __notused, void *data) {
 				struct chatroom *chat = conn->priv;
 
 				chat_forced_leave(acct, chat->title,
-					"the server", "can't connect");
+					_("the server"), _("can't connect"));
 				break;
 			}
 
 			case AIM_CONN_TYPE_AUTH:
 			case AIM_CONN_TYPE_BOS:
-				screen_err_msg("Unable to login as %s", acct->username);
+				screen_err_msg(_("Unable to login as %s"), acct->username);
 				pork_acct_disconnected(acct);
 				break;
 
@@ -477,11 +477,11 @@ int aim_login(struct pork_acct *acct) {
 
 	acct->connected = 0;
 	screen_win_msg(cur_window(), 1, 1, 0,
-		MSG_TYPE_STATUS, "Logging in as %s...", acct->username);
+		MSG_TYPE_STATUS, _("Logging in as %s..."), acct->username);
 
 	auth_conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_AUTH);
 	if (auth_conn == NULL) {
-		screen_err_msg("Connection error while logging in as %s",
+		screen_err_msg(_("Connection error while logging in as %s"),
 			acct->username);
 
 		return (-1);
@@ -494,7 +494,7 @@ int aim_login(struct pork_acct *acct) {
 		auth_conn->status |= AIM_CONN_STATUS_INPROGRESS;
 		pork_io_add(sock, IO_COND_WRITE, auth_conn, auth_conn, aim_connected);
 	} else {
-		screen_err_msg("Error connecting to the authorizer server as %s",
+		screen_err_msg(_("Error connecting to the authorizer server as %s"),
 			acct->username);
 		aim_conn_kill(&priv->aim_session, &auth_conn);
 		return (-1);
@@ -832,9 +832,9 @@ static FAIM_CB(aim_recv_err_loc) {
 	if (code < array_elem(msgerrreason))
 		err_str = msgerrreason[code];
 	else
-		err_str = "Reason unknown";
+		err_str = _("Reason unknown");
 
-	screen_err_msg("User information for %s is unavailable: %s", dest, err_str);
+	screen_err_msg(_("User information for %s is unavailable: %s"), dest, err_str);
 	return (1);
 }
 
@@ -853,7 +853,7 @@ static FAIM_CB(aim_recv_err_msg) {
 	if (code < array_elem(msgerrreason))
 		err_str = msgerrreason[code];
 	else
-		err_str = "Reason unknown";
+		err_str = _("Reason unknown");
 
 	if (dest != NULL) {
 		struct imwindow *win;
@@ -863,10 +863,10 @@ static FAIM_CB(aim_recv_err_msg) {
 			win = cur_window();
 
 		screen_win_msg(win, 1, 1, 0, MSG_TYPE_ERROR,
-			"%s's message to %s was not sent: %s",
+			_("%s's message to %s was not sent: %s"),
 			acct->username, dest, err_str);
 	} else {
-		screen_err_msg("The last message by %s was not sent: %s",
+		screen_err_msg(_("The last message by %s was not sent: %s"),
 			acct->username, err_str);
 	}
 
@@ -885,9 +885,9 @@ static FAIM_CB(aim_recv_err_other) {
 	if (code < array_elem(msgerrreason))
 		err_str = msgerrreason[code];
 	else
-		err_str = "Reason unknown";
+		err_str = _("Reason unknown");
 
-	screen_err_msg("AIM Error: %s", err_str);
+	screen_err_msg(_("AIM Error: %s"), err_str);
 	return (1);
 }
 
@@ -1051,14 +1051,14 @@ static int parse_im_chan2(	aim_session_t *session,
 				args->info.sendfile.totfiles == 0)
 			{
 				screen_err_msg(
-					"%s [%s:%d] has sent an invalid request to send a file",
+					_("%s [%s:%d] has sent an invalid request to send a file"),
 					userinfo->sn, args->verifiedip, args->port);
 				return (0);
 			}
 
 			p = strrchr(args->info.sendfile.filename, '\\');
 			if (p != NULL && p[1] == '*') {
-				screen_err_msg("%s [%s:%d] has attempted to send you a directory (%s). This isn't supported yet.",
+				screen_err_msg(_("%s [%s:%d] has attempted to send you a directory (%s). This isn't supported yet."),
 					userinfo->sn, args->verifiedip, args->port,
 					args->info.sendfile.filename);
 
@@ -1085,7 +1085,7 @@ static int parse_im_chan2(	aim_session_t *session,
 			xstrncpy(xfer->faddr_ip, args->verifiedip, sizeof(xfer->faddr_ip));
 			if (get_addr(args->verifiedip, &xfer->faddr) != 0) {
 				screen_err_msg(
-					"%s [%s:%d] has sent an invalid request to send a file",
+					_("%s [%s:%d] has sent an invalid request to send a file"),
 					userinfo->sn, args->verifiedip, args->port);
 			}
 
@@ -1201,53 +1201,53 @@ static FAIM_CB(aim_recv_missed) {
 		case 0:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s because it was invalid" :
-						"%s missed %u messages from %s because they were invalid",
+						_("%s missed %u message from %s because it was invalid") :
+						_("%s missed %u messages from %s because they were invalid"),
 					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 1:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s because it was too large" :
-						"%s missed %u messages from %s because they were too large",
+						_("%s missed %u message from %s because it was too large") :
+						_("%s missed %u messages from %s because they were too large"),
 					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 2:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s because the rate limit has been exceeded" :
-						"%s missed %u messages from %s because the rate limit has been exceeded",
+						_("%s missed %u message from %s because the rate limit has been exceeded") :
+						_("%s missed %u messages from %s because the rate limit has been exceeded"),
 					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 3:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s because the sender's warning level is too high" :
-						"%s missed %u messages from %s because the sender's warning level is too high",
+						_("%s missed %u message from %s because the sender's warning level is too high") :
+						_("%s missed %u messages from %s because the sender's warning level is too high"),
 					acct->username, num_missed, userinfo->sn);
 			break;
 
 		case 4:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s because your warning level is too high" :
-						"%s missed %u messages from %s because your warning level is too high",
+						_("%s missed %u message from %s because your warning level is too high") :
+						_("%s missed %u messages from %s because your warning level is too high"),
 					acct->username, num_missed, userinfo->sn);
 			break;
 
 		default:
 			ret = snprintf(buf, sizeof(buf),
 					num_missed == 1 ?
-						"%s missed %u message from %s for unknown reasons" :
-						"%s missed %u messages from %s for unknown reasons",
+						_("%s missed %u message from %s for unknown reasons") :
+						_("%s missed %u messages from %s for unknown reasons"),
 					acct->username, num_missed, userinfo->sn);
 				break;
 	}
 
-	screen_err_msg("Error: %s", buf);
+	screen_err_msg(_("Error: %s"), buf);
 	return (1);
 }
 
@@ -1383,7 +1383,7 @@ static FAIM_CB(aim_recv_rate_change) {
 
 		case AIM_RATE_CODE_LIMIT:
 			aim_conn_setlatency(fr->conn, 10);
-			screen_err_msg("The last message from %s was not sent because you are over the rate limit. Please wait 10 seconds, and then try again", acct->username);
+			screen_err_msg(_("The last message from %s was not sent because you are over the rate limit. Please wait 10 seconds, and then try again"), acct->username);
 			aim_conn_setlatency(fr->conn, window_size / 2);
 			break;
 
@@ -1663,7 +1663,7 @@ static FAIM_CB(aim_recv_redirect) {
 
 		chatnav = aim_newconn(session, AIM_CONN_TYPE_CHATNAV);
 		if (chatnav == NULL) {
-			screen_err_msg("Unable to connect to the chatnav server: %s",
+			screen_err_msg(_("Unable to connect to the chatnav server: %s"),
 				strerror(errno));
 			return (0);
 		}
@@ -1676,7 +1676,7 @@ static FAIM_CB(aim_recv_redirect) {
 			pork_io_add(sock, IO_COND_WRITE, chatnav, chatnav, aim_connected);
 		} else {
 			aim_conn_kill(session, &chatnav);
-			screen_err_msg("Unable to connect to the chatnav server: %s",
+			screen_err_msg(_("Unable to connect to the chatnav server: %s"),
 				strerror(errno));
 			return (0);
 		}
@@ -1701,7 +1701,7 @@ static FAIM_CB(aim_recv_redirect) {
 
 		chat_conn = aim_newconn(session, AIM_CONN_TYPE_CHAT);
 		if (chat_conn == NULL) {
-			screen_err_msg("Unable to connect to the chat server");
+			screen_err_msg(_("Unable to connect to the chat server"));
 			return (0);
 		}
 
@@ -1714,7 +1714,7 @@ static FAIM_CB(aim_recv_redirect) {
 				aim_connected);
 		} else {
 			aim_conn_kill(session, &chat_conn);
-			screen_err_msg("Unable to connect to the chat server");
+			screen_err_msg(_("Unable to connect to the chat server"));
 			return (0);
 		}
 
@@ -1783,7 +1783,7 @@ static FAIM_CB(aim_recv_search_error) {
 		return (1);
 	}
 
-	screen_cmd_output("No results were found for %s", address);
+	screen_cmd_output(_("No results were found for %s"), address);
 	return (1);
 }
 
@@ -1812,14 +1812,14 @@ static FAIM_CB(aim_recv_search_reply) {
 			return (1);
 		}
 
-		screen_cmd_output("No results were found for %s", address);
+		screen_cmd_output(_("No results were found for %s"), address);
 		return (1);
 	}
 
-	ret = snprintf(buf, len, "%s has registered the following screen names: %s",
+	ret = snprintf(buf, len, _("%s has registered the following screen names: %s"),
 			address, &usernames[0]);
 	if (ret < 0 || (size_t) ret >= len) {
-		screen_err_msg("The results for %s were too long to display", address);
+		screen_err_msg(_("The results for %s were too long to display"), address);
 		return (1);
 	}
 	len -= ret;
@@ -1828,7 +1828,7 @@ static FAIM_CB(aim_recv_search_reply) {
 	for (j = 1 ; j < num ; j++) {
 		ret = snprintf(&buf[i], len, ", %s", &usernames[j * (MAXSNLEN + 1)]);
 		if (ret < 0 || (size_t) ret >= len) {
-			screen_err_msg("The results for %s were too long to display",
+			screen_err_msg(_("The results for %s were too long to display"),
 				address);
 			return (1);
 		}
@@ -1903,7 +1903,7 @@ static FAIM_CB(aim_ssi_recv_list) {
 			alias = aim_ssi_getalias(session->ssi.local, group_name, cur->name);
 
 			if (group_name == NULL)
-				group_name = "orphans";
+				group_name = _("orphans");
 
 			buddy = buddy_find(acct, cur->name);
 			if (buddy != NULL) {
@@ -2227,32 +2227,32 @@ static FAIM_CB(aim_parse_authresp) {
 	if (authresp->errorcode || !authresp->bosip || !authresp->cookie) {
 		switch (authresp->errorcode) {
 			case 0x05:
-				screen_err_msg("Error logging in %s: Incorrect username or password",
+				screen_err_msg(_("Error logging in %s: Incorrect username or password"),
 					acct->username);
 				break;
 
 			case 0x11:
-				screen_err_msg("Error logging in %s: This account has been suspended",
+				screen_err_msg(_("Error logging in %s: This account has been suspended"),
 					acct->username);
 				break;
 
 			case 0x14:
-				screen_err_msg("Error logging in %s: This service is temporarily unavailable",
+				screen_err_msg(_("Error logging in %s: This service is temporarily unavailable"),
 					acct->username);
 				break;
 
 			case 0x18:
-				screen_err_msg("Error logging in %s: This account has been connecting too frequently",
+				screen_err_msg(_("Error logging in %s: This account has been connecting too frequently"),
 					acct->username);
 				break;
 
 			case 0x1c:
-				screen_err_msg("Error logging in %s: Client is too old",
+				screen_err_msg(_("Error logging in %s: Client is too old"),
 					acct->username);
 				break;
 
 			default:
-				screen_err_msg("Error logging in %s: Authentication failed",
+				screen_err_msg(_("Error logging in %s: Authentication failed"),
 					acct->username);
 				break;
 		}
@@ -2263,7 +2263,7 @@ static FAIM_CB(aim_parse_authresp) {
 	bos_conn = aim_newconn(session, AIM_CONN_TYPE_BOS);
 	if (bos_conn == NULL) {
 		aim_conn_kill(session, &bos_conn);
-		screen_err_msg("Unable to connect to the AIM BOS server");
+		screen_err_msg(_("Unable to connect to the AIM BOS server"));
 		return (1);
 	}
 
@@ -2279,7 +2279,7 @@ static FAIM_CB(aim_parse_authresp) {
 			aim_connected);
 	} else {
 		aim_conn_kill(session, &bos_conn);
-		screen_err_msg("Unable to connect to the BOS server");
+		screen_err_msg(_("Unable to connect to the BOS server"));
 		return (0);
 	}
 

@@ -76,7 +76,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		struct pork_acct *acct = session->data;
 		char *errstr = strerror(ret);
 
-		screen_err_msg("network error: %s: %s", acct->username, errstr);
+		screen_err_msg(_("network error: %s: %s"), acct->username, errstr);
 
 		close(sock);
 		pork_acct_disconnected(acct);
@@ -186,12 +186,12 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	int ret;
 
 	if (args == NULL) {
-		screen_err_msg("Error: IRC: Syntax is /connect -irc <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]");
+		screen_err_msg(_("Error: IRC: Syntax is /connect -irc <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]"));
 		return (-1);
 	}
 
 	if (irc_add_servers(acct, args) < 1) {
-		screen_err_msg("Error: %s: No server specified", acct->username);
+		screen_err_msg(_("Error: %s: No server specified"), acct->username);
 		return (-1);
 	}
 
@@ -324,7 +324,7 @@ static int irc_change_nick(struct pork_acct *acct, char *nick) {
 
 	if (irc->nick_len) {
 		if (strlen(nick) > irc->nick_len) {
-			screen_err_msg("Error: Nick is too long. Maximum length is %d",
+			screen_err_msg(_("Error: Nick is too long. Maximum length is %d"),
 				irc->nick_len);
 
 			return (-1);
@@ -353,7 +353,7 @@ static int irc_chan_kick(	struct pork_acct *acct,
 							char *reason)
 {
 	if (reason == NULL)
-		reason = "No reason given";
+		reason = _("No reason given");
 
 	return (irc_send_kick(acct->data, chat->title, user, reason));
 }
@@ -797,7 +797,7 @@ int irc_quote(struct irc_session *session, char *str) {
 		p++;
 
 	if (!strncasecmp(p, "NICK ", 5)) {
-		screen_err_msg("Use the /nick command.");
+		screen_err_msg(_("Use the /nick command."));
 		return (-1);
 	}
 

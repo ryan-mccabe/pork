@@ -52,7 +52,7 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 	fp = fopen(filename, "r");
 	if (fp == NULL) {
 		if (errno != ENOENT) {
-			screen_err_msg("Can't open buddy list: %s: %s",
+			screen_err_msg(_("Can't open buddy list: %s: %s"),
 				filename, strerror(errno));
 			return (-1);
 		}
@@ -70,7 +70,7 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 		++line;
 		p = strchr(buf, '\n');
 		if (p == NULL) {
-			screen_err_msg("Invalid buddy list data at line %u", line);
+			screen_err_msg(_("Invalid buddy list data at line %u"), line);
 			fclose(fp);
 			return (-1);
 		}
@@ -91,7 +91,7 @@ static int read_buddy_list(struct pork_acct *acct, const char *filename) {
 			struct buddy *buddy;
 
 			if (cur_group == NULL) {
-				screen_err_msg("Invalid buddy list data at line %u", line);
+				screen_err_msg(_("Invalid buddy list data at line %u"), line);
 				fclose(fp);
 				return (-1);
 			}

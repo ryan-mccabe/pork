@@ -47,7 +47,7 @@ USER_COMMAND(cmd_history_list) {
 	if (cur == NULL)
 		return;
 
-	screen_win_msg(win, 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "Command history:");
+	screen_win_msg(win, 0, 0, 0, MSG_TYPE_CMD_OUTPUT, _("Command history:"));
 
 	do {
 		screen_win_msg(win, 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%u: %s", i++,

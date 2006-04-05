@@ -55,7 +55,7 @@ static int irc_send(struct irc_session *session, char *command, size_t len) {
 		cmd->len = len;
 
 		if (queue_add(session->outq, cmd) != 0) {
-			screen_err_msg("Error: %s: Error adding IRC command to the outbound queue.",
+			screen_err_msg(_("Error: %s: Error adding IRC command to the outbound queue."),
 				((struct pork_acct *) session->data)->username);
 
 			free(cmd->cmd);
@@ -121,14 +121,14 @@ int irc_connect(struct pork_acct *acct,
 		port = "6667"; /* XXX FIXME */
 
 	if (get_port(port, &port_num) != 0) {
-		screen_err_msg("Error: %s: Invalid IRC server port: %s",
+		screen_err_msg(_("Error: %s: Invalid IRC server port: %s"),
 			acct->username, port);
 		memset(buf, 0, sizeof(buf));
 		return (-1);
 	}
 
 	if (get_addr(buf, &ss) != 0) {
-		screen_err_msg("Error: %s: Invalid IRC server host: %s",
+		screen_err_msg(_("Error: %s: Invalid IRC server host: %s"),
 			acct->username, buf);
 		memset(buf, 0, sizeof(buf));
 		return (-1);
@@ -136,7 +136,7 @@ int irc_connect(struct pork_acct *acct,
 
 	if (irchost != NULL) {
 		if (get_addr(irchost, &local) != 0) {
-			screen_err_msg("Error: %s: Invalid local hostname: %s",
+			screen_err_msg(_("Error: %s: Invalid local hostname: %s"),
 				acct->username, irchost);
 			memcpy(&local, &acct->laddr, sizeof(local));
 		}

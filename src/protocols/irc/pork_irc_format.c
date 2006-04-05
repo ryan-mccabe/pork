@@ -11,6 +11,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <sys/types.h>
 #include <time.h>
@@ -18,8 +19,9 @@
 #include <ncurses.h>
 
 #include <pork.h>
-#include <pork_list.h>
 #include <pork_util.h>
+#include <pork_list.h>
+#include <pork_queue.h>
 #include <pork_inet.h>
 #include <pork_misc.h>
 #include <pork_set.h>
@@ -30,6 +32,7 @@
 #include <pork_screen.h>
 
 #include <pork_format.h>
+#include <pork_irc.h>
 #include <pork_irc_set.h>
 #include <pork_set_global.h>
 #include <pork_irc_format.h>
@@ -43,11 +46,16 @@ static int format_irc_args1(char c, char *buf, size_t len, va_list ap) {
 		case 'M':
 		case 'C':
 		case 't':
-			if (arg != NULL)
-				ret = xstrncpy(buf, arg, len);
+			if (arg != NULL) {
+				char *temp = irc_text_filter(arg);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
-case 'T':
+		case 'T':
 			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
 			break;
 	}
@@ -69,15 +77,25 @@ static int format_irc_args2(char c, char *buf, size_t len, va_list ap) {
 		case 'S':
 		case 'U':
 		case 'N':
-			if (arg1 != NULL)
-				ret = xstrncpy(buf, arg1, len);
+			if (arg1 != NULL) {
+				char *temp = irc_text_filter(arg1);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '2':
 		case 'M':
 		case 't':
-			if (arg2 != NULL)
-				ret = xstrncpy(buf, arg2, len);
+			if (arg2 != NULL) {
+				char *temp = irc_text_filter(arg2);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case 'T':
@@ -101,19 +119,34 @@ static int format_irc_args3(char c, char *buf, size_t len, va_list ap) {
 		case '1':
 		case 'U':
 		case 'C':
-			if (arg1 != NULL)
-				ret = xstrncpy(buf, arg1, len);
+			if (arg1 != NULL) {
+				char *temp = irc_text_filter(arg1);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '2':
 		case 'H':
-			if (arg2 != NULL)
-				ret = xstrncpy(buf, arg2, len);
+			if (arg2 != NULL) {
+				char *temp = irc_text_filter(arg2);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '3':
-			if (arg3 != NULL)
-				ret = xstrncpy(buf, arg3, len);
+			if (arg3 != NULL) {
+				char *temp = irc_text_filter(arg3);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case 'T':
@@ -136,23 +169,43 @@ static int format_irc_args4(char c, char *buf, size_t len, va_list ap) {
 
 	switch (c) {
 		case '1':
-			if (arg1 != NULL)
-				ret = xstrncpy(buf, arg1, len);
+			if (arg1 != NULL) {
+				char *temp = irc_text_filter(arg1);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '2':
-			if (arg2 != NULL)
-				ret = xstrncpy(buf, arg2, len);
+			if (arg2 != NULL) {
+				char *temp = irc_text_filter(arg2);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '3':
-			if (arg3 != NULL)
-				ret = xstrncpy(buf, arg3, len);
+			if (arg3 != NULL) {
+				char *temp = irc_text_filter(arg3);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '4':
-			if (arg4 != NULL)
-				ret = xstrncpy(buf, arg4, len);
+			if (arg4 != NULL) {
+				char *temp = irc_text_filter(arg4);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case 'T':
@@ -177,32 +230,57 @@ static int format_irc_args5(char c, char *buf, size_t len, va_list ap) {
 	switch (c) {
 		case 'D':
 		case '1':
-			if (arg1 != NULL)
-				ret = xstrncpy(buf, arg1, len);
+			if (arg1 != NULL) {
+				char *temp = irc_text_filter(arg1);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '2':
 		case 'S':
-			if (arg2 != NULL)
-				ret = xstrncpy(buf, arg2, len);
+			if (arg2 != NULL) {
+				char *temp = irc_text_filter(arg2);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '3':
 		case 'H':
-			if (arg3 != NULL)
-				ret = xstrncpy(buf, arg3, len);
+			if (arg3 != NULL) {
+				char *temp = irc_text_filter(arg3);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '4':
 		case 'A':
-			if (arg4 != NULL)
-				ret = xstrncpy(buf, arg4, len);
+			if (arg4 != NULL) {
+				char *temp = irc_text_filter(arg4);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case '5':
 		case 'M':
-			if (arg5 != NULL)
-				ret = xstrncpy(buf, arg5, len);
+			if (arg5 != NULL) {
+				char *temp = irc_text_filter(arg5);
+				if (temp == NULL)
+					return (-1);
+				ret = xstrncpy(buf, temp, len);
+				free(temp);
+			}
 			break;
 
 		case 'T':

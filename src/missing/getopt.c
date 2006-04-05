@@ -233,7 +233,7 @@ int _getopt_internal(	int argc,
 
 		if (ambig && !exact) {
 			if (print_errors) {
-				fprintf(stderr, "%s: option `%s' is ambiguous\n",
+				fprintf(stderr, _("%s: option `%s' is ambiguous\n"),
 					argv[0], argv[optind]);
 			}
 
@@ -255,11 +255,11 @@ int _getopt_internal(	int argc,
 					if (print_errors) {
 						if (argv[optind - 1][1] == '-') {
 							fprintf(stderr,
-								"%s: option `--%s' doesn't allow an argument\n",
+								_("%s: option `--%s' doesn't allow an argument\n"),
 								argv[0], pfound->name);
 						} else {
 							fprintf(stderr,
-								"%s: option `%c%s' doesn't allow an argument\n",
+								_("%s: option `%c%s' doesn't allow an argument\n"),
 								argv[0], argv[optind - 1][0], pfound->name);
 						}
 					}
@@ -275,7 +275,7 @@ int _getopt_internal(	int argc,
 				else {
 					if (print_errors) {
 						fprintf(stderr,
-							"%s: option `%s' requires an argument\n",
+							_("%s: option `%s' requires an argument\n"),
 							argv[0], argv[optind - 1]);
 					}
 
@@ -304,10 +304,10 @@ int _getopt_internal(	int argc,
 		{
 			if (print_errors) {
 				if (argv[optind][1] == '-') {
-					fprintf(stderr, "%s: unrecognized option `--%s'\n",
+					fprintf(stderr, _("%s: unrecognized option `--%s'\n"),
 						argv[0], nextchar);
 				} else {
-					fprintf(stderr, "%s: unrecognized option `%c%s'\n",
+					fprintf(stderr, _("%s: unrecognized option `%c%s'\n"),
 						argv[0], argv[optind][0], nextchar);
 				}
 			}
@@ -330,9 +330,9 @@ int _getopt_internal(	int argc,
 		if (temp == NULL || c == ':') {
 			if (print_errors) {
 				if (posixly_correct) {
-					fprintf(stderr, "%s: illegal option -- %c\n", argv[0], c);
+					fprintf(stderr, _("%s: illegal option -- %c\n"), argv[0], c);
 				} else {
-					fprintf(stderr, "%s: invalid option -- %c\n", argv[0], c);
+					fprintf(stderr, _("%s: invalid option -- %c\n"), argv[0], c);
 				}
 			}
 
@@ -354,7 +354,7 @@ int _getopt_internal(	int argc,
 				optind++;
 			} else if (optind == argc) {
 				if (print_errors) {
-					fprintf(stderr, "%s: option requires an argument -- %c\n",
+					fprintf(stderr, _("%s: option requires an argument -- %c\n"),
 								argv[0], c);
 				}
 
@@ -395,7 +395,7 @@ int _getopt_internal(	int argc,
 
 			if (ambig && !exact) {
 				if (print_errors) {
-					fprintf(stderr, "%s: option `-W %s' is ambiguous\n",
+					fprintf(stderr, _("%s: option `-W %s' is ambiguous\n"),
 							argv[0], argv[optind]);
 				}
 
@@ -414,7 +414,7 @@ int _getopt_internal(	int argc,
 					else {
 						if (print_errors) {
 							fprintf(stderr,
-								"%s option `-W %s' doesn't allow an argument\n",
+								_("%s option `-W %s' doesn't allow an argument\n"),
 								argv[0], pfound->name);
 						}
 
@@ -427,7 +427,7 @@ int _getopt_internal(	int argc,
 					else {
 						if (print_errors) {
 							fprintf(stderr,
-								"%s: option `%s' requires an argument\n",
+								_("%s: option `%s' requires an argument\n"),
 								argv[0], argv[optind - 1]);
 						}
 
@@ -468,7 +468,7 @@ int _getopt_internal(	int argc,
 				} else if (optind == argc) {
 					if (print_errors) {
 						fprintf(stderr,
-							"%s: option requires an argument -- %c\n",
+							_("%s: option requires an argument -- %c\n"),
 							argv[0], c);
 					}
 

@@ -55,13 +55,13 @@ USER_COMMAND(cmd_acct_set) {
 		args += 7;
 		refnum_str = strsep(&args, " ");
 		if (refnum_str == NULL || str_to_uint(args, &refnum) != 0) {
-			screen_err_msg("Invalid account refnum: %s", args);
+			screen_err_msg(_("Invalid account refnum: %s"), args);
 			return;
 		}
 
 		acct = pork_acct_get_data(refnum);
 		if (acct == NULL) {
-			screen_err_msg("No account with refnum %u exists", refnum);
+			screen_err_msg(_("No account with refnum %u exists"), refnum);
 			return;
 		}
 

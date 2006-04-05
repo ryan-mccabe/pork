@@ -51,7 +51,7 @@ void screen_doupdate(void);
 	do { \
 		int __psockerr; \
 		if ((__psockerr = sock_is_error((x)))) { \
-			screen_err_msg("(%s:%d) network error: %s: %s", __FILE__, __LINE__, ((struct pork_acct *) (a))->username, strerror(__psockerr)); \
+			screen_err_msg(_("(%s:%d) network error: %s: %s"), __FILE__, __LINE__, ((struct pork_acct *) (a))->username, strerror(__psockerr)); \
 		} \
 	} while (0)
 
@@ -61,7 +61,7 @@ void screen_doupdate(void);
 	do { \
 		int __psockerr; \
 		if ((__psockerr = sock_is_error((x)))) { \
-			screen_err_msg("network error: %s: %s", ((struct pork_acct *) (a))->username, strerror(__psockerr)); \
+			screen_err_msg(_("network error: %s: %s"), ((struct pork_acct *) (a))->username, strerror(__psockerr)); \
 		} \
 	} while (0)
 

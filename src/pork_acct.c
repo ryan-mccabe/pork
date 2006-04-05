@@ -223,7 +223,7 @@ int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
 void pork_acct_print_list(void) {
 	dlist_t *cur = screen.acct_list;
 
-	screen_cmd_output("REFNUM\tUSERNAME\t\tPROTOCOL\tSERVER\t\t\t\t\t\tSTATUS");
+	screen_cmd_output(_("REFNUM\tUSERNAME\t\tPROTOCOL\tSERVER\t\t\t\t\t\tSTATUS"));
 	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
 		char buf[128];
 		struct pork_acct *acct = cur->data;
@@ -239,15 +239,15 @@ void pork_acct_print_list(void) {
 		}
 
 		if (acct->reconnecting) {
-			snprintf(buf, sizeof(buf), "reconnecting (attempt %u/%u)",
+			snprintf(buf, sizeof(buf), _("reconnecting (attempt %u/%u)"),
 				acct->reconnect_tries, max_reconnect_tries);
 		} else if (acct->disconnected) {
 			snprintf(buf, sizeof(buf),
-				"disconnected: reconnect attempt %u/%u in %ld seconds",
+				_("disconnected: reconnect attempt %u/%u in %ld seconds"),
 				acct->reconnect_tries + 1, max_reconnect_tries,
 				max(0, acct->reconnect_next_try - time(NULL)));
 		} else
-			xstrncpy(buf, "connected", sizeof(buf));
+			xstrncpy(buf, _("connected"), sizeof(buf));
 
 		if (acct->server != NULL) {
 			if (acct->fport != NULL) {
@@ -296,14 +296,14 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 
 	acct = pork_acct_init(user, protocol);
 	if (acct == NULL) {
-		screen_err_msg("%s is already connected", user);
+		screen_err_msg(_("%s is already connected"), user);
 		return (-1);
 	}
 
 	pork_acct_add(acct);
 
 	if (!acct->can_connect || acct->proto->connect == NULL) {
-		screen_err_msg("You must specify a screen name before connecting");
+		screen_err_msg(_("You must specify a screen name before connecting"));
 		pork_acct_del_refnum(acct->refnum, NULL);
 		return (-1);
 	}
@@ -311,7 +311,7 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 	screen_bind_all_unbound(acct);
 
 	if (acct->proto->connect(acct, args) == -1) {
-		screen_err_msg("Unable to login as %s", acct->username);
+		screen_err_msg(_("Unable to login as %s"), acct->username);
 		pork_acct_del_refnum(acct->refnum, NULL);
 		return (-1);
 	}
@@ -353,7 +353,7 @@ inline void pork_acct_update(void) {
 
 			if (idle_after > 0 && time_diff >= 60 * idle_after) {
 				screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_IDLE,
-					"Setting %s idle after %d minutes of inactivity",
+					_("Setting %s idle after %d minutes of inactivity"),
 					acct->username, (int) time_diff / 60);
 				acct->proto->set_idle_time(acct, time_diff);
 			}
@@ -442,7 +442,7 @@ void pork_acct_connected(struct pork_acct *acct) {
 
 	if (!event_generate(acct->events, EVENT_SIGNON, acct->refnum)) {
 		screen_win_msg(cur_window(), 1, 1, 0,
-			MSG_TYPE_SIGNON, "Logged in as %s successfully", acct->username);
+			MSG_TYPE_SIGNON, _("Logged in as %s successfully"), acct->username);
 	}
 }
 
@@ -458,7 +458,7 @@ static int pork_acct_reconnect(struct pork_acct *acct) {
 	acct->reconnect_tries++;
 	acct->reconnecting = 1;
 
-	screen_err_msg("Automatically reconnecting account %s (attempt %u)",
+	screen_err_msg(_("Automatically reconnecting account %s (attempt %u)"),
 		acct->username, acct->reconnect_tries);
 
 	return (acct->proto->reconnect(acct, NULL));
@@ -479,7 +479,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	acct->disconnected = 1;
 
 	if (acct->reconnect_tries >= max_reconnect_tries) {
-		screen_err_msg("Failed to reconnect %s after %u tries. Giving up.",
+		screen_err_msg(_("Failed to reconnect %s after %u tries. Giving up."),
 			acct->username, max_reconnect_tries);
 
 		pork_acct_del_refnum(acct->refnum, NULL);
@@ -504,7 +504,7 @@ int pork_acct_disconnected(struct pork_acct *acct) {
 		return (pork_acct_connect_fail(acct));
 
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_SIGNOFF,
-		"%s has been disconnected", acct->username);
+		_("%s has been disconnected"), acct->username);
 
 	acct->connected = 0;
 	acct->reconnecting = 0;
@@ -536,7 +536,7 @@ void pork_acct_reconnect_all(void) {
 					acct->reconnect_next_try + timeout < now)
 		{
 			screen_err_msg(
-				"Attempt %u to reconnect %s timed out after %u seconds",
+				_("Attempt %u to reconnect %s timed out after %u seconds"),
 				acct->reconnect_tries, acct->username, timeout);
 
 			acct->proto->connect_abort(acct);

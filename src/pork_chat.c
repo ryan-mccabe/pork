@@ -250,7 +250,7 @@ int chat_ignore(struct pork_acct *acct, char *chat_name, char *user) {
 
 	chat_user = chat_find_user(acct, chat, user);
 	if (chat_user == NULL) {
-		screen_err_msg("%s is not a member of %s", user, chat->title_quoted);
+		screen_err_msg(_("%s is not a member of %s"), user, chat->title_quoted);
 		return (-1);
 	}
 
@@ -283,7 +283,7 @@ int chat_unignore(struct pork_acct *acct, char *chat_name, char *user) {
 
 	chat_user = chat_find_user(acct, chat, user);
 	if (chat_user == NULL) {
-		screen_err_msg("%s is not a member of %s", user, chat->title_quoted);
+		screen_err_msg(_("%s is not a member of %s"), user, chat->title_quoted);
 		return (-1);
 	}
 
@@ -364,7 +364,7 @@ int chat_join(struct pork_acct *acct, char *args) {
 	if (acct->proto->chat_name(args, buf, sizeof(buf),
 		arg_buf, sizeof(arg_buf)) == -1)
 	{
-		screen_err_msg("Invalid chat name: %s", args);
+		screen_err_msg(_("Invalid chat name: %s"), args);
 		return (-1);
 	}
 
@@ -372,7 +372,7 @@ int chat_join(struct pork_acct *acct, char *args) {
 	if (imwindow == NULL) {
 		imwindow = screen_new_chat_window(acct, buf);
 		if (imwindow == NULL) {
-			screen_err_msg("Unable to create a new window for %s", buf);
+			screen_err_msg(_("Unable to create a new window for %s"), buf);
 			return (-1);
 		}
 	}
@@ -403,7 +403,7 @@ int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
 
 	if (acct->proto->chat_leave != NULL) {
 		if (acct->proto->chat_leave(acct, chat) == -1) {
-			screen_err_msg("Error leaving chat room %s for %s",
+			screen_err_msg(_("Error leaving chat room %s for %s"),
 				chat->title_quoted, acct->username);
 			return (-1);
 		}
@@ -522,18 +522,18 @@ void chat_list(struct pork_acct *acct) {
 
 	cur = acct->chat_list;
 	if (cur == NULL) {
-		screen_cmd_output("%s is not a member of any chat rooms",
+		screen_cmd_output(_("%s is not a member of any chat rooms"),
 			acct->username);
 		return;
 	}
 
-	screen_cmd_output("%s is joined to the following chat rooms",
+	screen_cmd_output(_("%s is joined to the following chat rooms"),
 		acct->username);
 
 	do {
 		struct chatroom *chat = cur->data;
 
-		screen_cmd_output("  %s in window refnum %u",
+		screen_cmd_output(_("  %s in window refnum %u"),
 			chat->title_quoted, chat->win->refnum);
 
 		cur = cur->next;

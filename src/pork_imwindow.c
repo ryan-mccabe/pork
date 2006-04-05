@@ -181,9 +181,9 @@ void imwindow_blist_show(struct imwindow *win) {
 }
 
 void imwindow_buffer_find(struct imwindow *win, char *str, u_int32_t opt) {
-	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "Matching lines:");
+	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, _("Matching lines:"));
 	swindow_print_matching(&win->swindow, str, opt);
-	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "End of matches");
+	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, _("End of matches"));
 }
 
 void imwindow_blist_hide(struct imwindow *win) {
@@ -342,8 +342,8 @@ inline void imwindow_recv_msg(struct imwindow *win) {
 }
 
 /*
-** Bind the account whose reference number is "refnum" to the window
-** "imwindow".
+** Bind the account whose reference number is @refnum to the window
+** @imwindow
 */
 
 int imwindow_bind_acct(struct imwindow *win, u_int32_t refnum) {

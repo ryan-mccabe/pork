@@ -137,7 +137,7 @@ static void event_print_type(struct event *events, u_int32_t type) {
 
 	if (cur == NULL) {
 		screen_win_msg(cur_window(), 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-			"No %s events", events_info[type].name);
+			_("No %s events"), events_info[type].name);
 		return;
 	}
 
@@ -162,7 +162,7 @@ void event_list(struct event *events, const char *event_type) {
 
 		event = event_find(event_type);
 		if (event == -1) {
-			screen_err_msg("No such event: %s", event_type);
+			screen_err_msg(_("No such event: %s"), event_type);
 			return;
 		}
 

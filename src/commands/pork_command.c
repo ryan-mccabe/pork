@@ -93,7 +93,7 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 		if (ret == 0)
 			str = alias_str;
 		else if (ret == 1) {
-			screen_err_msg("The alias chain is too long");
+			screen_err_msg(_("The alias chain is too long"));
 			return (-1);
 		}
 	}
@@ -114,7 +114,7 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 						sizeof(struct command), cmd_compare);
 
 				if (cmd == NULL) {
-					screen_err_msg("Unknown %s command: %s",
+					screen_err_msg(_("Unknown %s command: %s"),
 						proto->name, cmd_str);
 					return (-1);
 				}
@@ -127,19 +127,19 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 						cmd->cmd(NULL, str);
 						return (0);
 					} else {
-						screen_err_msg("%s may not run %s commands",
+						screen_err_msg(_("%s may not run %s commands"),
 							acct->username, proto->name);
 						return (-1);
 					}
 				}
 			} else {
 				if (str != NULL)
-					screen_err_msg("Unknown %s command: %s", proto->name, str);
+					screen_err_msg(_("Unknown %s command: %s"), proto->name, str);
 
 				return (-1);
 			}
 		} else {
-			screen_err_msg("Unknown %scommand: %s",
+			screen_err_msg(_("Unknown %scommand: %s"),
 				command_set[set]->type, cmd_str);
 			return (-1);
 		}
@@ -193,7 +193,7 @@ static int command_send_to_win(struct pork_acct *acct, char *str) {
 		struct chatroom *chat = imwindow->data;
 
 		if (chat == NULL) {
-			screen_err_msg("%s is not a member of %s",
+			screen_err_msg(_("%s is not a member of %s"),
 				acct->username, imwindow->target);
 		} else
 			chat_send_msg(acct, chat, chat->title, str);

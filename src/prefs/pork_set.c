@@ -105,7 +105,7 @@ static void opt_print_var(struct pref_val *pref, int i, const char *text) {
 				screen_nocolor_msg("%s %s \"%s\"",
 					pref_name(pref, i), text, str);
 			} else
-				screen_nocolor_msg("%s is [UNSET]", pref_name(pref, i));
+				screen_nocolor_msg(_("%s is [UNSET]"), pref_name(pref, i));
 
 			break;
 		}
@@ -143,7 +143,7 @@ static void opt_print(struct pref_val *pref) {
 	size_t i;
 
 	for (i = 0 ; i < pref->set->num_opts ; i++)
-		opt_print_var(pref, i, "is set to");
+		opt_print_var(pref, i, _("is set to"));
 }
 
 void opt_write(struct pref_val *pref, FILE *fp) {
@@ -203,7 +203,7 @@ static int opt_compare(const void *l, const void *r) {
 }
 
 /*
-** Find the position of the pref option named "name"
+** Find the position of the pref option named @name
 ** in the pref option table.
 */
 
@@ -388,16 +388,16 @@ int opt_set_var(struct pref_val *pref, char *args, ...) {
 	opt = opt_find(pref->set, var);
 	if (opt == -1) {
 		if (pref->set->name == NULL)
-			screen_err_msg("Unknown variable: %s", var);
+			screen_err_msg(_("Unknown variable: %s"), var);
 		else
-			screen_err_msg("Unknown %s variable: %s", pref->set->name, var);
+			screen_err_msg(_("Unknown %s variable: %s"), pref->set->name, var);
 
 		return (-1);
 	}
 
 	value = args;
 	if (value == NULL || blank_str(value)) {
-		opt_print_var(pref, opt, "is set to");
+		opt_print_var(pref, opt, _("is set to"));
 		return (0);
 	}
 
@@ -406,10 +406,10 @@ int opt_set_var(struct pref_val *pref, char *args, ...) {
 	va_end(ap);
 
 	if (ret == -1) {
-		screen_nocolor_msg("Bad argument for %s: %s", var, value);
+		screen_nocolor_msg(_("Bad argument for %s: %s"), var, value);
 		return (-1);
 	} else
-		opt_print_var(pref, opt, "set to");
+		opt_print_var(pref, opt, _("set to"));
 
 	return (0);
 }

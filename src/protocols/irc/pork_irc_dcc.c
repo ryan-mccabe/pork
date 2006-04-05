@@ -103,7 +103,7 @@ static void irc_file_send_peer_connected(int fd, u_int32_t cond, void *data) {
 	close(fd);
 
 	if (sock == -1) {
-		screen_err_msg("Error accepting connection: %s", strerror(errno));
+		screen_err_msg(_("Error accepting connection: %s"), strerror(errno));
 		transfer_abort(xfer);
 	}
 
@@ -162,7 +162,7 @@ int irc_file_accept(struct file_transfer *xfer) {
 		pork_io_add(sock, IO_COND_WRITE, xfer, xfer,
 			irc_dcc_send_handler_connected);
 	} else {
-		screen_err_msg("Error connecting to %s:%d (%s)",
+		screen_err_msg(_("Error connecting to %s:%d (%s)"),
 			xfer->faddr_ip, xfer->fport, strerror(errno));
 		transfer_abort(xfer);
 		return (-1);
@@ -180,7 +180,7 @@ int irc_file_send(struct file_transfer *xfer) {
 	struct irc_session *session = xfer->acct->data;
 
 	if (transfer_bind_listen_sock(xfer, session->sock) == -1) {
-		screen_err_msg("Unable to bind a listening socket -- aborting transfer");
+		screen_err_msg(_("Unable to bind a listening socket -- aborting transfer"));
 		transfer_abort(xfer);
 		return (-1);
 	}

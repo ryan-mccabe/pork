@@ -174,8 +174,8 @@ int blank_str(const char *str) {
 }
 
 /*
-** Returns the portion of the string starting with token number "tok_num".
-** Returns NULL if there are less tokens than "tok_num" in the string.
+** Returns the portion of the string starting with token number @tok_num.
+** Returns NULL if there are less tokens than @tok_num in the string.
 */
 
 char *str_from_tok(char *str, u_int32_t tok_num) {

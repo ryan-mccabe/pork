@@ -42,7 +42,7 @@ USER_COMMAND(cmd_scroll_by) {
 		return;
 
 	if (str_to_int(args, &lines) != 0) {
-		screen_err_msg("Invalid number of lines: %s", args);
+		screen_err_msg(_("Invalid number of lines: %s"), args);
 		return;
 	}
 

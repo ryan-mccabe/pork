@@ -248,7 +248,7 @@ int get_addr(const char *hostname, struct sockaddr_storage *addr) {
 			break;
 
 		default:
-			debug("unknown family: %d", res->ai_addr->sa_family);
+			debug("unknown protocol family: %d", res->ai_addr->sa_family);
 			goto out_fail;
 	}
 
@@ -369,7 +369,7 @@ int sock_listen(struct sockaddr_storage *ss, in_port_t listen_port) {
 			break;
 
 		default:
-			debug("unknown family: %d", cur->ai_family);
+			debug("unknown protocol family: %d", cur->ai_family);
 			free(cur);
 			return (-1);
 	}

@@ -85,7 +85,7 @@ int wgetinput(WINDOW *win) {
 }
 
 /*
-** "Normalize" the string "str"
+** Normalize the string @str
 **
 ** AIM screen names need to be normalized
 ** before they're sent to the server.
@@ -127,8 +127,8 @@ int date_to_str(time_t timespec, char *buf, size_t len) {
 }
 
 /*
-** Convert "timespec" (in minutes) to a string of the
-** form "DAYSd HOURSh MINm"
+** Convert @timespec (in minutes) to a string of the
+** form '<DAYS>d <HOURS>h <MIN>m'
 */
 
 int time_to_str(u_int32_t timespec, char *buf, size_t len) {
@@ -213,7 +213,7 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len) {
 	if (days > 0) {
 		int ret;
 
-		ret = snprintf(buf, len, "%u day%s ",
+		ret = snprintf(buf, len, _("%u day%s "),
 				days, (days != 1 ? "s" : ""));
 		if (ret < 0 || (size_t) ret >= len) {
 			*buf = '\0';
@@ -227,7 +227,7 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len) {
 	if (hours > 0) {
 		int ret;
 
-		ret = snprintf(&buf[i], len, "%u hour%s ",
+		ret = snprintf(&buf[i], len, _("%u hour%s "),
 				hours, (hours != 1 ? "s" : ""));
 		if (ret < 0 || (size_t) ret >= len) {
 			*buf = '\0';
@@ -241,7 +241,7 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len) {
 	if (min > 0) {
 		int ret;
 
-		ret = snprintf(&buf[i], len, "%u minute%s ",
+		ret = snprintf(&buf[i], len, _("%u minute%s "),
 				min, (min != 1 ? "s" : ""));
 		if (ret < 0 || (size_t) ret >= len) {
 			*buf = '\0';
@@ -255,7 +255,7 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len) {
 	if (seconds > 0) {
 		int ret;
 
-		ret = snprintf(&buf[i], len, "%u second%s ",
+		ret = snprintf(&buf[i], len, _("%u second%s "),
 				seconds, (seconds != 1 ? "s" : ""));
 		if (ret < 0 || (size_t) ret >= len) {
 			*buf = '\0';
@@ -271,7 +271,7 @@ int time_to_str_full(u_int32_t timespec, char *buf, size_t len) {
 		return (0);
 	}
 
-	if (xstrncpy(buf, "0 seconds", len) == -1)
+	if (xstrncpy(buf, _("0 seconds"), len) == -1)
 		return (-1);
 
 	return (0);

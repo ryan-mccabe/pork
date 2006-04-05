@@ -169,7 +169,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 
 	rows = max(1, (int) rows - STATUS_ROWS);
 
-	win = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "status");
+	win = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, _("status"));
 	if (win == NULL)
 		return (-1);
 	input_init(&screen.input, cols);
@@ -246,12 +246,12 @@ int screen_renumber(struct imwindow *imwindow, u_int32_t refnum) {
 			imw->refnum = old_refnum;
 			screen_window_list_add(temp);
 			screen_win_msg(imw, 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-				"This is now window %%W%u", old_refnum);
+				_("This is now window %%W%u"), old_refnum);
 		}
 	}
 
 	screen_window_list_add(node);
-	screen_cmd_output("This is now window %%W%u", imwindow->refnum);
+	screen_cmd_output(_("This is now window %%W%u"), imwindow->refnum);
 	return (0);
 }
 

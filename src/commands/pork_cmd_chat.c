@@ -53,7 +53,7 @@ USER_COMMAND(cmd_chat_ban) {
 		if (win->type == WIN_TYPE_CHAT && win->data != NULL)
 			chat_ban(acct, win->data, arg1);
 		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
+			screen_err_msg(_("%s is not a member of %s"), acct->username, arg1);
 
 		return;
 	}
@@ -78,7 +78,7 @@ USER_COMMAND(cmd_chat_ignore) {
 		struct chatroom *chat = imwindow->data;
 
 		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window is not a chat window"));
 			return;
 		}
 
@@ -106,7 +106,7 @@ USER_COMMAND(cmd_chat_invite) {
 		struct chatroom *chat = imwindow->data;
 
 		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window is not a chat window"));
 			return;
 		}
 
@@ -137,7 +137,7 @@ USER_COMMAND(cmd_chat_kick) {
 		if (win->type == WIN_TYPE_CHAT && win->data != NULL)
 			chat_kick(acct, win->data, arg1, args);
 		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
+			screen_err_msg(_("%s is not a member of %s"), acct->username, arg1);
 
 		return;
 	}
@@ -155,7 +155,7 @@ USER_COMMAND(cmd_chat_leave) {
 		struct chatroom *chat;
 
 		if (win->type != WIN_TYPE_CHAT) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window is not a chat window"));
 			return;
 		}
 
@@ -182,13 +182,13 @@ USER_COMMAND(cmd_chat_send) {
 
 	chat_name = strsep(&args, " ");
 	if (chat_name == NULL || args == NULL) {
-		screen_err_msg("You must specify a chatroom and a message");
+		screen_err_msg(_("You must specify a chatroom and a message"));
 		return;
 	}
 
 	win = imwindow_find_chat_target(acct, chat_name);
 	if (win == NULL || win->data == NULL) {
-		screen_err_msg("%s is not joined to %s", acct->username, chat_name);
+		screen_err_msg(_("%s is not joined to %s"), acct->username, chat_name);
 		return;
 	}
 
@@ -217,7 +217,7 @@ USER_COMMAND(cmd_chat_topic) {
 		if (win->type == WIN_TYPE_CHAT)
 			chat = win->data;
 		else {
-			screen_err_msg("You must specify a chat room if the current window isn't a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window isn't a chat window"));
 			return;
 		}
 	}
@@ -240,7 +240,7 @@ USER_COMMAND(cmd_chat_unignore) {
 		struct chatroom *chat = imwindow->data;
 
 		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window is not a chat window"));
 			return;
 		}
 
@@ -258,7 +258,7 @@ USER_COMMAND(cmd_chat_who) {
 		struct chatroom *chat;
 
 		if (imwindow->type != WIN_TYPE_CHAT) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
+			screen_err_msg(_("You must specify a chat room if the current window is not a chat window"));
 			return;
 		}
 

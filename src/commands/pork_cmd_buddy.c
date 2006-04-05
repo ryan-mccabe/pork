@@ -45,26 +45,26 @@ USER_COMMAND(cmd_buddy_add) {
 
 	screen_name = strsep(&args, " ");
 	if (screen_name == NULL || blank_str(screen_name)) {
-		screen_err_msg("syntax is /buddy add <user> <group>");
+		screen_err_msg(_("syntax is /buddy add <user> <group>"));
 		return;
 	}
 
 	buddy = buddy_find(acct, screen_name);
 	if (buddy != NULL) {
-		screen_err_msg("%s is already a member of the group %s",
+		screen_err_msg(_("%s is already a member of the group %s"),
 			screen_name, buddy->group->name);
 		return;
 	}
 
 	group_name = args;
 	if (group_name == NULL || blank_str(group_name)) {
-		screen_err_msg("syntax is /buddy add <user> <group>");
+		screen_err_msg(_("syntax is /buddy add <user> <group>"));
 		return;
 	}
 
 	group = group_find(acct, group_name);
 	if (group == NULL) {
-		screen_err_msg("The group %s does not exist on %s's buddy list",
+		screen_err_msg(_("The group %s does not exist on %s's buddy list"),
 			group_name, acct->username);
 		return;
 	}
@@ -77,10 +77,10 @@ USER_COMMAND(cmd_buddy_block) {
 		return;
 
 	if (buddy_add_block(acct, args, 1) == -1) {
-		screen_err_msg("%s is already on %s's blocked users list",
+		screen_err_msg(_("%s is already on %s's blocked users list"),
 			acct->username, args);
 	} else {
-		screen_cmd_output("%s has been added %s's to blocked users list",
+		screen_cmd_output(_("%s has been added %s's to blocked users list"),
 			acct->username, args);
 	}
 }
@@ -90,10 +90,10 @@ USER_COMMAND(cmd_buddy_permit) {
 		return;
 
 	if (buddy_add_permit(acct, args, 1) == -1) {
-		screen_err_msg("%s is already on %s's permitted users list",
+		screen_err_msg(_("%s is already on %s's permitted users list"),
 			acct->username, args);
 	} else {
-		screen_cmd_output("%s has been added to %s's permitted users list",
+		screen_cmd_output(_("%s has been added to %s's permitted users list"),
 			args, acct->username);
 	}
 }
@@ -120,7 +120,7 @@ USER_COMMAND(cmd_buddy_alias) {
 
 	buddy = buddy_find(acct, buddy_name);
 	if (buddy == NULL) {
-		screen_err_msg("%s is not on %s's buddy list",
+		screen_err_msg(_("%s is not on %s's buddy list"),
 			acct->username, buddy_name);
 		return;
 	}
@@ -128,7 +128,7 @@ USER_COMMAND(cmd_buddy_alias) {
 	if (buddy_alias(acct, buddy, alias, 1) != -1) {
 		struct imwindow *win;
 
-		screen_cmd_output("%s is now known as %s to %s",
+		screen_cmd_output(_("%s is now known as %s to %s"),
 			buddy_name, alias, acct->username);
 
 		/*
@@ -174,7 +174,7 @@ USER_COMMAND(cmd_buddy_list) {
 	gcur = pref->group_list;
 	if (gcur != NULL) {
 		screen_win_msg(win, 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-			"%s's buddy list: ", acct->username);
+			_("%s's buddy list: "), acct->username);
 	}
 
 	while (gcur != NULL) {
@@ -203,9 +203,9 @@ USER_COMMAND(cmd_buddy_list) {
 
 					time_to_str(buddy->idle_time, time_buf, sizeof(time_buf));
 
-					ret = snprintf(buddy_status, len, "idle: %s ", time_buf);
+					ret = snprintf(buddy_status, len, _("idle: %s "), time_buf);
 					if (ret < 0 || (size_t) ret >= len) {
-						screen_err_msg("Output was too long to display");
+						screen_err_msg(_("Output was too long to display"));
 						return;
 					}
 
@@ -214,7 +214,7 @@ USER_COMMAND(cmd_buddy_list) {
 				}
 
 				if (buddy->warn_level > 0) {
-					snprintf(&buddy_status[i], len, "warn level: %d%%",
+					snprintf(&buddy_status[i], len, _("warn level: %d%%"),
 						buddy->warn_level);
 				}
 
@@ -238,11 +238,11 @@ USER_COMMAND(cmd_buddy_list_permit) {
 
 	cur = pref->permit_list;
 	if (cur == NULL) {
-		screen_cmd_output("%s's permitted users list is empty", acct->username);
+		screen_cmd_output(_("%s's permitted users list is empty"), acct->username);
 		return;
 	}
 
-	screen_cmd_output("%s's permitted users list:", acct->username);
+	screen_cmd_output(_("%s's permitted users list:"), acct->username);
 
 	while (cur != NULL) {
 		screen_cmd_output(" - %s", (char *) cur->data);
@@ -256,11 +256,11 @@ USER_COMMAND(cmd_buddy_list_block) {
 
 	cur = pref->block_list;
 	if (cur == NULL) {
-		screen_cmd_output("%s's blocked users list is empty", acct->username);
+		screen_cmd_output(_("%s's blocked users list is empty"), acct->username);
 		return;
 	}
 
-	screen_cmd_output("%s's blocked users list:", acct->username);
+	screen_cmd_output(_("%s's blocked users list:"), acct->username);
 
 	while (cur != NULL) {
 		screen_cmd_output(" - %s", (char *) cur->data);
@@ -289,10 +289,10 @@ USER_COMMAND(cmd_buddy_remove_permit) {
 		return;
 
 	if (buddy_remove_permit(acct, args, 1) != 0) {
-		screen_err_msg("%s is not on %s's permitted users list",
+		screen_err_msg(_("%s is not on %s's permitted users list"),
 			args, acct->username);
 	} else {
-		screen_cmd_output("%s has been removed from %s's permited users list",
+		screen_cmd_output(_("%s has been removed from %s's permited users list"),
 			args, acct->username);
 	}
 }
@@ -302,10 +302,10 @@ USER_COMMAND(cmd_buddy_unblock) {
 		return;
 
 	if (buddy_remove_block(acct, args, 1) != 0) {
-		screen_err_msg("%s is not on %s's blocked users list",
+		screen_err_msg(_("%s is not on %s's blocked users list"),
 			args, acct->username);
 	} else {
-		screen_cmd_output("%s has been removed from %s's blocked users list",
+		screen_cmd_output(_("%s has been removed from %s's blocked users list"),
 			args, acct->username);
 	}
 }
@@ -315,9 +315,9 @@ USER_COMMAND(cmd_buddy_remove) {
 		return;
 
 	if (buddy_remove(acct, args, 1) != 0)
-		screen_err_msg("%s is not on %s's buddy list", args, acct->username);
+		screen_err_msg(_("%s is not on %s's buddy list"), args, acct->username);
 	else {
-		screen_cmd_output("%s has been removed from %s's buddy list",
+		screen_cmd_output(_("%s has been removed from %s's buddy list"),
 			args, acct->username);
 	}
 }
@@ -327,10 +327,10 @@ USER_COMMAND(cmd_buddy_remove_group) {
 		return;
 
 	if (group_remove(acct, args, 1) != 0) {
-		screen_err_msg("The group %s does not exist on %s's buddy list",
+		screen_err_msg(_("The group %s does not exist on %s's buddy list"),
 			args, acct->username);
 	} else {
-		screen_cmd_output("The group %s has been removed from %s's buddy list",
+		screen_cmd_output(_("The group %s has been removed from %s's buddy list"),
 			args, acct->username);
 	}
 }
@@ -343,17 +343,17 @@ USER_COMMAND(cmd_buddy_seen) {
 
 	buddy = buddy_find(acct, args);
 	if (buddy == NULL) {
-		screen_err_msg("%s is not on %s's buddy list", args, acct->username);
+		screen_err_msg(_("%s is not on %s's buddy list"), args, acct->username);
 		return;
 	}
 
 	if (buddy->status != STATUS_OFFLINE) {
-		screen_cmd_output("%s is currently online", buddy->name);
+		screen_cmd_output(_("%s is currently online"), buddy->name);
 		return;
 	}
 
 	if (!buddy->last_seen) {
-		screen_cmd_output("%s has never been seen online by %s",
+		screen_cmd_output(_("%s has never been seen online by %s"),
 			args, acct->username);
 	} else {
 		char *p;
@@ -370,7 +370,7 @@ USER_COMMAND(cmd_buddy_seen) {
 		if (p != NULL)
 			*p = '\0';
 
-		screen_cmd_output("%s last saw %s online %s (%s ago)",
+		screen_cmd_output(_("%s last saw %s online %s (%s ago)"),
 			acct->username, buddy->name, timestr, timebuf);
 	}
 }

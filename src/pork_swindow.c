@@ -209,8 +209,8 @@ void swindow_prune(struct swindow *swindow) {
 }
 
 /*
-** Adjust the swindow->scrollbuf_top pointer so that it's pointing to
-** the line that's "n" lines up from the current top of the screen.
+** Adjust the @swindow->scrollbuf_top pointer so that it's pointing to
+** the line that's @n lines up from the current top of the screen.
 */
 
 static void swindow_adjust_top(struct swindow *swindow, u_int32_t n) {
@@ -412,9 +412,10 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 	dlist_t *old_head = swindow->scrollbuf;
 	int y_pos;
 	u_int32_t scrollbuf_max;
-	u_int32_t log_type = opt_get_int(swindow->prefs, WIN_OPT_LOG_TYPES);
+	u_int32_t log_type;
 	u_int32_t activity_types;
 
+	log_type = opt_get_int(swindow->prefs, WIN_OPT_LOG_TYPES);
 	activity_types = opt_get_int(swindow->prefs, WIN_OPT_ACTIVITY_TYPES);
 
 	/*
@@ -441,7 +442,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 		wvec[1].iov_len = 1;
 
 		if (writev(swindow->log_fd, wvec, 2) != (int) imsg->len + 1) {
-			screen_err_msg("Error writing logfile: %s",
+			screen_err_msg(_("Error writing logfile: %s"),
 				strerror(errno));
 		}
 
@@ -800,7 +801,7 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 		wvec[0].iov_len = imsg->len;
 
 		if (writev(fd, wvec, 2) != (int) imsg->len + 1) {
-			screen_err_msg("Error writing buffer to %s: %s",
+			screen_err_msg(_("Error writing buffer to %s: %s"),
 				file, strerror(errno));
 		}
 
@@ -812,7 +813,7 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 }
 
 /*
-** Set the window to log to "logfile"
+** Set the window to log to @logfile
 */
 
 void swindow_set_logfile(struct swindow *swindow) {
@@ -839,14 +840,14 @@ int swindow_set_log(struct swindow *swindow) {
 
 	logfile = opt_get_str(swindow->prefs, WIN_OPT_LOGFILE);
 	if (logfile == NULL) {
-		screen_err_msg("No logfile has been specified for this window");
+		screen_err_msg(_("No logfile has been specified for this window"));
 		goto out_err;
 	}
 
 	create_full_path(logfile);
 	fd = open(logfile, O_CREAT | O_APPEND | O_WRONLY, 0600);
 	if (fd == -1) {
-		screen_err_msg("Unable to open %s for writing: %s",
+		screen_err_msg(_("Unable to open %s for writing: %s"),
 			logfile, strerror(errno));
 		goto out_err;
 	}
@@ -855,7 +856,7 @@ int swindow_set_log(struct swindow *swindow) {
 	tm = localtime(&cur_time);
 
 	len = strftime(timebuf, sizeof(timebuf),
-		"\n---------- Log started on %a %b %d %T %Z %Y ----------\n\n", tm);
+		_("\n---------- Log started on %a %b %d %T %Z %Y ----------\n\n"), tm);
 	write(fd, timebuf, len);
 
 	swindow->log_fd = fd;
@@ -885,7 +886,7 @@ void swindow_end_log(struct swindow *swindow) {
 	tm = localtime(&cur_time);
 
 	len = strftime(timebuf, sizeof(timebuf),
-		"\n---------- Log ended on %a %b %d %T %Z %Y ----------\n\n", tm);
+		_("\n---------- Log ended on %a %b %d %T %Z %Y ----------\n\n"), tm);
 	write(swindow->log_fd, timebuf, len);
 
 	close(swindow->log_fd);

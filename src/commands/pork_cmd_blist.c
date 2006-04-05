@@ -48,10 +48,10 @@ USER_COMMAND(cmd_blist_add_block) {
 
 	buddy = cell->data;
 	if (buddy_add_block(acct, buddy->nname, 1) == -1) {
-		screen_err_msg("%s is already on %s's block list",
+		screen_err_msg(_("%s is already on %s's block list"),
 			buddy->name, acct->username);
 	} else {
-		screen_cmd_output("%s has been added to %s's blocked users list",
+		screen_cmd_output(_("%s has been added to %s's blocked users list"),
 			buddy->name, acct->username);
 	}
 }
@@ -67,10 +67,10 @@ USER_COMMAND(cmd_blist_add_permit) {
 
 	buddy = cell->data;
 	if (buddy_add_permit(acct, buddy->nname, 1) == -1) {
-		screen_err_msg("%s is already on %s's permit list",
+		screen_err_msg(_("%s is already on %s's permit list"),
 			buddy->name, acct->username);
 	} else {
-		screen_cmd_output("%s has been added to %s's permitted users list",
+		screen_cmd_output(_("%s has been added to %s's permitted users list"),
 			buddy->name, acct->username);
 	}
 }
@@ -186,11 +186,11 @@ USER_COMMAND(cmd_blist_remove) {
 
 	buddy = cell->data;
 	if (buddy_remove(acct, buddy->nname, 1) != 0) {
-		screen_err_msg("%s could not be removed from %s's buddy list",
+		screen_err_msg(_("%s could not be removed from %s's buddy list"),
 			buddy->name, acct->username);
 	} else {
 		char *name = xstrdup(buddy->name);
-		screen_cmd_output("%s has been removed from %s's buddy list",
+		screen_cmd_output(_("%s has been removed from %s's buddy list"),
 			name, acct->username);
 		free(name);
 	}
@@ -207,10 +207,10 @@ USER_COMMAND(cmd_blist_remove_block) {
 
 	buddy = cell->data;
 	if (buddy_remove_block(acct, buddy->nname, 1) != 0) {
-		screen_err_msg("%s is not on %s's blocked users list",
+		screen_err_msg(_("%s is not on %s's blocked users list"),
 			buddy->name, acct->username);
 	} else {
-		screen_cmd_output("%s has been removed from %s's blocked users list",
+		screen_cmd_output(_("%s has been removed from %s's blocked users list"),
 			buddy->name, acct->username);
 	}
 }
@@ -226,10 +226,10 @@ USER_COMMAND(cmd_blist_remove_permit) {
 
 	buddy = cell->data;
 	if (buddy_remove_permit(acct, buddy->nname, 1) != 0) {
-		screen_err_msg("%s is not on %s's permitted users list",
+		screen_err_msg(_("%s is not on %s's permitted users list"),
 			buddy->name, acct->username);
 	} else {
-		screen_cmd_output("%s has been removed from %s's permited users list",
+		screen_cmd_output(_("%s has been removed from %s's permited users list"),
 			buddy->name, acct->username);
 	}
 }
@@ -309,7 +309,7 @@ USER_COMMAND(cmd_blist_width) {
 		return;
 
 	if (str_to_uint(args, &new_len) != 0) {
-		screen_err_msg("Error: invalid width: %s", args);
+		screen_err_msg(_("Error: invalid width: %s"), args);
 		return;
 	}
 

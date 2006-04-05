@@ -44,11 +44,11 @@
 char *gai_strerror(int ecode) {
 	switch (ecode) {
 		case EAI_NODATA:
-			return ("no address associated with hostname.");
+			return (_("no address associated with hostname"));
 		case EAI_MEMORY:
-			return ("memory allocation failure.");
+			return (_("memory allocation failure"));
 		default:
-			return ("unknown error.");
+			return (_("unknown error"));
 	}
 }
 

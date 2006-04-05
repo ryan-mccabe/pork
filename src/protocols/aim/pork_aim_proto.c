@@ -381,9 +381,9 @@ static int aim_connect(struct pork_acct *acct, char *args) {
 		} else {
 			char buf[128];
 
-			screen_prompt_user("Password: ", buf, sizeof(buf));
+			screen_prompt_user(_("Password: "), buf, sizeof(buf));
 			if (buf[0] == '\0') {
-				screen_err_msg("There was an error reading your password");
+				screen_err_msg(_("There was an error reading your password"));
 				return (-1);
 			}
 
@@ -529,7 +529,7 @@ static int aim_file_accept(struct file_transfer *xfer) {
 	oft_info->conn = aim_newconn(&priv->aim_session, AIM_CONN_TYPE_RENDEZVOUS);
 
 	if (oft_info->conn == NULL) {
-		screen_err_msg("Error connecting to %s@%s while receiving %s",
+		screen_err_msg(_("Error connecting to %s@%s while receiving %s"),
 			xfer->peer_username, buf, xfer->fname_local);
 		return (-1);
 	}
@@ -546,7 +546,7 @@ static int aim_file_accept(struct file_transfer *xfer) {
 			aim_connected);
 	} else {
 		aim_conn_kill(&priv->aim_session, &oft_info->conn);
-		screen_err_msg("Error connecting to %s@%s while receiving %s",
+		screen_err_msg(_("Error connecting to %s@%s while receiving %s"),
 			xfer->peer_username, buf, xfer->fname_local);
 		return (-1);
 	}
@@ -613,10 +613,8 @@ static int aim_action(struct pork_acct *acct, char *dest, char *msg) {
 	else
 		ret = snprintf(buf, sizeof(buf), "/me %s", msg);
 
-	if (ret < 0 || (size_t) ret >= sizeof(buf)) {
-		debug("snprintf failed");
+	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
-	}
 
 	return (aim_send_msg(acct, dest, buf));
 }
@@ -662,7 +660,7 @@ static int aim_set_away(struct pork_acct *acct, char *away_msg) {
 
 	len = strlen(msg_html);
 	if (len > priv->rights.max_away_len) {
-		screen_err_msg("%s's away message is too long. The maximum length is %u characters",
+		screen_err_msg(_("%s's away message is too long. The maximum length is %u characters"),
 			acct->username, priv->rights.max_away_len);
 		return (-1);
 	}
@@ -705,7 +703,7 @@ static int aim_set_profile(struct pork_acct *acct, char *profile) {
 
 	len = strlen(profile_html);
 	if (len > priv->rights.max_profile_len) {
-		screen_err_msg("%s's profile is too long. The maximum length is %u characters",
+		screen_err_msg(_("%s's profile is too long. The maximum length is %u characters"),
 			acct->username, priv->rights.max_profile_len);
 		return (-1);
 	}
@@ -763,7 +761,7 @@ int aim_chat_print_users(	struct pork_acct *acct __notused,
 			ret = snprintf(&buf[i], len, "[%%B%s%%x] ", chat_user->name);
 
 		if (ret < 0 || (size_t) ret >= len) {
-			screen_err_msg("The results were too long to display");
+			screen_err_msg(_("The results were too long to display"));
 			return (0);
 		}
 

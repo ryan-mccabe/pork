@@ -121,7 +121,7 @@ USER_COMMAND(irc_cmd_save) {
 }
 
 USER_COMMAND(FIXME) {
-	screen_err_msg("This command is not implemented yet.");
+	screen_err_msg(_("This command is not implemented yet."));
 }
 
 static struct command irc_command[] = {

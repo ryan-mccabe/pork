@@ -31,7 +31,7 @@
 #include <pork_aim_html.h>
 
 /*
-** Strip any html tags from "str"
+** Strip any html tags from @str
 ** Replace common "&*;" forms with their ascii representation.
 **
 ** This function uses xmalloc() to grab its memory and so it must be

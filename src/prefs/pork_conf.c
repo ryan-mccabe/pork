@@ -217,7 +217,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 			free(acct->profile);
 			acct->profile = xstrdup(p);
 		} else {
-			screen_err_msg("Error: account config line %d: bad setting: %s",
+			screen_err_msg(_("Error: account config line %d: bad setting: %s"),
 				line, buf);
 		}
 	}
@@ -235,11 +235,11 @@ int read_user_config(struct pork_acct *acct) {
 
 	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
 	if (read_conf(acct, buf) != 0 && errno != ENOENT)
-		screen_err_msg("There was an error reading your porkrc file");
+		screen_err_msg(_("There was an error reading your porkrc file"));
 
 	snprintf(buf, sizeof(buf), "%s/account", pork_dir);
 	if (read_acct_conf(acct, buf) != 0)
-		screen_err_msg("Error: Can't read account config file, %s", buf);
+		screen_err_msg(_("Error: Can't read account config file, %s"), buf);
 
 	return (0);
 }
@@ -309,7 +309,7 @@ int read_global_config(void) {
 	char buf[4096];
 
 	if (read_conf(screen.null_acct, SYSTEM_PORKRC) != 0)
-		screen_err_msg("Error reading the system-wide porkrc file");
+		screen_err_msg(_("Error reading the system-wide porkrc file"));
 
 	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
 	if (pork_dir == NULL)

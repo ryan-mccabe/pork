@@ -368,10 +368,11 @@ static pref_val_t global_default_pref_vals[] = {
 	},{	.pref_val.s = DEFAULT_TEXT_BUDDY_ACTIVE,
 	},{	.pref_val.s = DEFAULT_TEXT_BUDDY_AWAY,
 	},{	.pref_val.s = DEFAULT_TEXT_BUDDY_IDLE,
+	},{	.pref_val.s = DEFAULT_TEXT_BUDDY_WIRELESS,
 	},{	.pref_val.s = DEFAULT_TEXT_NO_NAME,
 	},{	.pref_val.s = DEFAULT_TEXT_NO_ROOM,
 	},{	.pref_val.s = DEFAULT_TEXT_TYPING,
-	},{	.pref_val.s = DEFAULT_TEXT_TYPING_PAUSED,
+	},{	.pref_val.s = DEFAULT_TEXT_TYPING_PAUSED
 	}
 };
 

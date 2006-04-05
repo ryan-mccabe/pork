@@ -92,7 +92,7 @@ USER_COMMAND(cmd_input_prompt) {
 		!strcasecmp(args, "off") || !strcasecmp(args, "false"))
 	{
 		input_set_prompt(cur_window()->input, NULL);
-		screen_cmd_output("Input prompt set to off");
+		screen_cmd_output(_("Input prompt set to off"));
 	} else if (	args != NULL &&
 				(!strcasecmp(args, "on") || !strcasecmp(args, "true")))
 	{
@@ -102,7 +102,7 @@ USER_COMMAND(cmd_input_prompt) {
 		if (prompt != NULL)
 			input_set_prompt(cur_window()->input, prompt);
 		else
-			screen_err_msg("No prompt format has been specified");
+			screen_err_msg(_("No prompt format has been specified"));
 	}
 }
 
@@ -115,7 +115,7 @@ USER_COMMAND(cmd_input_remove) {
 		int len;
 
 		if (str_to_int(args, &len) == -1)
-			screen_err_msg("Bad number of characters: %s", args);
+			screen_err_msg(_("Bad number of characters: %s"), args);
 		else
 			input_remove(cur_window()->input, len);
 	}
