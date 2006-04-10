@@ -67,6 +67,8 @@ static void opt_updated_priv_input(struct pref_val *pref, va_list ap) {
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
+	if (win == NULL)
+		return;
 
 	new_val = opt_get_bool(pref, WIN_OPT_PRIVATE_INPUT);
 	imwindow_set_priv_input(win, new_val);
@@ -77,11 +79,13 @@ static void opt_updated_show_blist(struct pref_val *pref, va_list ap) {
 	struct pork_acct *acct;
 	struct imwindow *win;
 
+	win = va_arg(ap, struct imwindow *);
+	if (win == NULL)
+		return;
+
 	acct = win->owner;
 	if (acct->blist == NULL)
 		return;
-
-	win = va_arg(ap, struct imwindow *);
 
 	new_val = opt_get_bool(pref, WIN_OPT_SHOW_BLIST);
 	if (new_val == win->blist_visible)
