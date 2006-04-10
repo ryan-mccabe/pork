@@ -18,10 +18,12 @@
 	#define __used		__attribute__((used))
 	#define __notused	__attribute__((unused))
 	#define __format(x) __attribute__((format x ))
+	#define __noreturn	__attribute__((noreturn))
 #else
 	#define __used
 	#define __notused
 	#define __format(x)
+	#define __noreturn
 #endif
 
 #ifdef ENABLE_DEBUGGING
@@ -30,7 +32,7 @@
 #	define debug(format, args...) do { } while (0)
 #endif
 
-void pork_exit(int status, char *msg, char *fmt, ...) __format((printf, 3, 4));
+void pork_exit(int status, char *msg, char *fmt, ...) __format((printf, 3, 4)) __noreturn;
 void keyboard_input(int fd, u_int32_t condition, void *data);
 
 #else

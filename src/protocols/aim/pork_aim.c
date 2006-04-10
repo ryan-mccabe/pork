@@ -304,6 +304,10 @@ static void aim_conn_event(int sock, u_int32_t cond, void *data) {
 				}
 
 				break;
+
+			default:
+				debug("Unknown connection type dead: %d", conn->type);
+				break;
 		}
 
 		return;
@@ -375,6 +379,10 @@ void aim_connected(int sock, u_int32_t cond __notused, void *data) {
 			case AIM_CONN_TYPE_RENDEZVOUS:
 				if (conn->subtype == AIM_CONN_SUBTYPE_OFT_SENDFILE)
 					transfer_lost(conn->priv);
+				break;
+
+			default:
+				debug("Error for unknown connection type: %d", conn->type);
 				break;
 		}
 	} else {

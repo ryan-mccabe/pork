@@ -751,6 +751,10 @@ static int irc_handler_353(struct pork_acct *acct, struct irc_input *in) {
 				case '%':
 					status |= CHAT_STATUS_HALFOP;
 					break;
+
+				default:
+					debug("Unknown status symbol: %c", tok[0]);
+					break;
 			}
 
 			offset += ret;

@@ -84,6 +84,10 @@ int get_options(int argc, char *const argv[]) {
 				printf("%s\n", PACKAGE_WEBSITE);
 				exit(0);
 				break;
+
+			default:
+				fprintf(stderr, "Unknown option: %c\n");
+				exit(-1);
 		}
 	}
 
