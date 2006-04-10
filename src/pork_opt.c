@@ -86,7 +86,7 @@ int get_options(int argc, char *const argv[]) {
 				break;
 
 			default:
-				fprintf(stderr, "Unknown option: %c\n");
+				fprintf(stderr, "Unknown option: %c -- Try --help\n", opt);
 				exit(-1);
 		}
 	}

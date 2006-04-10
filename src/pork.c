@@ -66,10 +66,10 @@ struct screen screen;
 */
 
 static void binding_insert(int key) {
-	struct imwindow *imwindow = cur_window();
+	struct imwindow *win = cur_window();
 
 	if (key > 0 && key <= 0xff)
-		input_insert(imwindow->input, key);
+		input_insert(win->input, key);
 }
 
 static inline void binding_run(struct pork_acct *acct, struct binding *binding)
@@ -115,8 +115,8 @@ void keyboard_input(int fd __notused,
 					u_int32_t cond,
 					void *data __notused)
 {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
+	struct imwindow *win = cur_window();
+	struct pork_acct *acct = win->owner;
 	int key;
 
 	/*
@@ -145,11 +145,11 @@ void keyboard_input(int fd __notused,
 			MSG_TYPE_UNIDLE, _("%s is no longer marked idle"), acct->username);
 	}
 
-	bind_exec(acct, imwindow->active_binds, key);
+	bind_exec(acct, win->active_binds, key);
 }
 
 int main(int argc, char **argv) {
-	struct imwindow *imwindow;
+	struct imwindow *win;
 	time_t timer_last_run;
 	time_t status_last_update = 0;
 	int ret;
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 	signal(SIGPIPE, SIG_IGN);
 
 	wmove(screen.status_bar, STATUS_ROWS - 1, 0);
-	imwindow = cur_window();
+	win = cur_window();
 
 	bind_init(&screen.binds);
 	bind_set_handlers(&screen.binds.main, binding_run, binding_insert);
@@ -217,8 +217,8 @@ int main(int argc, char **argv) {
 			pork_acct_reconnect_all();
 		}
 
-		imwindow = cur_window();
-		dirty = imwindow_refresh(imwindow);
+		win = cur_window();
+		dirty = imwindow_refresh(win);
 
 		/*
 		** Draw the status bar at most once per second.
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
 		time(&time_now);
 		if (status_last_update < time_now) {
 			status_last_update = time_now;
-			status_draw(imwindow->owner);
+			status_draw(win->owner);
 			dirty++;
 		}
 

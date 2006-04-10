@@ -67,34 +67,33 @@ static void opt_updated_priv_input(struct pref_val *pref, va_list ap) {
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
-	if (win == NULL)
-		return;
-
-	new_val = opt_get_bool(pref, WIN_OPT_PRIVATE_INPUT);
-	imwindow_set_priv_input(win, new_val);
+	if (win != NULL) {
+		new_val = opt_get_bool(pref, WIN_OPT_PRIVATE_INPUT);
+		imwindow_set_priv_input(win, new_val);
+	}
 }
 
 static void opt_updated_show_blist(struct pref_val *pref, va_list ap) {
-	u_int32_t new_val;
-	struct pork_acct *acct;
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
-	if (win == NULL)
-		return;
+	if (win != NULL) {
+		struct pork_acct *acct;
+		u_int32_t new_val;
 
-	acct = win->owner;
-	if (acct->blist == NULL)
-		return;
+		acct = win->owner;
+		if (acct->blist == NULL)
+			return;
 
-	new_val = opt_get_bool(pref, WIN_OPT_SHOW_BLIST);
-	if (new_val == win->blist_visible)
-		return;
+		new_val = opt_get_bool(pref, WIN_OPT_SHOW_BLIST);
+		if (new_val == win->blist_visible)
+			return;
 
-	if (new_val)
-		imwindow_blist_show(win);
-	else
-		imwindow_blist_hide(win);
+		if (new_val)
+			imwindow_blist_show(win);
+		else
+			imwindow_blist_hide(win);
+	}
 }
 
 static void opt_updated_wordwrap(struct pref_val *pref __notused, va_list ap) {

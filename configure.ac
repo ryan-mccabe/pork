@@ -33,14 +33,15 @@ AC_ARG_ENABLE(debug,
 [  --enable-debug		  Enable debugging])
 if test "$enableval" = "yes"; then
 	AC_DEFINE(ENABLE_DEBUGGING, 1, [Define to enable debugging])
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O0 -g3"
+	DEBUG_CFLAGS="-O0 -g3 -ggdb"
 fi
 
 enableval=""
 AC_ARG_ENABLE(warn,
 [  --enable-warn		  Enable a bunch of compiler warnings])
 if test "$enableval" = "yes"; then
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -W -Wall -Wno-unused-parameter -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -W -Wall -Wextra -Wno-unused-parameter -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations" # -Wno-cast-qual -Wformat -Wformat-security -Wformat-y2k -Wmissing-field-initializers -Wpacked -Wredundant-decls -Wreturn-type -Wlong-long -Wmissing-braces -Wmissing-format-attribute -Wmissing-noreturn -Wimplicit-function-declaration -Waggregate-return -Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wswitch-enum -Wstrict-aliasing=2 -Wswitch -Wswitch-default -Wunreachable-code -Wvolatile-register-var -Wwrite-strings -Wformat-nonliteral -Winvalid-pch -Winline -Wpointer-sign"
+
 fi
 
 withval=""
@@ -341,7 +342,7 @@ if test "$have_struct_addrinfo" = "yes"; then
 fi
 
 if test -n "$DEBUG_CFLAGS$DEBUG_LIBS"; then
-	CFLAGS="$(echo $CFLAGS | sed 's/-O[[1-9]]*/-O0/g' | sed 's/-g[[0-9]]*/-g3/g')"
+	CFLAGS="$(echo $CFLAGS | sed 's/-O[[1-9]]*/-O0/g' | sed 's/-g[[0-9]]*/-g3 -ggdb/g')"
 fi
 
 AC_SUBST(LIBS)
