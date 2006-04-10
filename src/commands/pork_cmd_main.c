@@ -222,7 +222,7 @@ USER_COMMAND(cmd_connect) {
 
 USER_COMMAND(cmd_echo) {
 	if (args != NULL)
-		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, args);
+		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "%s", args);
 }
 
 USER_COMMAND(cmd_disconnect) {
@@ -368,6 +368,10 @@ USER_COMMAND(cmd_lastlog) {
 
 				case 'i':
 					opts |= SWINDOW_FIND_ICASE;
+					break;
+
+				default:
+					screen_err_msg("Unknown option: '%c' -- ignoring", *args);
 					break;
 			}
 

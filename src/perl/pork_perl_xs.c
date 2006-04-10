@@ -50,8 +50,6 @@
 #include <pork_perl.h>
 #include <pork_perl_xs.h>
 
-extern struct screen screen;
-
 XS(PORK_run_cmd) {
 	char *command_str;
 	size_t notused;

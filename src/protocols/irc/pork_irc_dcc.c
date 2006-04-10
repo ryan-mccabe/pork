@@ -42,7 +42,10 @@
 #include <pork_irc.h>
 #include <pork_irc_dcc.h>
 
-static void irc_dcc_send_handler_connected(int fd, u_int32_t cond, void *data) {
+static void irc_dcc_send_handler_connected(	int fd,
+											u_int32_t cond __notused,
+											void *data)
+{
 	struct file_transfer *xfer = data;
 
 	pork_io_del(data);
@@ -92,7 +95,10 @@ static void irc_file_send_ready(int fd, u_int32_t cond, void *data) {
 	}
 }
 
-static void irc_file_send_peer_connected(int fd, u_int32_t cond, void *data) {
+static void irc_file_send_peer_connected(	int fd,
+											u_int32_t cond __notused,
+											void *data)
+{
 	struct file_transfer *xfer = data;
 	int sock;
 	socklen_t len = sin_len(&xfer->laddr);
@@ -201,7 +207,9 @@ int irc_file_send(struct file_transfer *xfer) {
 	return (0);
 }
 
-int irc_recv_data(struct file_transfer *xfer, char *buf, size_t len) {
+int irc_recv_data(	struct file_transfer *xfer,
+					char *buf __notused,
+					size_t len __notused) {
 	u_int32_t offset;
 	struct dcc *dcc = xfer->data;
 
@@ -383,7 +391,7 @@ int irc_handler_dcc_accept(struct pork_acct *acct, struct irc_input *in) {
 	return (-1);
 }
 
-int irc_handler_dcc_reject(struct pork_acct *acct, struct irc_input *in) {
+int irc_handler_dcc_reject(	struct pork_acct *acct, struct irc_input *in) {
 	char *type;
 	char *p;
 	char *host;

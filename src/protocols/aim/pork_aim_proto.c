@@ -194,7 +194,10 @@ static int aim_leave_chatroom(struct pork_acct *acct, struct chatroom *chat) {
 	return (0);
 }
 
-static int aim_join_chatroom(struct pork_acct *acct, char *name, char *args) {
+static int aim_join_chatroom(	struct pork_acct *acct,
+								char *name,
+								char *args __notused)
+{
 	int ret;
 	struct aim_priv *priv = acct->data;
 	aim_conn_t *chatnav_conn;
@@ -570,8 +573,8 @@ static char *aim_filter_text_out(char *msg) {
 static int aim_chat_get_name(	const char *str,
 						char *buf,
 						size_t len,
-						char *arg_buf,
-						size_t arg_len)
+						char *arg_buf __notused,
+						size_t arg_len __notused)
 {
 	struct chatroom_info info;
 	int ret;

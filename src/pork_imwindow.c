@@ -42,8 +42,6 @@
 #include <pork_format.h>
 #include <pork_chat.h>
 
-extern struct screen screen;
-
 struct imwindow *imwindow_new(	u_int32_t rows,
 								u_int32_t cols,
 								u_int32_t refnum,

@@ -37,7 +37,7 @@
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
-static void opt_updated_histlen(struct pref_val *pref, va_list ap) {
+static void opt_updated_histlen(struct pref_val *pref __notused, va_list ap) {
 	struct pork_input *input;
 
 	input = va_arg(ap, struct pork_input *);

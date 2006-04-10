@@ -186,7 +186,9 @@ int irc_callback_add(	struct irc_session *session,
 	return (0);
 }
 
-static int irc_handler_err_msg(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_err_msg(	struct pork_acct *acct __notused,
+								struct irc_input *in)
+{
 	char *msg;
 	char *str;
 
@@ -350,7 +352,9 @@ static int irc_handler_ctcp_echo(	struct pork_acct *acct,
 	return (0);
 }
 
-static int irc_handler_print_arg(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_print_arg(	struct pork_acct *acct __notused,
+									struct irc_input *in)
+{
 	char *str;
 
 	if (in->args == NULL) {
@@ -519,7 +523,9 @@ static int irc_handler_001(struct pork_acct *acct, struct irc_input *in) {
 	return (irc_handler_print_arg(acct, in));
 }
 
-static int irc_handler_print_num(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_print_num(	struct pork_acct *acct __notused,
+									struct irc_input *in)
+{
 	char *str;
 
 	if (in->args == NULL || in->num_tokens < 4) {
@@ -535,7 +541,9 @@ static int irc_handler_print_num(struct pork_acct *acct, struct irc_input *in) {
 	return (0);
 }
 
-static int irc_handler_print_tok(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_print_tok(	struct pork_acct *acct __notused,
+									struct irc_input *in)
+{
 	u_int32_t i;
 	char buf[2048];
 	size_t len = sizeof(buf);
@@ -650,7 +658,8 @@ static int irc_handler_352(struct pork_acct *acct, struct irc_input *in) {
 	return (0);
 }
 
-static int irc_handler_367(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_367(	struct pork_acct *acct __notused,
+							struct irc_input *in) {
 	char *str;
 
 	if (in->num_tokens < 4) {
@@ -1369,7 +1378,9 @@ static int irc_handler_302(struct pork_acct *acct, struct irc_input *in) {
 	return (0);
 }
 
-static int irc_handler_321(struct pork_acct *acct, struct irc_input *in) {
+static int irc_handler_321(	struct pork_acct *acct __notused,
+							struct irc_input *in __notused)
+{
 	/* XXX - make this line-up. */
 	screen_win_msg(cur_window(), 0, 1, 0, MSG_TYPE_CHAT_STATUS,
 		"Channel\t\t\tUsers\t\tTopic");

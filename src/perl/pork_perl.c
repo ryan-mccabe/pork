@@ -220,6 +220,10 @@ int execute_perl_va(char *function, const char *fmt, va_list ap) {
 				XPUSHs(sv_2mortal(newSViv(int_arg)));
 				break;
 			}
+
+			default:
+				debug("Unknown perl fmt type");
+				break;
 		}
 	}
 

@@ -65,7 +65,7 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 	irc_flush_outq(data);
 }
 
-static void irc_connected(int sock, u_int32_t cond, void *data) {
+static void irc_connected(int sock, u_int32_t cond __notused, void *data) {
 	int ret;
 	struct irc_session *session = data;
 
@@ -249,7 +249,7 @@ static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
 }
 
 static int irc_chan_send(	struct pork_acct *acct,
-							struct chatroom *chat,
+							struct chatroom *chat __notused,
 							char *target,
 							char *msg)
 {
@@ -380,7 +380,7 @@ static int irc_chan_ban(	struct pork_acct *acct,
 }
 
 static int irc_chan_notice(	struct pork_acct *acct,
-							struct chatroom *chat,
+							struct chatroom *chat __notused,
 							char *target,
 							char *msg)
 {
@@ -422,7 +422,7 @@ static int irc_action(struct pork_acct *acct, char *dest, char *msg) {
 }
 
 static int irc_chan_action(	struct pork_acct *acct,
-							struct chatroom *chat,
+							struct chatroom *chat __notused,
 							char *target,
 							char *msg)
 {
@@ -677,6 +677,10 @@ char *irc_text_filter(char *str) {
 							bgcol = -1;
 							bold = 0;
 							break;
+
+						default:
+							debug("unknown color num: %d", num);
+							break;
 					}
 				}
 
@@ -723,7 +727,7 @@ out:
 	return (ret);
 }
 
-int irc_chan_free(struct pork_acct *acct, void *data) {
+int irc_chan_free(struct pork_acct *acct __notused, void *data) {
 	struct irc_chan_data *chat_data = data;
 
 	hash_destroy(&chat_data->mode_args);
@@ -746,9 +750,9 @@ int irc_chanmode_has_arg(struct irc_session *session, char mode) {
 			case 'v':
 			case 'I':
 				return (1);
+			default:
+				return (0);
 		}
-
-		return (0);
 	}
 
 	p = strchr(session->chanmodes, mode);

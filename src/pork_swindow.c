@@ -41,7 +41,6 @@ static void swindow_scroll(struct swindow *swindow, int n);
 static int swindow_print_msg_wr(struct swindow *swindow,
 								struct imsg *imsg,
 								u_int32_t y,
-								u_int32_t x,
 								u_int32_t firstline,
 								u_int32_t lastline)
 {
@@ -113,7 +112,7 @@ static int swindow_print_msg(	struct swindow *swindow,
 	chtype *msg;
 
 	if (opt_get_bool(swindow->prefs, WIN_OPT_WORDWRAP))
-		return (swindow_print_msg_wr(swindow, imsg, y, x, firstline, lastline));
+		return (swindow_print_msg_wr(swindow, imsg, y, firstline, lastline));
 
 	if (lastline < firstline)
 		return (-1);
@@ -250,10 +249,7 @@ static void swindow_adjust_top(struct swindow *swindow, u_int32_t n) {
 ** and when wordwrap is turned on or off.
 */
 
-static void swindow_recalculate(struct swindow *swindow,
-								u_int32_t old_rows,
-								u_int32_t old_cols)
-{
+static void swindow_recalculate(struct swindow *swindow, u_int32_t old_cols) {
 	dlist_t *cur = swindow->scrollbuf;
 	u_int32_t total_lines = 0;
 	struct imsg *imsg_top;
@@ -298,7 +294,6 @@ void swindow_resize(struct swindow *swindow,
 					u_int32_t new_row,
 					u_int32_t new_col)
 {
-	u_int32_t old_rows = swindow->rows;
 	u_int32_t old_cols = swindow->cols;
 	int ret;
 
@@ -320,7 +315,7 @@ void swindow_resize(struct swindow *swindow,
 	if (opt_get_int(swindow->prefs, WIN_OPT_SCROLLBUF_LEN) < swindow->rows)
 		SET_INT(swindow->prefs->val[WIN_OPT_SCROLLBUF_LEN], swindow->rows);
 
-	swindow_recalculate(swindow, old_rows, old_cols);
+	swindow_recalculate(swindow, old_cols);
 	swindow_redraw(swindow);
 }
 
@@ -769,7 +764,7 @@ inline void swindow_set_wordwrap(struct swindow *swindow) {
 	** Allow for updating after the continued char changed but the
 	** wordwrap enabled setting didn't.
 	*/
-	swindow_recalculate(swindow, swindow->rows, swindow->cols);
+	swindow_recalculate(swindow, swindow->cols);
 	wclear(swindow->win);
 	swindow_redraw(swindow);
 }

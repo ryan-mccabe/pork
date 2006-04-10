@@ -57,7 +57,6 @@ struct imwindow *screen_new_chat_window(struct pork_acct *acct, char *name);
 int screen_close_window(struct imwindow *imwindow);
 void screen_cycle_fwd(void);
 void screen_cycle_bak(void);
-void screen_doupdate(void);
 
 #else
 #	warning "included multiple times"

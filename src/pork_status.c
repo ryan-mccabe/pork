@@ -34,8 +34,6 @@
 #include <pork_status.h>
 #include <pork_format.h>
 
-extern struct screen screen;
-
 int status_init(void) {
 	WINDOW *win;
 

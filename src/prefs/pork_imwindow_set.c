@@ -37,7 +37,7 @@
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 
-static void opt_updated_log(struct pref_val *pref, va_list ap) {
+static void opt_updated_log(struct pref_val *pref __notused, va_list ap) {
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
@@ -54,7 +54,7 @@ static void opt_updated_log(struct pref_val *pref, va_list ap) {
 	}
 }
 
-static void opt_updated_logfile(struct pref_val *pref, va_list ap) {
+static void opt_updated_logfile(struct pref_val *pref __notused, va_list ap) {
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
@@ -63,35 +63,37 @@ static void opt_updated_logfile(struct pref_val *pref, va_list ap) {
 }
 
 static void opt_updated_priv_input(struct pref_val *pref, va_list ap) {
-#if 0
 	u_int32_t new_val;
+	struct imwindow *win;
 
-	new_val = optget_bool(imwindow->opts, WIN_OPT_PRIVATE_INPUT);
-	imwindow_set_priv_input(imwindow, new_val);
-#endif
+	win = va_arg(ap, struct imwindow *);
+
+	new_val = opt_get_bool(pref, WIN_OPT_PRIVATE_INPUT);
+	imwindow_set_priv_input(win, new_val);
 }
 
 static void opt_updated_show_blist(struct pref_val *pref, va_list ap) {
-#if 0
 	u_int32_t new_val;
 	struct pork_acct *acct;
+	struct imwindow *win;
 
-	acct = imwindow->owner;
+	acct = win->owner;
 	if (acct->blist == NULL)
 		return;
 
-	new_val = optget_bool(imwindow->opts, WIN_OPT_SHOW_BLIST);
-	if (new_val == imwindow->blist_visible)
+	win = va_arg(ap, struct imwindow *);
+
+	new_val = opt_get_bool(pref, WIN_OPT_SHOW_BLIST);
+	if (new_val == win->blist_visible)
 		return;
 
 	if (new_val)
-		imwindow_blist_show(imwindow);
+		imwindow_blist_show(win);
 	else
-		imwindow_blist_hide(imwindow);
-#endif
+		imwindow_blist_hide(win);
 }
 
-static void opt_updated_wordwrap(struct pref_val *pref, va_list ap) {
+static void opt_updated_wordwrap(struct pref_val *pref __notused, va_list ap) {
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);

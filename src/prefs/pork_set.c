@@ -82,6 +82,10 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
 		case OPT_TYPE_COLOR:
 			ret = color_get_str(opt_get_int(pref, i), buf, len);
 			break;
+
+		default:
+			debug("Unknown set type");
+			break;
 	}
 
 	if (ret < 0 || (size_t) ret >= len)
@@ -132,6 +136,10 @@ static void opt_print_var(struct pref_val *pref, int i, const char *text) {
 			screen_nocolor_msg("%s %s %s", pref_name(pref, i), text, buf);
 			break;
 		}
+
+		default:
+			debug("Unknown set type");
+			break;
 	}
 }
 
@@ -191,6 +199,10 @@ void opt_write(struct pref_val *pref, FILE *fp) {
 				fprintf(fp, "set %s %s\n", pref_name(pref, i), buf);
 				break;
 			}
+
+			default:
+				debug("Unknown set type");
+				break;
 		}
 	}
 }

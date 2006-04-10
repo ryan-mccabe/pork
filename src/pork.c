@@ -236,8 +236,6 @@ int main(int argc, char **argv) {
 		if (dirty)
 			screen_doupdate();
 	}
-
-	pork_exit(0, NULL, NULL);
 }
 
 /*
