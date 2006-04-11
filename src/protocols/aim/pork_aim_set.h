@@ -15,6 +15,9 @@ struct pref_val *aim_get_default_prefs(void);
 
 enum {
 	AIM_OPT_AUTOSAVE = 0,
+	AIM_OPT_AIM_HOST,
+	AIM_OPT_AIM_PORT,
+	AIM_OPT_AIM_SERVER,
 	AIM_OPT_FORMAT_WHOIS_AWAY,
 	AIM_OPT_FORMAT_WHOIS_IDLE,
 	AIM_OPT_FORMAT_WHOIS_MEMBER,
@@ -33,6 +36,9 @@ enum {
 };
 
 #define DEFAULT_AIM_AUTOSAVE					0
+#define DEFAULT_AIM_AIM_HOST					""
+#define DEFAULT_AIM_AIM_PORT					5190
+#define DEFAULT_AIM_AIM_SERVER					"login.oscar.aol.com"
 #define DEFAULT_AIM_FORMAT_WHOIS_AWAY			"%D-%Ca%cway message%W:%x $A"
 #define DEFAULT_AIM_FORMAT_WHOIS_IDLE			"%D-%p-%P--%Ci%cdle time%W:%x $i"
 #define DEFAULT_AIM_FORMAT_WHOIS_MEMBER			"%D-%Cm%cember since%W:%x $d"
@@ -45,8 +51,6 @@ enum {
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR	"#ffffff"
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR	"#000000"
 #define DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE		""
-#define DEFAULT_AIM_PORT						5190
-#define DEFAULT_AIM_SERVER						"login.oscar.aol.com"
 
 #else
 #	warning "included multiple times"

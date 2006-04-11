@@ -30,7 +30,16 @@
 #include <pork_proto.h>
 
 static const struct pork_pref aim_pref_list[] = {
-	{	.name = "AUTOSAVE",
+	{	.name = "AIM_HOST",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "AIM_PORT",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
+	},{	.name = "AIM_SERVER",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str,
+	},{	.name = "AUTOSAVE",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
 	},{	.name = "FORMAT_WHOIS_AWAY",
@@ -69,12 +78,6 @@ static const struct pork_pref aim_pref_list[] = {
 	},{	.name = "OUTGOING_MSG_FONT_SIZE",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
-	},{	.name = "PORT",
-		.type = OPT_TYPE_INT,
-		.set = opt_set_int
-	},{	.name = "SERVER",
-		.type = OPT_TYPE_STR,
-		.set = opt_set_str
 	}
 };
 
@@ -85,7 +88,10 @@ static const struct pref_set aim_pref_set = {
 };
 
 static pref_val_t aim_default_pref_vals[] = {
-	{	.pref_val.b = DEFAULT_AIM_AUTOSAVE,
+	{	.pref_val.s = DEFAULT_AIM_AIM_HOST,
+	},{	.pref_val.i = DEFAULT_AIM_AIM_PORT,
+	},{	.pref_val.s = DEFAULT_AIM_AIM_SERVER,
+	},{	.pref_val.b = DEFAULT_AIM_AUTOSAVE,
 	},{	.pref_val.s = DEFAULT_AIM_FORMAT_WHOIS_AWAY,
 	},{	.pref_val.s = DEFAULT_AIM_FORMAT_WHOIS_IDLE,
 	},{	.pref_val.s = DEFAULT_AIM_FORMAT_WHOIS_MEMBER,
@@ -98,8 +104,6 @@ static pref_val_t aim_default_pref_vals[] = {
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_BGCOLOR,
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_FGCOLOR,
 	},{	.pref_val.s = DEFAULT_AIM_OUTGOING_MSG_FONT_SIZE,
-	},{	.pref_val.i = DEFAULT_AIM_PORT,
-	},{	.pref_val.s = DEFAULT_AIM_SERVER,
 	}
 };
 
