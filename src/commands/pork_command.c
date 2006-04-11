@@ -104,12 +104,15 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
-		struct pork_proto *proto;
+		if (set == CMDSET_MAIN) {
+			struct pork_proto *proto = proto_get_name(cmd_str);
 
-		if (set == CMDSET_MAIN && (proto = proto_get_name(cmd_str)) != NULL) {
-			cmd_str = strsep(&str, " \t");
+			if (proto != NULL)
+				cmd_str = strsep(&str, " \t");
+			else
+				proto = cur_window()->owner->proto;
 
-			if (cmd_str != NULL && cmd_str[0] != '\0') {
+			if (proto != NULL && cmd_str != NULL && cmd_str[0] != '\0') {
 				cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
 						sizeof(struct command), cmd_compare);
 
@@ -215,4 +218,3 @@ int command_enter_str(struct pork_acct *acct, char *str) {
 
 	return (0);
 }
-
