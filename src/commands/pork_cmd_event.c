@@ -32,7 +32,7 @@ USER_COMMAND(cmd_event_add) {
 	u_int32_t refnum;
 	struct event *events = acct->events;
 
-	if (args == NULL || *args == '\0') {
+	if (blank_str(args)) {
 		event_list(events, NULL);
 		return;
 	}
@@ -44,7 +44,7 @@ USER_COMMAND(cmd_event_add) {
 	}
 
 	strtoupper(event_type);
-	if (args == NULL) {
+	if (blank_str(args)) {
 		event_list(events, event_type);
 		return;
 	}
@@ -61,7 +61,7 @@ USER_COMMAND(cmd_event_del) {
 	char *event_type;
 	int ret;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	event_type = strsep(&args, " ");
@@ -87,7 +87,7 @@ USER_COMMAND(cmd_event_del) {
 USER_COMMAND(cmd_event_del_refnum) {
 	u_int32_t refnum;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (str_to_uint(args, &refnum) != 0) {

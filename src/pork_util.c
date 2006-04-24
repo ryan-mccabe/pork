@@ -29,11 +29,10 @@
 */
 
 void strtoupper(char *s) {
-	if (s == NULL)
-		return;
-
-	for (; *s != '\0' ; s++)
-		*s = toupper(*s);
+	if (s != NULL) {
+		while (*s != '\0')
+			*s++ = toupper(*s);
+	}
 }
 
 void *xrealloc(void *ptr, size_t size) {
@@ -80,12 +79,16 @@ char *xstrdup(const char *str) {
 	return (ret);
 }
 
-void free_str_wipe(char *str) {
-	if (str == NULL)
-		return;
+/*
+** For free()ing strings that contain information that ought not
+** be left hanging around in memory (e.g., passwords).
+*/
 
-	memset(str, 0, strlen(str));
-	free(str);
+void free_str_wipe(char *str) {
+	if (str != NULL) {
+		memset(str, 0, strlen(str));
+		free(str);
+	}
 }
 
 /*
@@ -161,13 +164,12 @@ char *xstrndup(const char *str, size_t len) {
 ** nothing but space characters), 0 if it's not blank.
 */
 
-int blank_str(const char *str) {
-	const char *p = str;
-
-	while (*p != '\0') {
-		if (*p != ' ')
-			return (0);
-		p++;
+int blank_str(const char *p) {
+	if (p != NULL) {
+		while (*p != '\0') {
+			if (*p++ != ' ')
+				return (0);
+		}
 	}
 
 	return (1);
@@ -178,12 +180,12 @@ int blank_str(const char *str) {
 ** Returns NULL if there are less tokens than @tok_num in the string.
 */
 
-char *str_from_tok(char *str, u_int32_t tok_num) {
-	char *p;
+char *str_from_tok(const char *str, u_int32_t tok_num) {
+	const char *p;
 	u_int32_t i;
 
 	if (tok_num <= 1)
-		return (str);
+		return ((char *) str);
 
 	p = str;
 	for (i = 0 ; i < tok_num - 1 && (p = strchr(p, ' ')) != NULL ; i++)
@@ -192,7 +194,7 @@ char *str_from_tok(char *str, u_int32_t tok_num) {
 	if (i != tok_num - 1 || p == NULL)
 		return (NULL);
 
-	return (p);
+	return ((char *) p);
 }
 
 /*
@@ -294,7 +296,8 @@ int expand_path(char *path, char *dest, size_t len) {
 				if (pw != NULL)
 					path = NULL;
 			} else {
-				char *user = xstrndup(path, p - path);
+				char *user = xstrndup(path,
+						POINTER_TO_UINT(p) - POINTER_TO_UINT(path));
 				pw = getpwnam(user);
 				free(user);
 

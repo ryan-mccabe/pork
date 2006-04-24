@@ -27,6 +27,7 @@ enum {
 	CMDSET_CHAT,
 	CMDSET_FILE,
 	CMDSET_ACCT,
+	CMDSET_PERL,
 	CMDSET_PROTO,
 };
 
@@ -43,8 +44,7 @@ struct command_set {
 
 int command_enter_str(struct pork_acct *acct, char *str);
 int run_one_command(struct pork_acct *acct, char *str, u_int32_t set);
-int run_mcommand(struct pork_acct *acct, char *str);
-inline int run_command(struct pork_acct *acct, char *str);
+int run_command(struct pork_acct *acct, char *str);
 
 #else
 #	warning "included multiple times"

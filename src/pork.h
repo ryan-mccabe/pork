@@ -14,16 +14,28 @@
 	#define _(x) (x)
 #endif
 
-#ifdef HAVE___ATTRIBUTE__
+#ifdef HAVE___ATTRIBUTE__USED
 	#define __used		__attribute__((used))
-	#define __notused	__attribute__((unused))
-	#define __format(x) __attribute__((format x ))
-	#define __noreturn	__attribute__((noreturn))
 #else
 	#define __used
+#endif
+
+#ifdef HAVE___ATTRIBUTE__UNUSED
+	#define __notused	__attribute__((unused))
+#else
 	#define __notused
-	#define __format(x)
+#endif
+
+#ifdef HAVE___ATTRIBUTE__NORETURN
+	#define __noreturn	__attribute__((noreturn))
+#else
 	#define __noreturn
+#endif
+
+#ifdef HAVE___ATTRIBUTE__FORMAT
+	#define __format(x) __attribute__((format x ))
+#else
+	#define __format(x)
 #endif
 
 #ifdef ENABLE_DEBUGGING

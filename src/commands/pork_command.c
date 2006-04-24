@@ -57,6 +57,7 @@ extern struct command_set event_set;
 extern struct command_set chat_set;
 extern struct command_set file_set;
 extern struct command_set acct_set;
+extern struct command_set perl_set;
 
 struct command_set *command_set[] = {
 	&main_set,
@@ -71,6 +72,7 @@ struct command_set *command_set[] = {
 	&chat_set,
 	&file_set,
 	&acct_set,
+	&perl_set,
 	NULL
 };
 
@@ -104,46 +106,57 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
-		if (set == CMDSET_MAIN) {
-			struct pork_proto *proto = proto_get_name(cmd_str);
+		int explicit = 0;
+		struct pork_proto *proto;
 
-			if (proto != NULL)
-				cmd_str = strsep(&str, " \t");
-			else
-				proto = cur_window()->owner->proto;
+		if (set != CMDSET_MAIN) {
+			screen_err_msg(_("Unknown %scommand: %s"),
+				command_set[set]->type, cmd_str);
+			return (-1);
+		}
 
-			if (proto != NULL && cmd_str != NULL && cmd_str[0] != '\0') {
-				cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
-						sizeof(struct command), cmd_compare);
+		proto = proto_get_name(cmd_str);
+		if (proto != NULL) {
+			explicit = 1;
+			cmd_str = strsep(&str, " \t");
+		} else
+			proto = cur_window()->owner->proto;
 
-				if (cmd == NULL) {
+		if (proto != NULL && proto->protocol >= 0 &&
+			cmd_str != NULL && cmd_str[0] != '\0')
+		{
+			cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
+					sizeof(struct command), cmd_compare);
+
+			if (cmd == NULL) {
+				if (explicit) {
 					screen_err_msg(_("Unknown %s command: %s"),
 						proto->name, cmd_str);
-					return (-1);
-				}
-
-				if (proto != acct->proto) {
-					/* yeah, this isn't a hack at all. */
-					if (!strcasecmp(cmd->name, "set") ||
-						!strcasecmp(cmd->name, "save"))
-					{
-						cmd->cmd(NULL, str);
-						return (0);
-					} else {
-						screen_err_msg(_("%s may not run %s commands"),
-							acct->username, proto->name);
-						return (-1);
-					}
-				}
-			} else {
-				if (str != NULL)
-					screen_err_msg(_("Unknown %s command: %s"), proto->name, str);
+				} else
+					screen_err_msg(_("Unknown command: %s"), cmd_str);
 
 				return (-1);
 			}
+
+			if (proto != acct->proto) {
+				/* yeah, this isn't a hack at all. */
+				if (!strcasecmp(cmd->name, "set") ||
+					!strcasecmp(cmd->name, "save"))
+				{
+					cmd->cmd(NULL, str);
+					return (0);
+				} else {
+					screen_err_msg(_("%s may not run %s commands"),
+						acct->username, proto->name);
+					return (-1);
+				}
+			}
 		} else {
-			screen_err_msg(_("Unknown %scommand: %s"),
-				command_set[set]->type, cmd_str);
+			if (str != NULL)
+				screen_err_msg(_("Unknown %s command: %s"), proto->name, str);
+			else
+				screen_err_msg(_("Unknown command: %s"), cmd_str);
+
 			return (-1);
 		}
 	}
@@ -153,51 +166,28 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 }
 
 inline int run_command(struct pork_acct *acct, char *str) {
-	return (run_one_command(acct, str, CMDSET_MAIN));
-}
+	int ret;
+	char *cmd = xstrdup(str);
 
-int run_mcommand(struct pork_acct *acct, char *str) {
-	int i = 0;
-	char *copystr = xstrdup(str);
-	char *cmdstr = copystr;
-	char *curcmd;
-
-	curcmd = strsep(&cmdstr, ";");
-	if (curcmd == NULL)
-		i = run_one_command(acct, cmdstr, CMDSET_MAIN);
-	else {
-		while (curcmd != NULL && i != -1) {
-			char cmdchars = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
-
-			while (*curcmd == ' ')
-				curcmd++;
-
-			while (*curcmd == cmdchars)
-				curcmd++;
-
-			i = run_one_command(acct, curcmd, CMDSET_MAIN);
-			curcmd = strsep(&cmdstr, ";");
-		}
-	}
-
-	free(copystr);
-	return (i);
+	ret = run_one_command(acct, cmd, CMDSET_MAIN);
+	free(cmd);
+	return (ret);
 }
 
 static int command_send_to_win(struct pork_acct *acct, char *str) {
-	struct imwindow *imwindow = cur_window();
+	struct imwindow *win = cur_window();
 
 	if (str == NULL || !acct->connected)
 		return (-1);
 
-	if (imwindow->type == WIN_TYPE_PRIVMSG)
-		pork_msg_send(acct, imwindow->target, str);
-	else if (imwindow->type == WIN_TYPE_CHAT) {
-		struct chatroom *chat = imwindow->data;
+	if (win->type == WIN_TYPE_PRIVMSG)
+		pork_msg_send(acct, win->target, str);
+	else if (win->type == WIN_TYPE_CHAT) {
+		struct chatroom *chat = win->data;
 
 		if (chat == NULL) {
 			screen_err_msg(_("%s is not a member of %s"),
-				acct->username, imwindow->target);
+				acct->username, win->target);
 		} else
 			chat_send_msg(acct, chat, chat->title, str);
 	}
@@ -209,11 +199,10 @@ int command_enter_str(struct pork_acct *acct, char *str) {
 	if (!event_generate(acct->events, EVENT_SEND_LINE,
 		str, acct->refnum))
 	{
-		if (str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS)) {
+		if (str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
 			run_command(acct, &str[1]);
-		} else {
+		else
 			command_send_to_win(acct, str);
-		}
 	}
 
 	return (0);

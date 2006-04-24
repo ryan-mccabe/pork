@@ -217,7 +217,7 @@ XS(PORK_blist_up) {
 XS(PORK_blist_width) {
 	struct pork_acct *acct;
 	struct blist *blist;
-	int new_width;
+	u_int32_t new_width;
 	dXSARGS;
 
 	if (items < 1)

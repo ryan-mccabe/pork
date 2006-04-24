@@ -88,7 +88,7 @@ USER_COMMAND(cmd_input_prev_word) {
 }
 
 USER_COMMAND(cmd_input_prompt) {
-	if (args == NULL || blank_str(args) ||
+	if (blank_str(args) ||
 		!strcasecmp(args, "off") || !strcasecmp(args, "false"))
 	{
 		input_set_prompt(cur_window()->input, NULL);
@@ -111,7 +111,7 @@ USER_COMMAND(cmd_input_next_word) {
 }
 
 USER_COMMAND(cmd_input_remove) {
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		int len;
 
 		if (str_to_int(args, &len) == -1)
@@ -133,7 +133,7 @@ USER_COMMAND(cmd_input_set) {
 	struct pork_input *input;
 	struct pref_val *pref;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		input = cur_window()->input;
 		pref = input->prefs;
 	} else if (!strncasecmp(args, "-default", 8)) {

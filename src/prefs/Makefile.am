@@ -1,6 +1,6 @@
 INCLUDES = -I../missing -I../perl -I.. -I. -I../..
 
-AM_CFLAGS = $(PERL_CFLAGS) $(DEBUG_CFLAGS)
+AM_CFLAGS = $(PERL_CFLAGS) $(DEBUG_CFLAGS) $(WARN_CFLAGS)
 AM_CFLAGS += -DSYSTEM_PORKRC=\"$(pkgdatadir)/porkrc\"
 
 noinst_LIBRARIES = libporkprefs.a

@@ -26,7 +26,7 @@ XS(PORK_get_opt);
 XS(PORK_load);
 XS(PORK_load_perl);
 XS(PORK_prompt_user);
-XS(PORK_quit);
+XS(PORK_quit) __noreturn;
 XS(PORK_quote);
 XS(PORK_refresh);
 XS(PORK_run_cmd);

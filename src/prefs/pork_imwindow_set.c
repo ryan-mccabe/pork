@@ -32,6 +32,7 @@
 #include <pork_acct_set.h>
 #include <pork_cstr.h>
 #include <pork_misc.h>
+#include <pork_proto.h>
 #include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_screen.h>
@@ -63,7 +64,7 @@ static void opt_updated_logfile(struct pref_val *pref __notused, va_list ap) {
 }
 
 static void opt_updated_priv_input(struct pref_val *pref, va_list ap) {
-	u_int32_t new_val;
+	int new_val;
 	struct imwindow *win;
 
 	win = va_arg(ap, struct imwindow *);
@@ -215,7 +216,7 @@ int imwindow_init_prefs(struct imwindow *win) {
 		char *log_dir;
 		int ret;
 
-		normalize(buf, win->target, sizeof(buf));
+		win->owner->proto->normalize(buf, win->target, sizeof(buf));
 		while ((p = strchr(buf, '/')) != NULL)
 			*p = '_';
 

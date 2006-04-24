@@ -74,25 +74,25 @@ struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name);
 struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
 											const char *target);
 
-inline int imwindow_add(struct imwindow *imwindow,
+int imwindow_add(struct imwindow *imwindow,
 						struct imsg *imsg,
 						u_int32_t type);
 
-inline int imwindow_ignore(struct imwindow *imwindow);
-inline int imwindow_unignore(struct imwindow *imwindow);
-inline int imwindow_skip(struct imwindow *imwindow);
-inline int imwindow_unskip(struct imwindow *imwindow);
-inline int imwindow_dump_buffer(struct imwindow *imwindow, char *file);
-inline void imwindow_rename(struct imwindow *imwindow, char *new_name);
-inline void imwindow_scroll_up(struct imwindow *imwindow);
-inline void imwindow_scroll_down(struct imwindow *imwindow);
-inline void imwindow_scroll_by(struct imwindow *imwindow, int lines);
-inline void imwindow_scroll_page_up(struct imwindow *imwindow);
-inline void imwindow_scroll_page_down(struct imwindow *imwindow);
-inline void imwindow_scroll_start(struct imwindow *imwindow);
-inline void imwindow_scroll_end(struct imwindow *imwindow);
-inline void imwindow_clear(struct imwindow *imwindow);
-inline void imwindow_erase(struct imwindow *imwindow);
+int imwindow_ignore(struct imwindow *imwindow);
+int imwindow_unignore(struct imwindow *imwindow);
+int imwindow_skip(struct imwindow *imwindow);
+int imwindow_unskip(struct imwindow *imwindow);
+int imwindow_dump_buffer(struct imwindow *imwindow, char *file);
+void imwindow_rename(struct imwindow *imwindow, char *new_name);
+void imwindow_scroll_up(struct imwindow *imwindow);
+void imwindow_scroll_down(struct imwindow *imwindow);
+void imwindow_scroll_by(struct imwindow *imwindow, int lines);
+void imwindow_scroll_page_up(struct imwindow *imwindow);
+void imwindow_scroll_page_down(struct imwindow *imwindow);
+void imwindow_scroll_start(struct imwindow *imwindow);
+void imwindow_scroll_end(struct imwindow *imwindow);
+void imwindow_clear(struct imwindow *imwindow);
+void imwindow_erase(struct imwindow *imwindow);
 
 #else
 #	warning "included multiple times"

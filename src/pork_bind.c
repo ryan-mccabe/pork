@@ -143,8 +143,9 @@ void bind_add(struct key_binds *bind_set, int key, char *command) {
 */
 
 static void bind_add_default(struct binds *binds) {
-	bind_add(&binds->main, '\n', "input send");
-	bind_add(&binds->main, 127, "input backspace");
+	bind_add(&binds->main, 0x0a, "input send");
+	bind_add(&binds->main, KEY_ENTER, "input send");
+	bind_add(&binds->main, 0x7f, "input backspace");
 	bind_add(&binds->main, KEY_BACKSPACE, "input backspace");
 }
 

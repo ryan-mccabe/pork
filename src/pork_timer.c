@@ -113,7 +113,7 @@ int timer_run(dlist_t **timer_list) {
 			char *command = xstrdup(timer->command);
 
 			triggered++;
-			run_mcommand(timer->acct, command);
+			run_command(timer->acct, command);
 			free(command);
 
 			if (timer->times != 1) {

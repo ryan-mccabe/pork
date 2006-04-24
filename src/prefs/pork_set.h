@@ -62,7 +62,7 @@ void opt_write(struct pref_val *pref, FILE *fp);
 int opt_tristate(char *args);
 int opt_set(struct pref_val *pref, u_int32_t opt, char *args, ...);
 int opt_set_var(struct pref_val *pref, char *args, ...);
-int opt_find(const struct pref_set *pref, const char *name);
+int opt_find(const struct pref_set *pref, const char *name, u_int32_t *opt);
 int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len);
 
 #define SET_STR(y,x)				((y).pref_val.s = (x))

@@ -36,16 +36,16 @@ int blist_cursor_end(struct blist *blist);
 int blist_cursor_pgdown(struct blist *blist);
 int blist_cursor_pgup(struct blist *blist);
 
-inline struct slist_cell *blist_get_cursor(struct blist *blist);
-inline int blist_resize(	struct blist *blist,
+struct slist_cell *blist_get_cursor(struct blist *blist);
+int blist_resize(	struct blist *blist,
 							u_int32_t rows,
 							u_int32_t cols,
 							u_int32_t screen_cols);
-inline void blist_destroy(struct blist *blist);
-inline void blist_draw(struct blist *blist);
-inline void blist_draw_cursor(struct blist *blist, int status);
-inline void blist_draw_line(struct blist *blist, struct slist_cell *cell);
-inline int blist_refresh(struct blist *blist);
+void blist_destroy(struct blist *blist);
+void blist_draw(struct blist *blist);
+void blist_draw_cursor(struct blist *blist, int status);
+void blist_draw_line(struct blist *blist, struct slist_cell *cell);
+int blist_refresh(struct blist *blist);
 
 void blist_draw_border(struct blist *blist, int border_state);
 void blist_changed_format(struct blist *blist);

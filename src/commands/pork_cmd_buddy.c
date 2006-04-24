@@ -44,7 +44,7 @@ USER_COMMAND(cmd_buddy_add) {
 	struct buddy *buddy;
 
 	screen_name = strsep(&args, " ");
-	if (screen_name == NULL || blank_str(screen_name)) {
+	if (blank_str(screen_name)) {
 		screen_err_msg(_("syntax is /buddy add <user> <group>"));
 		return;
 	}
@@ -57,7 +57,7 @@ USER_COMMAND(cmd_buddy_add) {
 	}
 
 	group_name = args;
-	if (group_name == NULL || blank_str(group_name)) {
+	if (blank_str(group_name)) {
 		screen_err_msg(_("syntax is /buddy add <user> <group>"));
 		return;
 	}
@@ -73,7 +73,7 @@ USER_COMMAND(cmd_buddy_add) {
 }
 
 USER_COMMAND(cmd_buddy_block) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (buddy_add_block(acct, args, 1) == -1) {
@@ -86,7 +86,7 @@ USER_COMMAND(cmd_buddy_block) {
 }
 
 USER_COMMAND(cmd_buddy_permit) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (buddy_add_permit(acct, args, 1) == -1) {
@@ -99,7 +99,7 @@ USER_COMMAND(cmd_buddy_permit) {
 }
 
 USER_COMMAND(cmd_buddy_add_group) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	group_add(acct, args);
@@ -115,7 +115,7 @@ USER_COMMAND(cmd_buddy_alias) {
 		return;
 
 	alias = args;
-	if (alias == NULL || blank_str(alias))
+	if (blank_str(alias))
 		return;
 
 	buddy = buddy_find(acct, buddy_name);
@@ -148,7 +148,7 @@ USER_COMMAND(cmd_buddy_awaymsg) {
 	if (acct->proto->get_away_msg == NULL)
 		return;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		if (win->type == WIN_TYPE_PRIVMSG)
 			args = win->target;
 		else
@@ -272,7 +272,7 @@ USER_COMMAND(cmd_buddy_profile) {
 	if (acct->proto->get_profile == NULL)
 		return;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		struct imwindow *win = cur_window();
 
 		if (win->type == WIN_TYPE_PRIVMSG)
@@ -285,7 +285,7 @@ USER_COMMAND(cmd_buddy_profile) {
 }
 
 USER_COMMAND(cmd_buddy_remove_permit) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (buddy_remove_permit(acct, args, 1) != 0) {
@@ -298,7 +298,7 @@ USER_COMMAND(cmd_buddy_remove_permit) {
 }
 
 USER_COMMAND(cmd_buddy_unblock) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (buddy_remove_block(acct, args, 1) != 0) {
@@ -311,7 +311,7 @@ USER_COMMAND(cmd_buddy_unblock) {
 }
 
 USER_COMMAND(cmd_buddy_remove) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (buddy_remove(acct, args, 1) != 0)
@@ -323,7 +323,7 @@ USER_COMMAND(cmd_buddy_remove) {
 }
 
 USER_COMMAND(cmd_buddy_remove_group) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (group_remove(acct, args, 1) != 0) {
@@ -338,7 +338,7 @@ USER_COMMAND(cmd_buddy_remove_group) {
 USER_COMMAND(cmd_buddy_seen) {
 	struct buddy *buddy;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	buddy = buddy_find(acct, args);
@@ -359,12 +359,14 @@ USER_COMMAND(cmd_buddy_seen) {
 		char *p;
 		char timebuf[64];
 		char timestr[64];
-		u_int32_t time_diff = (u_int32_t) time(NULL) - buddy->last_seen;
+		u_int32_t time_diff;
+		time_t last_seen;
 
+		time_diff = (u_int32_t) time(NULL) - buddy->last_seen;
 		time_to_str(time_diff / 60 , timebuf, sizeof(timebuf));
 
-		xstrncpy(timestr,
-			asctime(localtime((time_t *) &buddy->last_seen)), sizeof(timestr));
+		last_seen = buddy->last_seen;
+		xstrncpy(timestr, asctime(localtime(&last_seen)), sizeof(timestr));
 
 		p = strchr(timestr, '\n');
 		if (p != NULL)
@@ -379,7 +381,7 @@ USER_COMMAND(cmd_buddy_warn) {
 	if (acct->proto->warn == NULL)
 		return;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		struct imwindow *win = cur_window();
 
 		if (win->type == WIN_TYPE_PRIVMSG)
@@ -395,7 +397,7 @@ USER_COMMAND(cmd_buddy_warn_anon) {
 	if (acct->proto->warn_anon == NULL)
 		return;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		struct imwindow *win = cur_window();
 
 		if (win->type == WIN_TYPE_PRIVMSG)

@@ -32,7 +32,7 @@ USER_COMMAND(cmd_file_cancel) {
 	struct file_transfer *xfer;
 	char *refnum_str;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	refnum_str = strsep(&args, " ");
@@ -95,7 +95,7 @@ USER_COMMAND(cmd_file_get) {
 	u_int32_t refnum;
 	struct file_transfer *xfer;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	refnum_str = strsep(&args, " ");
@@ -118,7 +118,7 @@ USER_COMMAND(cmd_file_get) {
 		return;
 	}
 
-	if (args != NULL && blank_str(args))
+	if (blank_str(args))
 		args = NULL;
 
 	transfer_get(xfer, args);

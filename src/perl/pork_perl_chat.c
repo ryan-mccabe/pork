@@ -163,7 +163,7 @@ XS(PORK_chat_get_window) {
 	if (win == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(win->refnum);
+	XSRETURN_UV(win->refnum);
 }
 
 XS(PORK_chat_get_users) {

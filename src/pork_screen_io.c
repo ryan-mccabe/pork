@@ -245,13 +245,13 @@ void screen_print_str(struct imwindow *win, char *buf, size_t chlen, int type) {
 	}
 }
 
-inline void screen_win_msg(	struct imwindow *win,
-							int ts,
-							int banner,
-							int color,
-							int type,
-							char *fmt,
-							...)
+void screen_win_msg(struct imwindow *win,
+					int ts,
+					int banner,
+					int color,
+					int type,
+					char *fmt,
+					...)
 {
 	va_list ap;
 
@@ -262,7 +262,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_end(ap);
 }
 
-inline void screen_err_msg(char *fmt, ...) {
+void screen_err_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -272,7 +272,7 @@ inline void screen_err_msg(char *fmt, ...) {
 	va_end(ap);
 }
 
-inline void screen_cmd_output(char *fmt, ...) {
+void screen_cmd_output(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -283,7 +283,7 @@ inline void screen_cmd_output(char *fmt, ...) {
 	va_end(ap);
 }
 
-inline void screen_nocolor_msg(char *fmt, ...) {
+void screen_nocolor_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

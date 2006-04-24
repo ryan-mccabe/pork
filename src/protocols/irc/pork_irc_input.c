@@ -19,7 +19,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/in_systm.h>
 #include <arpa/inet.h>
 #include <errno.h>
 
@@ -660,7 +662,7 @@ static int irc_handler_352(struct pork_acct *acct, struct irc_input *in) {
 
 static int irc_handler_367(	struct pork_acct *acct __notused,
 							struct irc_input *in) {
-	char *str;
+	const char *str;
 
 	if (in->num_tokens < 4) {
 		debug("invalid input from server: \"%s\"", in->orig);
@@ -1202,9 +1204,9 @@ static int irc_handler_332(struct pork_acct *acct, struct irc_input *in) {
 }
 
 static int irc_handler_221(struct pork_acct *acct, struct irc_input *in) {
-	char *mode;
 	int ret;
 	char buf[2048];
+	const char *mode;
 
 	if (in->num_tokens < 4) {
 		debug("invalid input from server: \"%s\"", in->orig);

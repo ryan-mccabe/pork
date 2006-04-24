@@ -44,17 +44,17 @@ static void print_timer(void *data, void *nothing __notused) {
 
 USER_COMMAND(cmd_timer_add) {
 	char *p;
-	u_int32_t interval;
+	int interval;
 	u_int32_t times;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	p = strsep(&args, " ");
 	if (p == NULL)
 		return;
 
-	if (str_to_uint(p, &interval) != 0) {
+	if (str_to_int(p, &interval) != 0) {
 		screen_err_msg("Invalid timer interval: %s", p);
 		return;
 	}
@@ -68,7 +68,7 @@ USER_COMMAND(cmd_timer_add) {
 		return;
 	}
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	timer_add(&screen.timer_list, args, acct, interval, times);
@@ -77,7 +77,7 @@ USER_COMMAND(cmd_timer_add) {
 USER_COMMAND(cmd_timer_del) {
 	int ret;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	ret = timer_del(&screen.timer_list, args);
@@ -91,7 +91,7 @@ USER_COMMAND(cmd_timer_del_refnum) {
 	u_int32_t refnum;
 	int ret;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (str_to_uint(args, &refnum) != 0) {

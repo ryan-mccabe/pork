@@ -1,5 +1,5 @@
 INCLUDES = -I. -I.. -I../.. -I../../.. -I../../../.. -I../../../missing -I../../../prefs
-AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS)
+AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS) $(WARN_CFLAGS)
 
 EXTRA_DIST = \
 	AUTHORS \

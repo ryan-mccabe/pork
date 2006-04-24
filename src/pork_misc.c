@@ -84,31 +84,6 @@ int wgetinput(WINDOW *win) {
 	return (c);
 }
 
-/*
-** Normalize the string @str
-**
-** AIM screen names need to be normalized
-** before they're sent to the server.
-**
-** What this means is converting alphabetic characters
-** to lowercase and removing any space characters.
-*/
-
-int normalize(char *buf, const char *str, size_t len) {
-	size_t i;
-
-	len--;
-	for (i = 0 ; *str != '\0' && i < len ; str++) {
-		if (*str == ' ')
-			continue;
-
-		buf[i++] = tolower(*str);
-	}
-
-	buf[i] = '\0';
-	return (0);
-}
-
 int date_to_str(time_t timespec, char *buf, size_t len) {
 	char *p;
 

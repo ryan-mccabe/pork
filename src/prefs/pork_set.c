@@ -49,11 +49,11 @@ void opt_copy_pref_val(struct pref_val *pref, pref_val_t *val, size_t n) {
 }
 
 int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
-	int i;
-	int ret = -1;
+	int ret;
+	u_int32_t i;
 
-	i = opt_find(pref->set, opt);
-	if (i == -1)
+	ret = opt_find(pref->set, opt, &i);
+	if (ret == -1)
 		return (-1);
 
 	switch (pref_type(pref, i)) {
@@ -84,6 +84,7 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
 			break;
 
 		default:
+			ret = -1;
 			debug("Unknown set type");
 			break;
 	}
@@ -94,7 +95,8 @@ int opt_get_val(struct pref_val *pref, const char *opt, char *buf, size_t len) {
 	return (0);
 }
 
-static void opt_print_var(struct pref_val *pref, int i, const char *text) {
+static void opt_print_var(struct pref_val *pref, u_int32_t i, const char *text)
+{
 	switch (pref_type(pref, i)) {
 		case OPT_TYPE_BOOL:
 			screen_nocolor_msg("%s %s %s", pref_name(pref, i),
@@ -219,7 +221,8 @@ static int opt_compare(const void *l, const void *r) {
 ** in the pref option table.
 */
 
-int opt_find(const struct pref_set *pref_set, const char *name) {
+int opt_find(const struct pref_set *pref_set, const char *name, u_int32_t *opt)
+{
 	struct pork_pref *ppref;
 	u_int32_t offset;
 
@@ -230,7 +233,8 @@ int opt_find(const struct pref_set *pref_set, const char *name) {
 		return (-1);
 
 	offset = (long) ppref - (long) pref_set->prefs;
-	return (offset / sizeof(*ppref));
+	*opt = offset / sizeof(*ppref);
+	return (0);
 }
 
 /*
@@ -386,19 +390,22 @@ void opt_destroy(struct pref_val *pref) {
 int opt_set_var(struct pref_val *pref, char *args, ...) {
 	char *var;
 	char *value;
-	int opt;
+	u_int32_t opt;
 	int ret;
 	va_list ap;
 
+	if (blank_str(args))
+		return (-1);
+
 	var = strsep(&args, " ");
-	if (var == NULL || blank_str(var)) {
+	if (blank_str(var)) {
 		opt_print(pref);
 		return (-1);
 	}
 
 	strtoupper(var);
-	opt = opt_find(pref->set, var);
-	if (opt == -1) {
+	ret = opt_find(pref->set, var, &opt);
+	if (ret == -1) {
 		if (pref->set->name == NULL)
 			screen_err_msg(_("Unknown variable: %s"), var);
 		else
@@ -408,13 +415,13 @@ int opt_set_var(struct pref_val *pref, char *args, ...) {
 	}
 
 	value = args;
-	if (value == NULL || blank_str(value)) {
+	if (blank_str(value)) {
 		opt_print_var(pref, opt, _("is set to"));
 		return (0);
 	}
 
 	va_start(ap, args);
-	ret = pref->set->prefs[opt].set(pref, opt, args, ap);
+	ret = pref->set->prefs[opt].set(pref, opt, value, ap);
 	va_end(ap);
 
 	if (ret == -1) {

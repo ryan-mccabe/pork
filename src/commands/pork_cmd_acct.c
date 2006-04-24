@@ -39,9 +39,9 @@ USER_COMMAND(cmd_acct_save) {
 USER_COMMAND(cmd_acct_set) {
 	struct pref_val *pref;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args))
 		pref = acct->prefs;
-	} else if (!strncasecmp(args, "-default", 8)) {
+	else if (!strncasecmp(args, "-default", 8)) {
 		args += 8;
 		while (args[0] == ' ')
 			args++;

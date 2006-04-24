@@ -22,7 +22,7 @@ struct timer_entry {
 };
 
 int timer_run(dlist_t **timer_list);
-inline void timer_destroy(dlist_t **timer_list);
+void timer_destroy(dlist_t **timer_list);
 int timer_del_refnum(dlist_t **timer_list, u_int32_t refnum);
 int timer_del_owner(dlist_t **timer_list, struct pork_acct *acct);
 int timer_del(dlist_t **timer_list, char *command);

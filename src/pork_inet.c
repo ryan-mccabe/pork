@@ -20,6 +20,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/in_systm.h>
 #include <arpa/inet.h>
 
 #include <pork.h>
@@ -130,7 +131,7 @@ inline void get_ip(	struct sockaddr_storage *ss,
 ** sockaddr struct.
 */
 
-inline void *sin_addr(struct sockaddr_storage *ss) {
+void *sin_addr(struct sockaddr_storage *ss) {
 	if (ss->ss_family == AF_INET6)
 		return (&SIN6(ss)->sin6_addr);
 
@@ -163,7 +164,7 @@ inline in_port_t sin_port(const struct sockaddr_storage *ss) {
 ** Sets the port for the approprite socket family.
 */
 
-inline void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
+void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
 	if (ss->ss_family == AF_INET6)
 		SIN6(ss)->sin6_port = port;
 

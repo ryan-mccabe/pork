@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <time.h>
 #include <sys/time.h>
@@ -48,6 +50,20 @@
 #include <pork_aim_proto.h>
 #include <pork_aim_set.h>
 #include <pork_aim_cmd.h>
+
+static int normalize(char *buf, const char *str, size_t len) {
+	size_t i;
+
+	len--;
+	for (i = 0 ; *str != '\0' && i < len ; str++) {
+		if (*str == ' ')
+			continue;
+		buf[i++] = tolower(*str);
+	}
+
+	buf[i] = '\0';
+	return (0);
+}
 
 static int aim_buddy_add(struct pork_acct *acct, struct buddy *buddy) {
 	int ret;

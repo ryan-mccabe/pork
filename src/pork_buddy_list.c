@@ -353,7 +353,7 @@ int blist_cursor_pgup(struct blist *blist) {
 	return (ret);
 }
 
-inline struct slist_cell *blist_get_cursor(struct blist *blist) {
+struct slist_cell *blist_get_cursor(struct blist *blist) {
 	if (blist == NULL)
 		return (NULL);
 
@@ -386,7 +386,7 @@ int blist_resize(	struct blist *blist,
 	return (0);
 }
 
-inline void blist_destroy(struct blist *blist) {
+void blist_destroy(struct blist *blist) {
 	if (blist == NULL)
 		return;
 
@@ -394,12 +394,12 @@ inline void blist_destroy(struct blist *blist) {
 	memset(blist, 0, sizeof(*blist));
 }
 
-inline void blist_draw(struct blist *blist) {
+void blist_draw(struct blist *blist) {
 	slist_draw(&blist->slist);
 	blist_draw_cursor(blist, 1);
 }
 
-inline int blist_refresh(struct blist *blist) {
+int blist_refresh(struct blist *blist) {
 	return (slist_refresh(&blist->slist));
 }
 
@@ -418,7 +418,7 @@ void blist_draw_border(struct blist *blist, int border_state) {
 	wattrset(blist->slist.win, 0);
 }
 
-inline void blist_draw_cursor(struct blist *blist, int status) {
+void blist_draw_cursor(struct blist *blist, int status) {
 	attr_t curs_attr = 0;
 
 	if (status)
@@ -427,7 +427,7 @@ inline void blist_draw_cursor(struct blist *blist, int status) {
 	slist_draw_cursor(&blist->slist, curs_attr);
 }
 
-inline void blist_draw_line(struct blist *blist, struct slist_cell *cell) {
+void blist_draw_line(struct blist *blist, struct slist_cell *cell) {
 	slist_draw_line(&blist->slist, cell);
 }
 

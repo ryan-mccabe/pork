@@ -19,7 +19,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/in_systm.h>
 #include <arpa/inet.h>
 #include <errno.h>
 
@@ -183,6 +185,7 @@ int irc_file_accept(struct file_transfer *xfer) {
 int irc_file_send(struct file_transfer *xfer) {
 	char buf[4096];
 	struct dcc *dcc;
+	int ret;
 	struct irc_session *session = xfer->acct->data;
 
 	if (transfer_bind_listen_sock(xfer, session->sock) == -1) {
@@ -194,10 +197,16 @@ int irc_file_send(struct file_transfer *xfer) {
 	pork_io_add(xfer->sock, IO_COND_RW, xfer, xfer, irc_file_send_peer_connected);
 
 	/* Only ipv4 support for now. */
-	snprintf(buf, sizeof(buf),
-		(xfer->quote_fname ? "DCC SEND \"%s\" %u %hu %llu" : "DCC SEND %s %u %hu %llu"),
-		xfer->fname_base, htonl(SIN4(&xfer->laddr)->sin_addr.s_addr),
-		xfer->lport, xfer->file_len);
+	ret = snprintf(buf, sizeof(buf),
+			(xfer->quote_fname ?
+				"DCC SEND \"%s\" %u %hu %llu" : "DCC SEND %s %u %hu %llu"),
+			xfer->fname_base, htonl(SIN4(&xfer->laddr)->sin_addr.s_addr),
+			xfer->lport, xfer->file_len);
+
+	if (ret < 0 || (size_t) ret >= sizeof(buf)) {
+		transfer_abort(xfer);
+		return (-1);
+	}
 
 	dcc = xcalloc(1, sizeof(*dcc));
 	xfer->data = dcc;

@@ -495,6 +495,18 @@ void screen_cycle_fwd(void) {
 	screen_window_swap(cur);
 }
 
+void screen_cycle_fwd_active(void) {
+	dlist_t *cur = screen.cur_window;
+	struct imwindow *win;
+
+	do {
+		cur = cur->next;
+		win = cur->data;
+	} while (win->skip && !win->swindow.activity && cur != screen.cur_window);
+
+	screen_window_swap(cur);
+}
+
 void screen_cycle_bak(void) {
 	dlist_t *cur = screen.cur_window;
 	struct imwindow *win;
@@ -507,20 +519,32 @@ void screen_cycle_bak(void) {
 	screen_window_swap(cur);
 }
 
+void screen_cycle_bak_active(void) {
+	dlist_t *cur = screen.cur_window;
+	struct imwindow *win;
+
+	do {
+		cur = cur->prev;
+		win = cur->data;
+	} while (win->skip && !win->swindow.activity && cur != screen.cur_window);
+
+	screen_window_swap(cur);
+}
+
 void screen_bind_all_unbound(struct pork_acct *acct) {
 	dlist_t *node;
 
 	node = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = node->data;
+		struct imwindow *win = node->data;
 
-		if (imwindow->owner == screen.null_acct) {
-			imwindow_bind_acct(imwindow, acct->refnum);
+		if (win->owner == screen.null_acct) {
+			imwindow_bind_acct(win, acct->refnum);
 
-			if (!imwindow->blist_visible) {
-				if (opt_get_bool(imwindow->prefs, WIN_OPT_SHOW_BLIST))
-					opt_set(imwindow->prefs, WIN_OPT_SHOW_BLIST, "1");
+			if (acct->blist != NULL && !win->blist_visible) {
+				if (opt_get_bool(win->prefs, WIN_OPT_SHOW_BLIST))
+					opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
 				}
 			}
 

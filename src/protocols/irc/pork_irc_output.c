@@ -18,7 +18,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/in_systm.h>
 #include <arpa/inet.h>
 #include <errno.h>
 
@@ -406,7 +408,7 @@ int irc_send_quit(struct irc_session *session, char *reason) {
 	int ret;
 
 	if (reason == NULL)
-		reason = "XXX FIXME";
+		reason = "";
 
 	ret = snprintf(buf, sizeof(buf), "QUIT :%s\r\n", reason);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))

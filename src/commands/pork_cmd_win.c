@@ -40,7 +40,7 @@ USER_COMMAND(cmd_win_bind) {
 	u_int32_t refnum;
 	int ret;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		if (imwindow->owner != NULL && imwindow->owner->username != NULL) {
 			screen_cmd_output(_("This window is bound to account %s [refnum %u]"),
 				imwindow->owner->username, imwindow->owner->refnum);
@@ -81,7 +81,7 @@ USER_COMMAND(cmd_win_close) {
 }
 
 USER_COMMAND(cmd_win_dump) {
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		screen_err_msg(_("No output file specified"));
 	} else {
 		char buf[4096];
@@ -98,7 +98,7 @@ USER_COMMAND(cmd_win_erase) {
 USER_COMMAND(cmd_win_ignore) {
 	struct imwindow *win;
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -140,8 +140,16 @@ USER_COMMAND(cmd_win_next) {
 	screen_cycle_fwd();
 }
 
+USER_COMMAND(cmd_win_next_active) {
+	screen_cycle_fwd_active();
+}
+
 USER_COMMAND(cmd_win_prev) {
 	screen_cycle_bak();
+}
+
+USER_COMMAND(cmd_win_prev_active) {
+	screen_cycle_bak_active();
 }
 
 USER_COMMAND(cmd_win_rename) {
@@ -156,7 +164,7 @@ USER_COMMAND(cmd_win_rename) {
 USER_COMMAND(cmd_win_renumber) {
 	u_int32_t num;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		screen_cmd_output(_("This is window %u"), cur_window()->refnum);
 		return;
 	}
@@ -173,7 +181,7 @@ USER_COMMAND(cmd_win_set) {
 	struct imwindow *win;
 	struct pref_val *pref;
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		win = cur_window();
 		pref = win->prefs;
 	} else if (!strncasecmp(args, "-default", 8)) {
@@ -212,7 +220,7 @@ USER_COMMAND(cmd_win_set) {
 USER_COMMAND(cmd_win_skip) {
 	struct imwindow *win;
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -234,7 +242,7 @@ USER_COMMAND(cmd_win_skip) {
 USER_COMMAND(cmd_win_swap) {
 	u_int32_t num;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (str_to_uint(args, &num) != 0) {
@@ -249,7 +257,7 @@ USER_COMMAND(cmd_win_swap) {
 USER_COMMAND(cmd_win_unignore) {
 	struct imwindow *win;
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -271,7 +279,7 @@ USER_COMMAND(cmd_win_unignore) {
 USER_COMMAND(cmd_win_unskip) {
 	struct imwindow *win;
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -300,7 +308,9 @@ static struct command win_command[] = {
 	{ "ignore",				cmd_win_ignore		},
 	{ "list",				cmd_win_list		},
 	{ "next",				cmd_win_next		},
+	{ "next_active",		cmd_win_next_active	},
 	{ "prev",				cmd_win_prev		},
+	{ "prev_active",		cmd_win_prev_active	},
 	{ "rename",				cmd_win_rename		},
 	{ "renumber",			cmd_win_renumber	},
 	{ "set",				cmd_win_set			},

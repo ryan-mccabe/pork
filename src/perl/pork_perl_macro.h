@@ -13,7 +13,7 @@
 #define WIN_REFNUM(x, y) do { \
 	(void) cv; \
 	if (items > (x)) { \
-		u_int32_t __refnum = SvIV(ST((x))); \
+		u_int32_t __refnum = SvUV(ST((x))); \
 		struct imwindow *__win = imwindow_find_refnum(__refnum); \
 		if (__win == NULL) \
 			XSRETURN_##y; \
@@ -26,7 +26,7 @@
 #define ACCT_WIN_REFNUM(x, y) do { \
 	(void) cv; \
 	if (items > (x)) { \
-		u_int32_t __refnum = SvIV(ST((x))); \
+		u_int32_t __refnum = SvUV(ST((x))); \
 		struct imwindow *__win = imwindow_find_refnum(__refnum); \
 		if (__win == NULL) \
 			XSRETURN_##y; \
@@ -39,7 +39,7 @@
 #define INPUT_WIN_REFNUM(x, y) do { \
 	(void) cv; \
 	if (items > (x)) { \
-		u_int32_t __refnum = SvIV(ST((x))); \
+		u_int32_t __refnum = SvUV(ST((x))); \
 		struct imwindow *__win = imwindow_find_refnum(__refnum); \
 		if (__win == NULL) \
 			XSRETURN_##y; \

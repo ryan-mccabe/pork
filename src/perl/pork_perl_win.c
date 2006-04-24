@@ -132,7 +132,7 @@ XS(PORK_win_find_name) {
 	if (imwindow == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(imwindow->refnum);
+	XSRETURN_UV(imwindow->refnum);
 }
 
 XS(PORK_win_target) {
@@ -144,7 +144,7 @@ XS(PORK_win_target) {
 	if (items == 0)
 		XSRETURN_PV(cur_window()->target);
 
-	win_refnum = SvIV(ST(0));
+	win_refnum = SvUV(ST(0));
 
 	ACCT_WIN_REFNUM(1, UNDEF);
 	imwindow = imwindow_find_refnum(win_refnum);
@@ -173,7 +173,7 @@ XS(PORK_win_find_target) {
 	if (imwindow == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(imwindow->refnum);
+	XSRETURN_UV(imwindow->refnum);
 }
 
 XS(PORK_win_bind) {
@@ -184,7 +184,7 @@ XS(PORK_win_bind) {
 	if (items < 1)
 		XSRETURN_IV(-1);
 
-	acct_refnum = SvIV(ST(0));
+	acct_refnum = SvUV(ST(0));
 	WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(imwindow_bind_acct(win, acct_refnum));
 }
@@ -261,7 +261,7 @@ XS(PORK_win_renumber) {
 	if (items < 1)
 		XSRETURN_IV(-1);
 
-	new_refnum = SvIV(ST(0));
+	new_refnum = SvUV(ST(0));
 
 	WIN_REFNUM(1, IV(-1));
 	XSRETURN_IV(screen_renumber(win, new_refnum));
@@ -325,6 +325,6 @@ XS(PORK_win_swap) {
 	if (items != 1)
 		XSRETURN_IV(-1);
 
-	refnum = SvIV(ST(0));
+	refnum = SvUV(ST(0));
 	XSRETURN_IV(screen_goto_window(refnum));
 }

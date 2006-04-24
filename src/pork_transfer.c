@@ -161,8 +161,8 @@ inline struct file_transfer *transfer_find_refnum(	struct pork_acct *acct,
 
 void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
 {
-	int ret;
-	int written;
+	ssize_t ret;
+	size_t written;
 	char buf[4096];
 	struct file_transfer *xfer = data;
 
@@ -173,7 +173,7 @@ void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
 	}
 
 	written = fwrite(buf, 1, (size_t) ret, xfer->fp);
-	if (written != ret) {
+	if (written != (size_t) ret) {
 		screen_err_msg(_("Error writing file %s: %s"),
 			xfer->fname_local, strerror(errno));
 		transfer_lost(xfer);
@@ -185,7 +185,7 @@ void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
 
 	xfer->bytes_sent += written;
 	if (xfer->acct->proto->file_recv_data != NULL)
-		xfer->acct->proto->file_recv_data(xfer, buf, ret);
+		xfer->acct->proto->file_recv_data(xfer, buf, written);
 }
 
 void transfer_send_data(int fd __notused, u_int32_t cond __notused, void *data)
@@ -218,7 +218,7 @@ void transfer_send_data(int fd __notused, u_int32_t cond __notused, void *data)
 		xfer->status = TRANSFER_STATUS_COMPLETE;
 
 	if (xfer->acct->proto->file_send_data != NULL)
-		xfer->acct->proto->file_send_data(xfer, buf, ret);
+		xfer->acct->proto->file_send_data(xfer, buf, sent);
 }
 
 double transfer_time_elapsed(struct file_transfer *xfer) {
@@ -309,7 +309,7 @@ static int transfer_find_filename(struct file_transfer *xfer, char *filename) {
 		filename = xfer->fname_orig;
 		fname_orig = xfer->fname_orig;
 
-		if (download_dir != NULL && !blank_str(download_dir)) {
+		if (!blank_str(download_dir)) {
 			ret = xstrncpy(buf, download_dir, sizeof(buf) - 1);
 			if (ret == -1)
 				return (-1);

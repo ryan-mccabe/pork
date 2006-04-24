@@ -65,12 +65,18 @@ static const struct pork_pref acct_pref_list[] = {
 	},{	.name = "IDLE_AFTER",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
+	},{	.name = "LADDR",
+		.type = OPT_TYPE_STR,
+		.set = opt_set_str
 	},{	.name = "LOG_DIR",
 		.type = OPT_TYPE_STR,
 		.set = opt_set_str,
 	},{	.name = "LOGIN_ON_STARTUP",
 		.type = OPT_TYPE_BOOL,
 		.set = opt_set_bool,
+	},{	.name = "LPORT",
+		.type = OPT_TYPE_INT,
+		.set = opt_set_int,
 	},{	.name = "RECONNECT_INTERVAL",
 		.type = OPT_TYPE_INT,
 		.set = opt_set_int,
@@ -114,8 +120,10 @@ static pref_val_t acct_default_pref_vals[] = {
 	},{	.pref_val.s = DEFAULT_ACCT_DOWNLOAD_DIR,
 	},{	.pref_val.b = DEFAULT_ACCT_DUMP_MSGS_TO_STATUS,
 	},{	.pref_val.i = DEFAULT_ACCT_IDLE_AFTER,
+	},{	.pref_val.s = DEFAULT_ACCT_LADDR,
 	},{	.pref_val.s = DEFAULT_ACCT_LOG_DIR,
 	},{	.pref_val.b = DEFAULT_ACCT_LOGIN_ON_STARTUP,
+	},{	.pref_val.i = DEFAULT_ACCT_LPORT,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_INTERVAL,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_MAX_INTERVAL,
 	},{	.pref_val.i = DEFAULT_ACCT_RECONNECT_TRIES,
@@ -139,11 +147,8 @@ int acct_init_prefs(struct pork_acct *acct) {
 	char *pork_dir;
 
 	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
-	if (pork_dir == NULL) {
+	if (pork_dir == NULL)
 		pork_dir = DEFAULT_PORK_DIR;
-		if (pork_dir == NULL)
-			return (-1);
-	}
 
 	if (acct->proto->protocol >= 0) {
 		ret = snprintf(buf, sizeof(buf), "%s%s/%s",

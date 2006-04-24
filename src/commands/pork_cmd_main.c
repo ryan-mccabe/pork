@@ -38,7 +38,6 @@
 #include <pork_msg.h>
 #include <pork_events.h>
 #include <pork_conf.h>
-#include <pork_perl.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_command.h>
@@ -71,13 +70,13 @@ USER_COMMAND(cmd_alias) {
 	char *str;
 
 	alias = strsep(&args, " ");
-	if (alias == NULL || blank_str(alias)) {
+	if (blank_str(alias)) {
 		hash_iterate(&screen.alias_hash, print_alias, NULL);
 		return;
 	}
 
 	str = args;
-	if (str == NULL || blank_str(str)) {
+	if (blank_str(str)) {
 		struct alias *lalias = alias_find(&screen.alias_hash, alias);
 
 		if (lalias != NULL) {
@@ -108,7 +107,7 @@ USER_COMMAND(cmd_alias) {
 USER_COMMAND(cmd_auto) {
 	char *target;
 
-	if (args == NULL || !acct->connected)
+	if (blank_str(args) || !acct->connected)
 		return;
 
 	target = strsep(&args, " ");
@@ -129,11 +128,12 @@ USER_COMMAND(cmd_bind) {
 	int key;
 	char *func;
 	char *key_str;
-	struct key_binds *target_binds = cur_window()->active_binds;
+	struct key_binds *target_binds;
 	struct binding *binding;
 
+	target_binds = cur_window()->active_binds;
 	key_str = strsep(&args, " ");
-	if (key_str == NULL || blank_str(key_str)) {
+	if (blank_str(key_str)) {
 		hash_iterate(&target_binds->hash, print_binding, NULL);
 		return;
 	}
@@ -150,7 +150,7 @@ USER_COMMAND(cmd_bind) {
 
 		key_str = strsep(&args, " ");
 
-		if (key_str == NULL || blank_str(key_str)) {
+		if (blank_str(key_str)) {
 			hash_iterate(&target_binds->hash, print_binding, NULL);
 			return;
 		}
@@ -198,7 +198,7 @@ USER_COMMAND(cmd_connect) {
 	int protocol = PROTO_AIM;
 	char *user;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	if (*args == '-') {
@@ -232,7 +232,7 @@ USER_COMMAND(cmd_disconnect) {
 	if (!acct->can_connect)
 		return;
 
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		dest = acct->refnum;
 	else {
 		char *refnum = strsep(&args, " ");
@@ -242,7 +242,7 @@ USER_COMMAND(cmd_disconnect) {
 			return;
 		}
 
-		if (args != NULL && blank_str(args))
+		if (blank_str(args))
 			args = NULL;
 	}
 
@@ -267,7 +267,7 @@ USER_COMMAND(cmd_disconnect) {
 USER_COMMAND(cmd_help) {
 	char *section;
 
-	if (args == NULL) {
+	if (blank_str(args)) {
 		char buf[8192];
 
 		if (pork_help_get_cmds("main", buf, sizeof(buf)) != -1) {
@@ -286,7 +286,7 @@ USER_COMMAND(cmd_help) {
 		return;
 	}
 
-	if (args == NULL) {
+	if (blank_str(args)) {
 		char buf[8192];
 
 		if (pork_help_print("main", section) == -1) {
@@ -315,7 +315,7 @@ USER_COMMAND(cmd_help) {
 USER_COMMAND(cmd_idle) {
 	u_int32_t idle_secs = 0;
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		if (str_to_uint(args, &idle_secs) != 0) {
 			screen_err_msg(_("Invalid time specification: %s"), args);
 			return;
@@ -325,27 +325,8 @@ USER_COMMAND(cmd_idle) {
 	pork_set_idle_time(acct, idle_secs);
 }
 
-USER_COMMAND(cmd_laddr) {
-	if (args == NULL) {
-		char buf[2048];
-
-		if (get_hostname(&local_addr, buf, sizeof(buf)) != 0)
-			xstrncpy(buf, "0.0.0.0", sizeof(buf));
-
-		screen_cmd_output(_("New connections will use the local address %s"), buf);
-		return;
-	}
-
-	if (get_addr(args, &local_addr) != 0) {
-		screen_err_msg(_("Invalid local address: %s"), args);
-		return;
-	}
-
-	screen_cmd_output(_("New connections will use the local address %s"), args);
-}
-
 USER_COMMAND(cmd_lastlog) {
-	int opts = 0;
+	u_int32_t opts = 0;
 
 	if (args == NULL)
 		return;
@@ -391,7 +372,7 @@ USER_COMMAND(cmd_load) {
 	int quiet;
 	char buf[PATH_MAX];
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	quiet = screen_set_quiet(1);
@@ -404,7 +385,7 @@ USER_COMMAND(cmd_load) {
 }
 
 USER_COMMAND(cmd_lport) {
-	if (args == NULL) {
+	if (blank_str(args)) {
 		screen_cmd_output(_("New connections will use local port %u"),
 			ntohs(local_port));
 		return;
@@ -422,7 +403,7 @@ USER_COMMAND(cmd_lport) {
 USER_COMMAND(cmd_me) {
 	struct imwindow *win = cur_window();
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (win->type == WIN_TYPE_PRIVMSG)
@@ -440,7 +421,7 @@ USER_COMMAND(cmd_msg) {
 	char *target;
 	struct chatroom *chat;
 
-	if (args == NULL || !acct->connected)
+	if (blank_str(args) || !acct->connected)
 		return;
 
 	target = strsep(&args, " ");
@@ -457,7 +438,7 @@ USER_COMMAND(cmd_msg) {
 USER_COMMAND(cmd_query) {
 	struct imwindow *imwindow = cur_window();
 
-	if (args != NULL && !blank_str(args)) {
+	if (!blank_str(args)) {
 		struct imwindow *conv_window;
 
 		screen_make_query_window(acct, args, &conv_window);
@@ -511,7 +492,7 @@ USER_COMMAND(cmd_unbind) {
 	int c;
 
 	binding = strsep(&args, " ");
-	if (binding == NULL || blank_str(binding))
+	if (blank_str(binding))
 		return;
 
 	if (binding[0] == '-' && binding[1] != '\0') {
@@ -526,7 +507,7 @@ USER_COMMAND(cmd_unbind) {
 
 		binding = strsep(&args, " ");
 
-		if (binding == NULL || blank_str(binding))
+		if (blank_str(binding))
 			return;
 	}
 
@@ -543,7 +524,7 @@ USER_COMMAND(cmd_unbind) {
 }
 
 USER_COMMAND(cmd_unalias) {
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (alias_remove(&screen.alias_hash, args) == -1)
@@ -553,7 +534,7 @@ USER_COMMAND(cmd_unalias) {
 }
 
 USER_COMMAND(cmd_nick) {
-	if (args == NULL || blank_str(args))
+	if (blank_str(args))
 		return;
 
 	pork_change_nick(acct, args);
@@ -563,7 +544,7 @@ USER_COMMAND(cmd_notice) {
 	char *target;
 	struct chatroom *chat;
 
-	if (args == NULL || !acct->connected)
+	if (blank_str(args) || !acct->connected)
 		return;
 
 	target = strsep(&args, " ");
@@ -578,108 +559,8 @@ USER_COMMAND(cmd_notice) {
 }
 
 USER_COMMAND(cmd_perl) {
-	size_t num_args = 0;
-	char *p = args;
-	char **perl_args;
-	char *function;
-	char *orig;
-	size_t i = 0;
-
-	if (args == NULL || blank_str(args))
-		return;
-
-	p = args;
-	while (*p == ' ')
-		p++;
-
-	if (*p == '$')
-		p++;
-	args = p;
-	orig = p;
-
-	function = args;
-	p = strchr(function, '(');
-	if (p != NULL) {
-		*p++ = '\0';
-		args = p;
-	}
-
-	p = strchr(function, ' ');
-	if (p != NULL) {
-		*p = '\0';
-		args = p + 1;
-	}
-
-	if (args == orig) {
-		execute_perl(function, NULL);
-		return;
-	}
-
-	p = args;
-	while ((p = strchr(p, ',')) != NULL) {
-		++num_args;
-		++p;
-	}
-	num_args += 2;
-
-	p = strchr(args, ')');
-	if (p != NULL)
-		*p = '\0';
-
-	perl_args = xcalloc(num_args, sizeof(char *));
-
-	while ((p = strsep(&args, ",")) != NULL) {
-		char *s;
-
-		while (*p == ' ' || *p == '\t')
-			p++;
-
-		s = strrchr(p, ' ');
-		if (s != NULL && blank_str(s)) {
-			while (*s == ' ')
-				s--;
-			s[1] = '\0';
-		}
-
-		perl_args[i++] = p;
-	}
-
-	perl_args[i] = NULL;
-
-	execute_perl(function, perl_args);
-	free(perl_args);
-}
-
-/*
-** This destroys the perl state.
-** It has the effect of unloads all scripts. All scripts should
-** be catching the EVENT_UNLOAD event and doing any necessary cleanup
-** when it happens.
-*/
-
-USER_COMMAND(cmd_perl_dump) {
-	dlist_t *cur;
-
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
-		struct pork_acct *a = cur->data;
-		event_generate(acct->events, EVENT_UNLOAD, a->refnum);
-	}
-
-	perl_destroy();
-	perl_init();
-}
-
-USER_COMMAND(cmd_perl_load) {
-	int ret;
-	char buf[PATH_MAX];
-
-	if (args == NULL)
-		return;
-
-	expand_path(args, buf, sizeof(buf));
-	ret = perl_load_file(buf);
-	if (ret != 0)
-		screen_err_msg(_("Error: The file \"%s\" couldn't be loaded"), buf);
+	if (args != NULL)
+		run_one_command(acct, args, CMDSET_PERL);
 }
 
 USER_COMMAND(cmd_ping) {
@@ -964,7 +845,6 @@ static struct command command[] = {
 	{ "history",	cmd_history			},
 	{ "idle",		cmd_idle			},
 	{ "input",		cmd_input			},
-	{ "laddr",		cmd_laddr			},
 	{ "lastlog",	cmd_lastlog			},
 	{ "load",		cmd_load			},
 	{ "lport",		cmd_lport			},
@@ -973,8 +853,6 @@ static struct command command[] = {
 	{ "nick",		cmd_nick			},
 	{ "notice",		cmd_notice			},
 	{ "perl",		cmd_perl			},
-	{ "perl_dump",	cmd_perl_dump		},
-	{ "perl_load",	cmd_perl_load		},
 	{ "ping",		cmd_ping			},
 	{ "profile",	cmd_profile,		},
 	{ "query",		cmd_query			},

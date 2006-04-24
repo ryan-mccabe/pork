@@ -46,7 +46,7 @@
 
 XS(PORK_timer_add) {
 	char *command;
-	u_int32_t interval;
+	int interval;
 	u_int32_t times;
 	size_t notused;
 	dXSARGS;
@@ -57,13 +57,13 @@ XS(PORK_timer_add) {
 		XSRETURN_UNDEF;
 
 	interval = SvIV(ST(0));
-	times = SvIV(ST(1));
+	times = SvUV(ST(1));
 	command = SvPV(ST(2), notused);
 
 	if (command == NULL)
 		XSRETURN_UNDEF;
 
-	XSRETURN_IV(timer_add(&screen.timer_list, command, cur_window()->owner, interval, times));
+	XSRETURN_UV(timer_add(&screen.timer_list, command, cur_window()->owner, interval, times));
 }
 
 XS(PORK_timer_del) {

@@ -17,7 +17,6 @@ int initialize_environment(void);
 void set_default_win_opts(WINDOW *win);
 
 void resize_terminal(int rows, int cols);
-int normalize(char *dest, const char *src, size_t len);
 int time_to_str(u_int32_t timespec, char *buf, size_t len);
 int time_to_str_full(u_int32_t timespec, char *buf, size_t len);
 int date_to_str(time_t timespec, char *buf, size_t len);

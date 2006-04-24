@@ -59,6 +59,7 @@
 #include <pork_missing.h>
 
 struct screen screen;
+static void generic_signal_handler(int sig) __noreturn;
 
 /*
 ** The fallback for when no binding for a key exists.
@@ -84,11 +85,10 @@ static inline void binding_run(struct pork_acct *acct, struct binding *binding)
 
 	if (binding->key != '\n') {
 		int quiet = screen_set_quiet(1);
-
-		run_mcommand(acct, binding->binding);
+		run_command(acct, binding->binding);
 		screen_set_quiet(quiet);
 	} else
-		run_mcommand(acct, binding->binding);
+		run_command(acct, binding->binding);
 }
 
 static void resize_display(void) {

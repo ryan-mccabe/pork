@@ -65,7 +65,7 @@ XS(PORK_event_add) {
 	if (event_add(acct->events, type, handler, &refnum) != 0)
 		XSRETURN_UNDEF;
 
-	XSRETURN_IV(refnum);
+	XSRETURN_UV(refnum);
 }
 
 XS(PORK_event_del) {

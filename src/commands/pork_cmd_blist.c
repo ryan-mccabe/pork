@@ -93,7 +93,7 @@ USER_COMMAND(cmd_blist_collapse) {
 	struct slist_cell *cell;
 	struct blist *blist = acct->blist;
 
-	if (args == NULL)
+	if (blank_str(args))
 		cell = blist_get_cursor(blist);
 	else {
 		dlist_t *node;
@@ -305,7 +305,7 @@ USER_COMMAND(cmd_blist_width) {
 	u_int32_t new_len;
 	struct blist *blist = acct->blist;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (str_to_uint(args, &new_len) != 0) {

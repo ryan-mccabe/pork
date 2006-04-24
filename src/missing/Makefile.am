@@ -1,5 +1,5 @@
 INCLUDES = -I../../src
-AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS)
+AM_CFLAGS = $(DEBUG_CFLAGS) $(PERL_CFLAGS) $(WARN_CFLAGS)
 
 noinst_LIBRARIES = libmissing.a
 

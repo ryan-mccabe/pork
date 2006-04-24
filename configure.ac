@@ -25,6 +25,7 @@ AC_HEADER_TIME
 AC_STRUCT_TM
 AC_CANONICAL_HOST
 
+WARN_CFLAGS=""
 DEBUG_CFLAGS=""
 DEBUG_LIBS=""
 
@@ -33,15 +34,22 @@ AC_ARG_ENABLE(debug,
 [  --enable-debug		  Enable debugging])
 if test "$enableval" = "yes"; then
 	AC_DEFINE(ENABLE_DEBUGGING, 1, [Define to enable debugging])
-	DEBUG_CFLAGS="-O0 -g3 -ggdb"
+	DEBUG_CFLAGS="-O0 -fvar-tracking -g3 -ggdb"
+fi
+
+enableval=""
+AC_ARG_ENABLE(profile,
+[  --enable-profile       Enable profiling])
+if test "$enableval" = "yes"; then
+	DEBUG_CFLAGS="-pg --coverage -ftest-coverage -fprofile-generate"
+	DEBUG_LIBS="-pg"
 fi
 
 enableval=""
 AC_ARG_ENABLE(warn,
 [  --enable-warn		  Enable a bunch of compiler warnings])
 if test "$enableval" = "yes"; then
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -W -Wall -Wextra -Wno-unused-parameter -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations" # -Wno-cast-qual -Wformat -Wformat-security -Wformat-y2k -Wmissing-field-initializers -Wpacked -Wredundant-decls -Wreturn-type -Wlong-long -Wmissing-braces -Wmissing-format-attribute -Wmissing-noreturn -Wimplicit-function-declaration -Waggregate-return -Wcast-align -Wchar-subscripts -Wcomment -Wdisabled-optimization -Wswitch-enum -Wstrict-aliasing=2 -Wswitch -Wswitch-default -Wunreachable-code -Wvolatile-register-var -Wwrite-strings -Wformat-nonliteral -Winvalid-pch -Winline -Wpointer-sign"
-
+	WARN_CFLAGS="-O3 -ggdb -fstack-protector -fstrict-aliasing -W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wdeclaration-after-statement -Wredundant-decls -Wmissing-format-attribute -Wmissing-noreturn -Waggregate-return -Wstrict-aliasing=2 -Wlong-long -Wcomment -Wunreachable-code -Wswitch-enum -Wswitch-default -Wvolatile-register-var -Wformat=2 -Winit-self -Winvalid-pch -Winline -Wpointer-arith -Wbad-function-cast -Wcast-align -Wchar-subscripts -Wunsafe-loop-optimizations -Wdisabled-optimization -Wwrite-strings -Wsign-compare -Wconversion -Wmissing-field-initializers -Wnested-externs -Wstack-protector -Wunused-macros -Wendif-labels -Wno-cast-qual"
 fi
 
 withval=""
@@ -109,6 +117,7 @@ AC_ARG_ENABLE(perl,
 [  --disable-perl		  Disable use of perl scripting],
 		perl=$enableval, perl=yes)
 
+AC_SUBST(WARN_CFLAGS)
 AC_SUBST(DEBUG_CFLAGS)
 AC_SUBST(DEBUG_LIBS)
 
@@ -158,7 +167,7 @@ AC_TRY_COMPILE([#include <unistd.h>
 				#include <sys/socket.h>],
 					[sizeof(socklen_t);],
 			[AC_MSG_RESULT(yes)],
-			[AC_DEFINE(socklen_t, int, [Define if socklen_t is missing])
+			[AC_DEFINE(socklen_t, int, [Define to int if socklen_t is missing])
 			AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for in_addr_t)
@@ -170,7 +179,7 @@ AC_TRY_COMPILE([#include <unistd.h>
 				#include <netinet/in.h>],
 					[sizeof(in_addr_t);],
 			[AC_MSG_RESULT(yes)],
-			[AC_DEFINE(in_addr_t, unsigned int, [Define if in_addr_t is missing])
+			[AC_DEFINE(in_addr_t, unsigned int, [Define to unsigned int if in_addr_t is missing])
 			AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for in_port_t)
@@ -182,19 +191,42 @@ AC_TRY_COMPILE([#include <unistd.h>
 				#include <netinet/in.h>],
 					[sizeof(in_port_t);],
 			[AC_MSG_RESULT(yes)],
-			[AC_DEFINE(in_port_t, unsigned short, [Define if in_port_t is missing])
+			[AC_DEFINE(in_port_t, unsigned short, [Define to unsigned short if in_port_t is missing])
 			AC_MSG_RESULT(no)])
 
 AC_CHECK_SIZEOF(void *)
 AC_DEFINE_UNQUOTED(SIZEOF_VOID_P, $ac_cv_sizeof_void_p, [Size of the 'void *' type])
 
-AC_MSG_CHECKING(for __attribute__)
+AC_MSG_CHECKING(for __attribute__ unused)
 AC_TRY_COMPILE([#include <stdlib.h>],
-			[static void foo(void) __attribute__ ((unused));
-			static void foo(void) { exit(1); }],
-			[AC_MSG_RESULT(yes)],
-			[AC_DEFINE(HAVE___ATTRIBUTE__, 1, [Define if your compiler has __attribute__])
-			AC_MSG_RESULT(no)])
+			[int x __attribute__((unused));],
+			[AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE___ATTRIBUTE__UNUSED, 1, [Define if your compiler has __attribute__ unused])],
+			[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for __attribute__ used)
+AC_TRY_COMPILE([#include <stdlib.h>],
+			[int x __attribute__((used));],
+			[AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE___ATTRIBUTE__USED, 1, [Define if your compiler has __attribute__ used])],
+			[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for __attribute__ noreturn)
+AC_TRY_COMPILE([#include <stdlib.h>],
+			[ exit(0); } static void foo(void) __attribute__((noreturn));
+			static void foo(void) {exit(0); ],
+			[AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE___ATTRIBUTE__NORETURN, 1, [Define if your compiler has __attribute__ noreturn])],
+			[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for __attribute__ format)
+AC_TRY_COMPILE([#include <stdlib.h>
+				#include <stdarg.h>],
+			[ exit(0); } static int foo(char *fmt, ...) __attribute__((format (printf, 1, 2)));
+			static int foo(char *fmt, ...) { ],
+			[AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE___ATTRIBUTE__FORMAT, 1, [Define if your compiler has __attribute__ format])],
+			[AC_MSG_RESULT(no)])
 
 AC_TYPE_SIGNAL
 

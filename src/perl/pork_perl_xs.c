@@ -253,7 +253,7 @@ XS(PORK_echo) {
 		XSRETURN_IV(-1);
 
 	msg = SvPV(ST(0), notused);
-	screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, msg);
+	screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "%s", msg);
 	XSRETURN_IV(0);
 }
 
@@ -274,7 +274,6 @@ XS(PORK_quit) {
 	}
 
 	pork_exit(exit_val, reason, NULL);
-	XSRETURN_IV(0);
 }
 
 XS(PORK_refresh) {
@@ -755,7 +754,7 @@ XS(PORK_set_away) {
 }
 
 XS(PORK_set_idle) {
-	int seconds;
+	u_int32_t seconds;
 	struct pork_acct *acct;
 	dXSARGS;
 

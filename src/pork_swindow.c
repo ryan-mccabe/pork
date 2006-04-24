@@ -354,10 +354,12 @@ void swindow_redraw(struct swindow *swindow) {
 			swindow->bottom_blank = 0;
 			swindow->bottom_hidden = curs_pos - swindow->rows;
 			swindow->scrollbuf_bot = cur;
-			swindow_print_msg(swindow, imsg, 0, 0, swindow->top_hidden + 1,
-				curs_pos + swindow->rows);
-		} else
-			swindow_print_msg(swindow, imsg, 0, 0, swindow->top_hidden + 1, -1);
+			swindow_print_msg(swindow, imsg, 0, 0,
+				swindow->top_hidden + 1, curs_pos + swindow->rows);
+		} else {
+			swindow_print_msg(swindow, imsg, 0, 0,
+				swindow->top_hidden + 1, ~0U);
+		}
 
 		cur = cur->prev;
 	}
@@ -375,7 +377,7 @@ void swindow_redraw(struct swindow *swindow) {
 			break;
 		}
 
-		swindow_print_msg(swindow, imsg, curs_pos, 0, 1, -1);
+		swindow_print_msg(swindow, imsg, curs_pos, 0, 1, ~0U);
 		curs_pos += imsg->lines;
 
 		if (cur->prev == NULL) {
@@ -504,7 +506,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, u_int32_t msgtype) {
 		swindow_scroll(swindow, evict);
 	}
 
-	swindow_print_msg(swindow, imsg, y_pos, 0, msg_line_start, -1);
+	swindow_print_msg(swindow, imsg, y_pos, 0, msg_line_start, ~0U);
 	swindow->dirty = 1;
 
 	if (!swindow->visible && (activity_types & msgtype))

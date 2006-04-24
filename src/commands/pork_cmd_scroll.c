@@ -38,7 +38,7 @@
 USER_COMMAND(cmd_scroll_by) {
 	int lines;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	if (str_to_int(args, &lines) != 0) {

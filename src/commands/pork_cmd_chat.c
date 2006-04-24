@@ -43,7 +43,7 @@ USER_COMMAND(cmd_chat_ban) {
 	char *arg1;
 	char *arg2;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	arg1 = strsep(&args, " ");
@@ -68,7 +68,7 @@ USER_COMMAND(cmd_chat_ignore) {
 	char *chat_name;
 	char *user_name;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	chat_name = strsep(&args, " ");
@@ -95,7 +95,7 @@ USER_COMMAND(cmd_chat_invite) {
 	char *user_name;
 	char *invite_msg;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	chat_name = strsep(&args, " ");
@@ -127,7 +127,7 @@ USER_COMMAND(cmd_chat_kick) {
 	char *arg1;
 	char *arg2;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	arg1 = strsep(&args, " ");
@@ -151,7 +151,7 @@ USER_COMMAND(cmd_chat_leave) {
 	struct imwindow *win = cur_window();
 	char *name = args;
 
-	if (name == NULL || blank_str(name)) {
+	if (blank_str(name)) {
 		struct chatroom *chat;
 
 		if (win->type != WIN_TYPE_CHAT) {
@@ -177,7 +177,7 @@ USER_COMMAND(cmd_chat_send) {
 	struct imwindow *win;
 	char *chat_name;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	chat_name = strsep(&args, " ");
@@ -230,7 +230,7 @@ USER_COMMAND(cmd_chat_unignore) {
 	char *chat_name;
 	char *user_name;
 
-	if (args == NULL)
+	if (blank_str(args))
 		return;
 
 	chat_name = strsep(&args, " ");
@@ -254,7 +254,7 @@ USER_COMMAND(cmd_chat_unignore) {
 USER_COMMAND(cmd_chat_who) {
 	struct imwindow *imwindow = cur_window();
 
-	if (args == NULL || blank_str(args)) {
+	if (blank_str(args)) {
 		struct chatroom *chat;
 
 		if (imwindow->type != WIN_TYPE_CHAT) {
