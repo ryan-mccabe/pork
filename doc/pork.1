@@ -1,4 +1,4 @@
-.TH "pork" 1
+.TH "pork" 1 "July, 2005" "Pork AIM Client" "USER COMMANDS"
 .SH NAME
 pork \- An AOL Instant Messenger client for the UNIX console.
 .SH VERSION
@@ -6,26 +6,163 @@ pork \- An AOL Instant Messenger client for the UNIX console.
 .B version 0.99.0
 .SH SYNOPSIS
 .B pork
+[options]
 .SH DESCRIPTION
 Pork is a console based client for the AOL Instant Messenger service that
 uses the ncurses screen library. Pork is intended to be fast, useable, and
 stable.
 
 Pork was written by Ryan McCabe.
+
 .SH OPTIONS
 .TP
-None as yet.
+\-H or --host <addr>
+Use the local address specified for outgoing connections
+.br
+.TP
+\-p or --port <port>
+Use the local port specified for the main connection
+.br
+.TP
+-h or --help
+Display this help text
+.br
+.TP
+-v or --version
+Display version information and exit
+
+
+.SH USAGE
+
+To log into AIM, type /connect <username>, where <username> is your AIM
+screen name.  If you don't have an AIM screen name, you can get one
+at http://aim.aol.com.
+.br
+
+Pork now supports IRC. The syntax for connecting to an IRC server is /connect -irc <username> <server>[:<port>[:<password>]] [... <serverN>[:<port>[:<password>]]]
+.br
+
+When you're inside the client, type /help to find out what commands are
+supported.  Type /help <command> to get help on a particular command.
+.br
+
+Below are the default key bindings.  All keys can have their bindings
+changed or removed completely.  Enter the commands '/help bind' and
+\'/help keys' for more information.
+
+.SH "KEY BINDINGS"
+.br
+.B Default main key bindings:
+
+CTRL+A			Move the cursor to the start of the line.
+.br
+CTRL+B			Move the cursor to the start of the previous word.
+.br
+CTRL+E			Move the cursor to the end of the line.
+.br
+CTRL+F			Move the cursor to the start of the next word.
+.br
+CTRL+H			Backspace.
+.br
+META+BACKSPACE		Delete the previous word on the input line.
+.br
+CTRL+K			Close the current window.
+.br
+CTRL+L			Refresh the display.
+.br
+CTRL+T			Toggle timestamps on messages.
+.br
+CTRL+U			Clear the input line.
+.br
+CTRL+X			Switch to the next window in the window list.
+.br
+CTRL+Y			Switch to the previous window in the window list.
+.br
+TAB				Switch the input focus to the buddy list.
+.br
+META+/			Command auto-completion.
+.br
+META+<1-9>		Switch to the window having the specified number.
+.br
+HOME				Scroll to the top of the display.
+.br
+END				Scroll to the bottom of the display.
+.br
+PAGE UP			Scroll the display up one page.
+.br
+PAGE DOWN			Scroll the display down one page.
+.br
+UP ARROW			Scroll the input history list up.
+.br
+DOWN ARROW		Scroll the input history list down.
+.br
+CTRL+META+X		Bind the next account to the current window.
+
+
+.B Default buddy list key bindings:
+
+END				Move the buddy list cursor to the bottom of the
+				buddy list.
+.br	
+HOME				Move the buddy list cursor to the top of the
+				buddy list.
+.br	
+PAGE UP			Move the buddy list cursor one page up.
+.br	
+PAGE DOWN			Move the buddy list cursor one page down.
+.br	
+UP ARROW			Move the buddy list cursor up.
+.br	
+DOWN ARROW		Move the buddy list cursor down.
+.br	
+ENTER			Collapse the group the cursor is on, or if the 
+				cursor is on a user, open a conversation window 
+				with that user (or go to the conversation window, 
+				if one already exists).
+.br	
+TAB				Switch to main input focus.
+.br	
+CTRL+L			Refresh the buddy list display.
+.br	
+META+p			Remove the user under the cursor from the permit 
+				list.
+.br	
+META+P			Add the user the cursor is on to the permit list.
+.br	
+META+b			Remove the user the cursor is on from the block
+				list.
+.br	
+META+B			Add the user the cursor is on to the block list.
+.br	
+META+w			Warn the user the cursor is on.
+.br	
+META+W			Warn the user the cursor is on anonymously.
+.br	
+a				Get the away message of the user the cursor is on.
+.br	
+i				Get the profile and away message of the user the 					cursor is on.
+.br	
+CTRL+X			Switch to the next window in the window list.
+.br	
+CTRL+Y			Switch to the previous window in the window list.
+.br	
+
 .SH FILES
 .TP
-.B ~/.pork/porkrc
+.B ~/.pork/porkrc  
 \- The pork configuration file
 .TP
-.B ~/.pork/screenname.blist
+.B ~/.pork/screenname.blist 
 \- The buddy list for "screenname"
 .SH BUGS
 .TP
-.B ryan@numb.org
+.B ryan@numb.org 
 \- Please report bugs to this address
 .SH HOMEPAGE
 .TP
 .B http://dev.ojnk.org
+.SH AUTHORS
+Pork was written by Ryan McCabe <ryan@numb.org>. 
+.br
+This manpage was written by Benjamin Seidenberg <astronut@dlgeek.net>. 
+
