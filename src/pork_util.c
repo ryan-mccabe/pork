@@ -296,8 +296,7 @@ int expand_path(char *path, char *dest, size_t len) {
 				if (pw != NULL)
 					path = NULL;
 			} else {
-				char *user = xstrndup(path,
-						POINTER_TO_UINT(p) - POINTER_TO_UINT(path));
+				char *user = xstrndup(path, (size_t)(p - path));
 				pw = getpwnam(user);
 				free(user);
 
