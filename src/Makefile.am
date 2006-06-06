@@ -1,4 +1,4 @@
-SUBDIRS = missing prefs commands protocols perl
+SUBDIRS = missing xml prefs commands protocols perl
 bin_PROGRAMS = pork
 
 if IRC_SUPPORT

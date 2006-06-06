@@ -40,7 +40,7 @@ ssize_t sock_write(int sock, const void *buf, size_t len) {
 		ssize_t n;
 
 		n = write(sock, buf, len);
-		if (n == -1) {
+		if (n < 0) {
 			if (errno == EINTR || errno == EAGAIN)
 				continue;
 
@@ -50,7 +50,7 @@ ssize_t sock_write(int sock, const void *buf, size_t len) {
 
 		written += n;
 		len -= n;
-		buf = (char *) buf + n;
+		buf = (const char *) buf + n;
 	}
 
 	return (written);

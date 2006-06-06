@@ -10,6 +10,7 @@ AC_DEFINE(PACKAGE_AUTHOR, ["Ryan McCabe"], [author])
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PROG_INSTALL
@@ -392,6 +393,7 @@ AC_OUTPUT([
 	Makefile
 	src/Makefile
 	src/missing/Makefile
+	src/xml/Makefile
 	src/commands/Makefile
 	src/perl/Makefile
 	src/prefs/Makefile
