@@ -71,7 +71,7 @@ USER_COMMAND(cmd_timer_add) {
 	if (blank_str(args))
 		return;
 
-	timer_add(&screen.timer_list, args, acct, interval, times);
+	timer_add(&globals.timer_list, args, acct, interval, times);
 }
 
 USER_COMMAND(cmd_timer_del) {
@@ -80,7 +80,7 @@ USER_COMMAND(cmd_timer_del) {
 	if (blank_str(args))
 		return;
 
-	ret = timer_del(&screen.timer_list, args);
+	ret = timer_del(&globals.timer_list, args);
 	if (ret == -1)
 		screen_err_msg("No timer for \"%s\" was found", args);
 	else
@@ -99,7 +99,7 @@ USER_COMMAND(cmd_timer_del_refnum) {
 		return;
 	}
 
-	ret = timer_del_refnum(&screen.timer_list, refnum);
+	ret = timer_del_refnum(&globals.timer_list, refnum);
 	if (ret == -1)
 		screen_err_msg("No timer with refnum %u was found", refnum);
 	else
@@ -107,12 +107,12 @@ USER_COMMAND(cmd_timer_del_refnum) {
 }
 
 USER_COMMAND(cmd_timer_list) {
-	dlist_iterate(screen.timer_list, print_timer, NULL);
+	dlist_iterate(globals.timer_list, print_timer, NULL);
 }
 
 USER_COMMAND(cmd_timer_purge) {
-	if (screen.timer_list != NULL) {
-		timer_destroy(&screen.timer_list);
+	if (globals.timer_list != NULL) {
+		timer_destroy(&globals.timer_list);
 		screen_cmd_output("All timers have been removed");
 	}
 }

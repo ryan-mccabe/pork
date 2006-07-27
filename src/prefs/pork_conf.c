@@ -75,7 +75,7 @@ int read_conf(struct pork_acct *acct, const char *path) {
 	FILE *fp;
 	char buf[8192];
 	u_int32_t line = 0;
-	char cmdchar = opt_get_char(screen.global_prefs, OPT_CMDCHARS);
+	char cmdchar = opt_get_char(globals.prefs, OPT_CMDCHARS);
 
 	fp = fopen(path, "r");
 	if (fp == NULL) {
@@ -134,14 +134,14 @@ int write_global_conf(char *path) {
 		return (-1);
 	}
 
-	opt_write(screen.global_prefs, fp);
+	opt_write(globals.prefs, fp);
 	fprintf(fp, "\n\n");
 
-	hash_iterate(&screen.alias_hash, write_alias_line, fp);
+	hash_iterate(&globals.alias_hash, write_alias_line, fp);
 	fprintf(fp, "\n\n");
-	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
+	hash_iterate(&globals.binds.main.hash, write_bind_line, fp);
 	fprintf(fp, "\n\n");
-	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
+	hash_iterate(&globals.binds.blist.hash, write_bind_blist_line, fp);
 
 	if (fchmod(fileno(fp), 0600) != 0) {
 		debug("fchmod: %s: %s", porkrc, strerror(errno));
@@ -308,15 +308,15 @@ int read_global_config(void) {
 	char *pork_dir;
 	char buf[4096];
 
-	if (read_conf(screen.null_acct, SYSTEM_PORKRC) != 0)
+	if (read_conf(globals.null_acct, SYSTEM_PORKRC) != 0)
 		screen_err_msg(_("Error reading the system-wide porkrc file"));
 
-	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
+	pork_dir = opt_get_str(globals.prefs, OPT_PORK_DIR);
 	if (pork_dir == NULL)
 		return (-1);
 
 	snprintf(buf, sizeof(buf), "%s/porkrc", pork_dir);
-	if (read_conf(screen.null_acct, buf) != 0 &&
+	if (read_conf(globals.null_acct, buf) != 0 &&
 		errno != ENOENT)
 	{
 		return (-1);

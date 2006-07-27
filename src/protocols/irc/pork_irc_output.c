@@ -43,8 +43,11 @@
 
 #include <pork_irc.h>
 
-static int irc_send_server(int sock, char *cmd, size_t len) {
-	return (sock_write(sock, cmd, len));
+static int irc_send_server(	struct irc_session *session,
+							char *cmd,
+							size_t len)
+{
+	return (sock_write(session->transport, cmd, len, session->sock_write));
 }
 
 static int irc_send(struct irc_session *session, char *command, size_t len) {
@@ -68,7 +71,7 @@ static int irc_send(struct irc_session *session, char *command, size_t len) {
 		return (0);
 	}
 
-	ret = irc_send_server(session->sock, command, len);
+	ret = irc_send_server(session, command, len);
 	if (ret == -1)
 		pork_sock_err(session->data, session->sock);
 
@@ -80,7 +83,7 @@ int irc_flush_outq(struct irc_session *session) {
 	int ret = 0;
 
 	while ((cmd = queue_get(session->outq)) != NULL) {
-		if (irc_send_server(session->sock, cmd->cmd, cmd->len) > 0) {
+		if (irc_send_server(session, cmd->cmd, cmd->len) > 0) {
 			ret++;
 			free(cmd->cmd);
 			free(cmd);

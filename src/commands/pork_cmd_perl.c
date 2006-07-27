@@ -115,7 +115,7 @@ USER_COMMAND(cmd_perl_eval) {
 USER_COMMAND(cmd_perl_dump) {
 	dlist_t *cur;
 
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
+	for (cur = globals.acct_list ; cur != NULL ; cur = cur->next) {
 		struct pork_acct *a = cur->data;
 		event_generate(acct->events, EVENT_UNLOAD, a->refnum);
 	}

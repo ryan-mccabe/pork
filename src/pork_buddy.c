@@ -560,8 +560,8 @@ int buddy_went_offline(struct pork_acct *acct, char *user) {
 				MSG_TYPE_SIGNOFF, _("%s has signed off"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_SIGNOFF, _("%s has signed off"), name);
 		}
 	}
@@ -594,8 +594,8 @@ int buddy_came_online(struct pork_acct *acct, char *user, void *data) {
 				MSG_TYPE_SIGNON, _("%s has signed on"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_SIGNON)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_SIGNON, _("%s has signed on"), name);
 		}
 	}
@@ -629,8 +629,8 @@ int buddy_went_idle(struct pork_acct *acct, char *user, u_int32_t seconds) {
 				MSG_TYPE_IDLE, _("%s is now idle"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_IDLE, _("%s is now idle"), name);
 		}
 	}
@@ -661,8 +661,8 @@ int buddy_went_unidle(struct pork_acct *acct, char *user) {
 				MSG_TYPE_UNIDLE, _("%s is no longer idle"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_IDLE)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_UNIDLE, _("%s is no longer idle"), name);
 		}
 	}
@@ -693,8 +693,8 @@ int buddy_went_away(struct pork_acct *acct, char *user) {
 				MSG_TYPE_AWAY, _("%s is now away"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_AWAY, _("%s is now away"), name);
 		}
 	}
@@ -725,8 +725,8 @@ int buddy_went_unaway(struct pork_acct *acct, char *user) {
 				MSG_TYPE_BACK, _("%s is no longer away"), name);
 		}
 	} else if (notify) {
-		if (opt_get_bool(screen.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
-			screen_win_msg(screen.status_win, 1, 1, 0,
+		if (opt_get_bool(globals.status_win->prefs, WIN_OPT_SHOW_BUDDY_AWAY)) {
+			screen_win_msg(globals.status_win, 1, 1, 0,
 				MSG_TYPE_BACK, _("%s is no longer away"), name);
 		}
 	}

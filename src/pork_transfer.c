@@ -159,7 +159,7 @@ inline struct file_transfer *transfer_find_refnum(	struct pork_acct *acct,
 	return (NULL);
 }
 
-void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
+void transfer_recv_data(int fd __notused, u_int32_t flags __notused, void *data)
 {
 	ssize_t ret;
 	size_t written;
@@ -188,7 +188,7 @@ void transfer_recv_data(int fd __notused, u_int32_t cond __notused, void *data)
 		xfer->acct->proto->file_recv_data(xfer, buf, written);
 }
 
-void transfer_send_data(int fd __notused, u_int32_t cond __notused, void *data)
+void transfer_send_data(int fd __notused, u_int32_t flags __notused, void *data)
 {
 	int ret;
 	int sent;
@@ -205,7 +205,7 @@ void transfer_send_data(int fd __notused, u_int32_t cond __notused, void *data)
 	if (xfer->bytes_sent == 0)
 		gettimeofday(&xfer->time_started, NULL);
 
-	sent = sock_write(xfer->sock, buf, ret);
+	sent = sock_write(&xfer->sock, buf, ret, sock_write_clear);
 	if (sent != ret) {
 		screen_err_msg(_("Error sending data for file %s: %s"),
 			xfer->fname_local, strerror(errno));

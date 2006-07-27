@@ -40,6 +40,7 @@
 #include <pork_imwindow.h>
 #include <pork_input.h>
 #include <pork_bind.h>
+#include <pork_io.h>
 #include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_chat.h>
@@ -53,6 +54,7 @@
 #include <pork_irc_dcc.h>
 #include <pork_irc_set.h>
 #include <pork_irc_format.h>
+#include <pork_ssl.h>
 
 static struct irc_input *irc_tokenize(char *buf) {
 	struct irc_input *in = xcalloc(1, sizeof(*in));
@@ -409,45 +411,16 @@ static int irc_callback_run(struct irc_session *session,
 	return (cb->handler(session->data, in));
 }
 
-static ssize_t irc_read_data(int sock, char *buf, size_t len) {
-	int i;
-	ssize_t ret = 0;
-
-	for (i = 0 ; i < 5 ; i++) {
-		ret = read(sock, buf, len - 1);
-		if (ret == -1) {
-			if (errno == EINTR)
-				continue;
-
-			debug("read: %d:%s", sock, strerror(errno));
-			return (-1);
-		}
-
-		if (ret == 0) {
-			debug("read: %d:%s", sock, strerror(errno));
-			return (-1);
-		}
-
-		buf[ret] = '\0';
-		return (ret);
-	}
-
-	return (-1);
-}
-
-/*
-** Returns -1 if the connection died, 0 otherwise.
-*/
-
-int irc_input_dispatch(struct irc_session *session) {
+int irc_input_dispatch(struct irc_session *session, u_int32_t flags) {
 	int ret;
 	char *p;
 	char *cur;
 	struct pork_acct *acct = session->data;
 
-	ret = irc_read_data(session->sock,
+	ret = sock_read(session->transport,
 			&session->input_buf[session->input_offset],
-			sizeof(session->input_buf) - session->input_offset);
+			sizeof(session->input_buf) - session->input_offset,
+			session->sock_read);
 
 	if (ret < 1) {
 		pork_sock_err(acct, session->sock);
@@ -727,7 +700,7 @@ static int irc_handler_353(struct pork_acct *acct, struct irc_input *in) {
 
 	chat = chat_find(acct, in->tokens[4]);
 	if (chat == NULL) {
-		win = screen.status_win;
+		win = globals.status_win;
 		add = 0;
 	} else
 		win = chat->win;
@@ -943,7 +916,7 @@ static int irc_handler_privmsg(struct pork_acct *acct, struct irc_input *in) {
 
 			chat = chat_find(acct, in->tokens[2]);
 			if (chat == NULL || chat->win == NULL)
-				win = screen.status_win;
+				win = globals.status_win;
 			else
 				win = chat->win;
 			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_CHAT_MSG_RECV);

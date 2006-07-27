@@ -49,6 +49,7 @@ noinst_HEADERS = \
 	pork_screen.h		\
 	pork_screen_io.h	\
 	pork_slist.h		\
+	pork_ssl.h			\
 	pork_status.h		\
 	pork_swindow.h		\
 	pork_timer.h		\
@@ -83,6 +84,7 @@ pork_SOURCES = \
 	pork_screen.c		\
 	pork_screen_io.c	\
 	pork_slist.c		\
+	pork_ssl.c			\
 	pork_status.c		\
 	pork_swindow.c		\
 	pork_timer.c		\

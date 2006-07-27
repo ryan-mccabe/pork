@@ -113,8 +113,8 @@ int blist_init(struct pork_acct *acct) {
 
 	blist = xcalloc(1, sizeof(*blist));
 
-	ret = slist_init(&blist->slist, screen.rows - STATUS_ROWS, cols,
-			screen.cols - cols, 0);
+	ret = slist_init(&blist->slist, globals.rows - STATUS_ROWS, cols,
+			globals.cols - cols, 0);
 	if (ret != 0) {
 		free(blist);
 		return (-1);
@@ -407,9 +407,9 @@ void blist_draw_border(struct blist *blist, int border_state) {
 	attr_t border_attr;
 
 	if (border_state == 0)
-		border_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_NOFOCUS);
+		border_attr = opt_get_color(globals.prefs, OPT_COLOR_BLIST_NOFOCUS);
 	else
-		border_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_FOCUS);
+		border_attr = opt_get_color(globals.prefs, OPT_COLOR_BLIST_FOCUS);
 
 	slist_clear_bot(&blist->slist);
 
@@ -422,7 +422,7 @@ void blist_draw_cursor(struct blist *blist, int status) {
 	attr_t curs_attr = 0;
 
 	if (status)
-		curs_attr = opt_get_color(screen.global_prefs, OPT_COLOR_BLIST_SELECTOR);
+		curs_attr = opt_get_color(globals.prefs, OPT_COLOR_BLIST_SELECTOR);
 
 	slist_draw_cursor(&blist->slist, curs_attr);
 }

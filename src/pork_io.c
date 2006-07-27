@@ -55,10 +55,10 @@ void pork_io_destroy(void) {
 }
 
 int pork_io_add(int fd,
-				u_int32_t cond,
+				u_int32_t flags,
 				void *data,
 				void *key,
-				void (*callback)(int fd, u_int32_t cond, void *data))
+				void (*callback)(int fd, u_int32_t flags, void *data))
 {
 	dlist_t *node;
 	struct io_source *io;
@@ -74,7 +74,7 @@ int pork_io_add(int fd,
 
 	io = xcalloc(1, sizeof(*io));
 	io->fd = fd;
-	io->cond = cond;
+	io->flags = flags;
 	io->data = data;
 	io->key = key;
 	io->callback = callback;
@@ -108,36 +108,36 @@ int pork_io_dead(void *key) {
 	return (0);
 }
 
-int pork_io_set_cond(void *key, u_int32_t new_cond) {
+int pork_io_set_flags(void *key, u_int32_t new_flags) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
 	if (node == NULL)
 		return (-1);
 
-	((struct io_source *) node->data)->cond = new_cond;
+	((struct io_source *) node->data)->flags = new_flags;
 	return (0);
 }
 
-int pork_io_add_cond(void *key, u_int32_t new_cond) {
+int pork_io_add_flag(void *key, u_int32_t new_flag) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
 	if (node == NULL)
 		return (-1);
 
-	((struct io_source *) node->data)->cond |= new_cond;
+	((struct io_source *) node->data)->flags |= new_flag;
 	return (0);
 }
 
-int pork_io_del_cond(void *key, u_int32_t new_cond) {
+int pork_io_del_flag(void *key, u_int32_t flag) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
 	if (node == NULL)
 		return (-1);
 
-	((struct io_source *) node->data)->cond &= ~new_cond;
+	((struct io_source *) node->data)->flags &= ~flag;
 	return (0);
 }
 
@@ -152,7 +152,7 @@ static int pork_io_find_dead_fds(dlist_t *io_list) {
 		if (io->fd < 0 || sock_is_error(io->fd)) {
 			debug("fd %d is dead", io->fd);
 			if (io->callback != NULL)
-				io->callback(io->fd, IO_COND_DEAD, io->data);
+				io->callback(io->fd, IO_ATTR_DEAD, io->data);
 
 			pork_io_remove(cur);
 			bad_fd++;
@@ -183,23 +183,23 @@ int pork_io_run(void) {
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {
-			if (io->cond & IO_COND_ALWAYS && io->callback != NULL)
-				io->callback(io->fd, IO_COND_ALWAYS, io->data);
+			if (io->flags & IO_ATTR_ALWAYS && io->callback != NULL)
+				io->callback(io->fd, IO_ATTR_ALWAYS, io->data);
 
-			if (io->cond & IO_COND_READ)
+			if (io->flags & IO_COND_READ)
 				FD_SET(io->fd, &rfds);
 
-			if (io->cond & IO_COND_WRITE)
+			if (io->flags & IO_COND_WRITE)
 				FD_SET(io->fd, &wfds);
 
-			if (io->cond & IO_COND_EXCEPTION)
+			if (io->flags & IO_COND_EXCEPTION)
 				FD_SET(io->fd, &xfds);
 
 			if (io->fd > max_fd)
 				max_fd = io->fd;
 		} else {
 			if (io->callback != NULL)
-				io->callback(io->fd, IO_COND_DEAD, io->data);
+				io->callback(io->fd, IO_ATTR_DEAD, io->data);
 
 			pork_io_remove(cur);
 		}
@@ -228,19 +228,19 @@ int pork_io_run(void) {
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {
-			u_int32_t cond = 0;
+			u_int32_t flags = 0;
 
-			if ((io->cond & IO_COND_READ) && FD_ISSET(io->fd, &rfds))
-				cond |= IO_COND_READ;
+			if ((io->flags & IO_COND_READ) && FD_ISSET(io->fd, &rfds))
+				flags |= IO_COND_READ;
 
-			if ((io->cond & IO_COND_WRITE) && FD_ISSET(io->fd, &wfds))
-				cond |= IO_COND_WRITE;
+			if ((io->flags & IO_COND_WRITE) && FD_ISSET(io->fd, &wfds))
+				flags |= IO_COND_WRITE;
 
-			if ((io->cond & IO_COND_EXCEPTION) && FD_ISSET(io->fd, &xfds))
-				cond |= IO_COND_EXCEPTION;
+			if ((io->flags & IO_COND_EXCEPTION) && FD_ISSET(io->fd, &xfds))
+				flags |= IO_COND_EXCEPTION;
 
-			if (cond != 0 && io->callback != NULL)
-				io->callback(io->fd, cond, io->data);
+			if (flags != 0 && io->callback != NULL)
+				io->callback(io->fd, flags | IO_ATTR(io->flags), io->data);
 		}
 
 		cur = next;

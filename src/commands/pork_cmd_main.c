@@ -71,13 +71,13 @@ USER_COMMAND(cmd_alias) {
 
 	alias = strsep(&args, " ");
 	if (blank_str(alias)) {
-		hash_iterate(&screen.alias_hash, print_alias, NULL);
+		hash_iterate(&globals.alias_hash, print_alias, NULL);
 		return;
 	}
 
 	str = args;
 	if (blank_str(str)) {
-		struct alias *lalias = alias_find(&screen.alias_hash, alias);
+		struct alias *lalias = alias_find(&globals.alias_hash, alias);
 
 		if (lalias != NULL) {
 			screen_cmd_output(_("%s is aliased to %s%s"),
@@ -89,8 +89,8 @@ USER_COMMAND(cmd_alias) {
 		return;
 	}
 
-	if (alias_add(&screen.alias_hash, alias, str) == 0) {
-		struct alias *lalias = alias_find(&screen.alias_hash, alias);
+	if (alias_add(&globals.alias_hash, alias, str) == 0) {
+		struct alias *lalias = alias_find(&globals.alias_hash, alias);
 
 		if (lalias != NULL) {
 			screen_cmd_output(_("%s is aliased to %s%s"),
@@ -140,9 +140,9 @@ USER_COMMAND(cmd_bind) {
 
 	if (key_str[0] == '-' && key_str[1] != '\0') {
 		if (!strcasecmp(key_str, "-b") || !strcasecmp(key_str, "-buddy"))
-			target_binds = &screen.binds.blist;
+			target_binds = &globals.binds.blist;
 		else if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
-			target_binds = &screen.binds.main;
+			target_binds = &globals.binds.main;
 		else {
 			screen_err_msg(_("Bad bind flag: %s"), key_str);
 			return;
@@ -164,7 +164,7 @@ USER_COMMAND(cmd_bind) {
 
 	func = args;
 	if (func != NULL) {
-		if (*func == opt_get_char(screen.global_prefs, OPT_CMDCHARS) &&
+		if (*func == opt_get_char(globals.prefs, OPT_CMDCHARS) &&
 			*(func + 1) != '\0')
 		{
 			func++;
@@ -260,8 +260,8 @@ USER_COMMAND(cmd_disconnect) {
 
 	pork_acct_del(node, args);
 
-	if (screen.status_win->owner == screen.null_acct)
-		imwindow_bind_next_acct(screen.status_win);
+	if (globals.status_win->owner == globals.null_acct)
+		imwindow_bind_next_acct(globals.status_win);
 }
 
 USER_COMMAND(cmd_help) {
@@ -497,9 +497,9 @@ USER_COMMAND(cmd_unbind) {
 
 	if (binding[0] == '-' && binding[1] != '\0') {
 		if (!strcasecmp(binding, "-b") || !strcasecmp(binding, "-buddy"))
-			target_binds = &screen.binds.blist;
+			target_binds = &globals.binds.blist;
 		else if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
-			target_binds = &screen.binds.main;
+			target_binds = &globals.binds.main;
 		else {
 			screen_err_msg(_("Bad unbind flag: %s"), binding);
 			return;
@@ -527,7 +527,7 @@ USER_COMMAND(cmd_unalias) {
 	if (blank_str(args))
 		return;
 
-	if (alias_remove(&screen.alias_hash, args) == -1)
+	if (alias_remove(&globals.alias_hash, args) == -1)
 		screen_cmd_output(_("No such alias: %s"), args);
 	else
 		screen_cmd_output(_("Alias %s removed"), args);
@@ -656,7 +656,7 @@ USER_COMMAND(cmd_timer) {
 }
 
 USER_COMMAND(cmd_set) {
-	opt_set_var(screen.global_prefs, args);
+	opt_set_var(globals.prefs, args);
 }
 
 USER_COMMAND(cmd_complete) {

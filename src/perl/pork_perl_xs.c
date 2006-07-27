@@ -39,6 +39,7 @@
 #include <pork_swindow.h>
 #include <pork_imwindow.h>
 #include <pork_acct.h>
+#include <pork_proto.h>
 #include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_screen.h>
@@ -318,7 +319,7 @@ XS(PORK_bind) {
 	if (key == -1)
 		XSRETURN_IV(-1);
 
-	bind_add(&screen.binds.main, key, command);
+	bind_add(&globals.binds.main, key, command);
 	XSRETURN_IV(0);
 }
 
@@ -341,7 +342,7 @@ XS(PORK_unbind) {
 	if (key == -1)
 		XSRETURN_IV(-1);
 
-	key = bind_remove(&screen.binds.main, key);
+	key = bind_remove(&globals.binds.main, key);
 	XSRETURN_IV(0);
 }
 
@@ -365,7 +366,7 @@ XS(PORK_bind_get) {
 	if (key == -1)
 		XSRETURN_EMPTY;
 
-	binding = bind_find(&screen.binds.main, key);
+	binding = bind_find(&globals.binds.main, key);
 	if (binding == NULL)
 		XSRETURN_EMPTY;
 
@@ -394,7 +395,7 @@ XS(PORK_blist_bind) {
 	if (key == -1)
 		XSRETURN_IV(-1);
 
-	bind_add(&screen.binds.blist, key, command);
+	bind_add(&globals.binds.blist, key, command);
 	XSRETURN_IV(0);
 }
 
@@ -417,7 +418,7 @@ XS(PORK_blist_unbind) {
 	if (key == -1)
 		XSRETURN_IV(-1);
 
-	key = bind_remove(&screen.binds.blist, key);
+	key = bind_remove(&globals.binds.blist, key);
 	XSRETURN_IV(0);
 }
 
@@ -441,7 +442,7 @@ XS(PORK_blist_bind_get) {
 	if (key == -1)
 		XSRETURN_EMPTY;
 
-	binding = bind_find(&screen.binds.blist, key);
+	binding = bind_find(&globals.binds.blist, key);
 	if (binding == NULL)
 		XSRETURN_EMPTY;
 
@@ -465,7 +466,7 @@ XS(PORK_alias) {
 	if (alias == NULL || cmd == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(alias_add(&screen.alias_hash, alias, cmd));
+	XSRETURN_IV(alias_add(&globals.alias_hash, alias, cmd));
 }
 
 XS(PORK_alias_get) {
@@ -483,7 +484,7 @@ XS(PORK_alias_get) {
 	if (str == NULL)
 		XSRETURN_EMPTY;
 
-	alias = alias_find(&screen.alias_hash, str);
+	alias = alias_find(&globals.alias_hash, str);
 	if (alias == NULL)
 		XSRETURN_EMPTY;
 
@@ -512,7 +513,7 @@ XS(PORK_unalias) {
 	if (alias == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(alias_remove(&screen.alias_hash, alias));
+	XSRETURN_IV(alias_remove(&globals.alias_hash, alias));
 }
 
 XS(PORK_get_cur_user) {
@@ -577,7 +578,7 @@ XS(PORK_get_opt) {
 /* XXX - fix */
 
 XS(PORK_get_acct_list) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 	int args = 0;
 	dXSARGS;
 
@@ -774,10 +775,10 @@ XS(PORK_set_idle) {
 	} else
 		acct = cur_window()->owner;
 
-	if (!acct->connected)
+	if (!acct->connected || !acct->proto->set_idle_time)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(pork_set_idle_time(acct, seconds));
+	XSRETURN_IV(acct->proto->set_idle_time(acct, seconds));
 }
 
 XS(PORK_warn) {

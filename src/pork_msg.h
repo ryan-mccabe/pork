@@ -41,6 +41,7 @@ int pork_set_back(struct pork_acct *acct);
 int pork_msg_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_set_profile(struct pork_acct *acct, char *profile);
 int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds);
+int pork_set_idle(struct pork_acct *acct, u_int32_t seconds);
 int pork_send_warn(struct pork_acct *acct, char *user);
 int pork_recv_warn(struct pork_acct *acct, char *user, u_int16_t new_level);
 int pork_recv_warn_anon(struct pork_acct *acct, u_int16_t new_level);

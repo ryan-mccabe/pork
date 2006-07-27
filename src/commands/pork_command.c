@@ -91,7 +91,7 @@ int run_one_command(struct pork_acct *acct, char *str, u_int32_t set) {
 		int ret;
 		char *alias_str;
 
-		ret = alias_resolve(&screen.alias_hash, str, &alias_str);
+		ret = alias_resolve(&globals.alias_hash, str, &alias_str);
 		if (ret == 0)
 			str = alias_str;
 		else if (ret == 1) {
@@ -199,7 +199,7 @@ int command_enter_str(struct pork_acct *acct, char *str) {
 	if (!event_generate(acct->events, EVENT_SEND_LINE,
 		str, acct->refnum))
 	{
-		if (str[0] == opt_get_char(screen.global_prefs, OPT_CMDCHARS))
+		if (str[0] == opt_get_char(globals.prefs, OPT_CMDCHARS))
 			run_command(acct, &str[1]);
 		else
 			command_send_to_win(acct, str);

@@ -48,9 +48,9 @@
 inline void screen_doupdate(void) {
 	int cur_old = curs_set(0);
 
-	wmove(screen.status_bar, STATUS_ROWS - 1,
+	wmove(globals.status_bar, STATUS_ROWS - 1,
 		input_get_cursor_pos(cur_window()->input));
-	wnoutrefresh(screen.status_bar);
+	wnoutrefresh(globals.status_bar);
 
 	doupdate();
 	curs_set(cur_old);
@@ -69,11 +69,11 @@ int screen_draw_input(void) {
 		if (input_line == NULL)
 			return (0);
 
-		wmove(screen.status_bar, STATUS_ROWS - 1, 0);
-		wclrtoeol(screen.status_bar);
+		wmove(globals.status_bar, STATUS_ROWS - 1, 0);
+		wclrtoeol(globals.status_bar);
 
 		if (input_line == input->input_buf && input->prompt != NULL) {
-			wputnstr(screen.status_bar, cur_window()->prefs, input->prompt,
+			wputnstr(globals.status_bar, cur_window()->prefs, input->prompt,
 				min(input->width, input->prompt_len));
 			len -= input->prompt_len;
 		}
@@ -81,7 +81,7 @@ int screen_draw_input(void) {
 		if (len < 0)
 			return (1);
 
-		wputncstr(screen.status_bar, input_line, len);
+		wputncstr(globals.status_bar, input_line, len);
 
 		/*
 		** We don't need a wnoutfresh here for this window. Since it's
@@ -98,9 +98,9 @@ int screen_draw_input(void) {
 }
 
 inline int screen_set_quiet(int status) {
-	int ret = screen.quiet;
+	int ret = globals.quiet;
 
-	screen.quiet = status;
+	globals.quiet = status;
 	return (ret);
 }
 
@@ -109,15 +109,15 @@ int screen_prompt_user(char *prompt, char *buf, size_t len) {
 
 	buf[0] = '\0';
 
-	wmove(screen.status_bar, 1, 0);
-	wclrtoeol(screen.status_bar);
+	wmove(globals.status_bar, 1, 0);
+	wclrtoeol(globals.status_bar);
 
 	if (prompt != NULL)
-		waddstr(screen.status_bar, prompt);
+		waddstr(globals.status_bar, prompt);
 
-	wrefresh(screen.status_bar);
+	wrefresh(globals.status_bar);
 
-	ret = wgetnstr(screen.status_bar, buf, len);
+	ret = wgetnstr(globals.status_bar, buf, len);
 	return (ret);
 }
 
@@ -149,7 +149,7 @@ static void __screen_win_msg(	struct imwindow *win,
 		tstxt[0] = '\0';
 
 	if (opt & MSG_OPT_BANNER) {
-		banner_txt = opt_get_str(screen.global_prefs, OPT_BANNER);
+		banner_txt = opt_get_str(globals.prefs, OPT_BANNER);
 		if (banner_txt == NULL)
 			banner_txt = "\0";
 		else
@@ -276,7 +276,7 @@ void screen_cmd_output(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	if (!screen.quiet) {
+	if (!globals.quiet) {
 		__screen_win_msg(cur_window(), MSG_OPT_BANNER | MSG_OPT_COLOR,
 			MSG_TYPE_CMD_OUTPUT, fmt, ap);
 	}
@@ -287,7 +287,7 @@ void screen_nocolor_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	if (!screen.quiet) {
+	if (!globals.quiet) {
 		__screen_win_msg(cur_window(), MSG_OPT_BANNER,
 			MSG_TYPE_CMD_OUTPUT, fmt, ap);
 	}

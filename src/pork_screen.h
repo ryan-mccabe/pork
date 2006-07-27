@@ -10,7 +10,7 @@
 #ifndef __PORK_SCREEN_H
 #define __PORK_SCREEN_H
 
-extern struct screen screen;
+extern struct screen globals;
 
 enum {
 	FOCUS_MSG,
@@ -36,10 +36,11 @@ struct screen {
 	struct pork_input input;
 	struct binds binds;
 	hash_t alias_hash;
-	struct pref_val *global_prefs;
+	void *ssl_ctx;
+	struct pref_val *prefs;
 };
 
-#define cur_window() ((struct imwindow *) (screen.cur_window->data))
+#define cur_window() ((struct imwindow *) (globals.cur_window->data))
 
 int screen_init(u_int32_t rows, u_int32_t cols);
 void screen_destroy(void);

@@ -60,7 +60,19 @@ int nb_connect(	struct sockaddr_storage *ss,
 				in_port_t port,
 				int *dsock);
 
-ssize_t sock_write(int sock, const void *buf, size_t len);
+ssize_t sock_read_clear(void *sock, void *buf, size_t len);
+ssize_t sock_write_clear(void *sock, const void *buf, size_t len);
+
+ssize_t sock_write(	void *out,
+					const void *buf,
+					size_t len,
+					ssize_t (*writefn)(void *, const void *, size_t));
+
+ssize_t sock_read(	void *in,
+					void *buf,
+					size_t len,
+					ssize_t (*writefn)(void *, void *, size_t));
+
 int sockprintf(int fd, const char *fmt, ...) __format((printf, 2, 3));
 int get_port(const char *name, in_port_t *port);
 int get_addr(const char *hostname, struct sockaddr_storage *addr);

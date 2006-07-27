@@ -124,7 +124,7 @@ USER_COMMAND(cmd_win_list) {
 	screen_cmd_output(_("Window List:"));
 
 	screen_cmd_output(_("REFNUM\t\tNAME\t\tTYPE\t\tTARGET"));
-	cur = screen.window_list;
+	cur = globals.window_list;
 	do {
 		struct imwindow *imwindow = cur->data;
 
@@ -133,7 +133,7 @@ USER_COMMAND(cmd_win_list) {
 			win_types[imwindow->type], imwindow->target);
 
 		cur = cur->next;
-	} while (cur != screen.window_list);
+	} while (cur != globals.window_list);
 }
 
 USER_COMMAND(cmd_win_next) {

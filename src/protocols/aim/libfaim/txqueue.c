@@ -7,6 +7,9 @@
 
 #define FAIM_INTERNAL
 #include <aim.h>
+#include <config.h>
+#include <pork.h>
+#include <pork_inet.h>
 
 /*
  * Allocate a new tx frame.
@@ -188,7 +191,7 @@ faim_internal int aim_tx_enqueue(aim_session_t *sess, aim_frame_t *fr)
 
 static int aim_send(int fd, const void *buf, size_t count)
 {
-	return (sock_write(fd, buf, count));
+	return (sock_write(&fd, buf, count, sock_write_clear));
 }
 
 int aim_bstream_send(aim_bstream_t *bs, aim_conn_t *conn, size_t count)

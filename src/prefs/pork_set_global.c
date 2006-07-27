@@ -381,6 +381,6 @@ static struct pref_val global_defaults = {
 	.val = global_default_pref_vals
 };
 
-void init_global_prefs(struct screen *screen) {
-	screen->global_prefs = &global_defaults;
+void init_global_prefs(struct screen *globals) {
+	globals->prefs = &global_defaults;
 }

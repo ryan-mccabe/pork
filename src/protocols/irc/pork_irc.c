@@ -38,6 +38,10 @@
 #include <pork_screen_io.h>
 #include <pork_events.h>
 #include <pork_chat.h>
+#include <pork_input.h>
+#include <pork_bind.h>
+#include <pork_screen.h>
+#include <pork_ssl.h>
 #include <pork_missing.h>
 
 #include <pork_irc.h>
@@ -50,32 +54,29 @@
 #define HIGHLIGHT_UNDERLINE		0x02
 #define HIGHLIGHT_INVERSE		0x04
 
-static void irc_event(int sock, u_int32_t cond, void *data) {
-	if (cond & IO_COND_READ) {
-		if (irc_input_dispatch(data) == -1) {
+static void irc_event(int sock, u_int32_t flags, void *data) {
+	if (flags & IO_COND_READ) {
+		if (irc_input_dispatch(data, flags) == -1) {
 			struct irc_session *session = data;
 			struct pork_acct *acct = session->data;
 
 			pork_sock_err(acct, sock);
 			pork_io_del(data);
 			pork_acct_disconnected(acct);
-
-			return;
 		}
-	}
-
-	irc_flush_outq(data);
+	} else
+		irc_flush_outq(data);
 }
 
-static void irc_connected(int sock, u_int32_t cond __notused, void *data) {
+static void irc_connected(int sock, u_int32_t flags, void *data) {
 	int ret;
 	struct irc_session *session = data;
+	struct pork_acct *acct = session->data;
 
 	pork_io_del(data);
 
 	ret = sock_is_error(sock);
 	if (ret != 0) {
-		struct pork_acct *acct = session->data;
 		char *errstr = strerror(ret);
 
 		screen_err_msg(_("network error: %s: %s"), acct->username, errstr);
@@ -83,8 +84,31 @@ static void irc_connected(int sock, u_int32_t cond __notused, void *data) {
 		close(sock);
 		pork_acct_disconnected(acct);
 	} else {
+		u_int32_t new_flags = IO_COND_READ;
+
 		session->sock = sock;
 		sock_setflags(sock, 0);
+
+		if (flags & IO_ATTR_SSL) {
+			SSL *ssl = ssl_connect(globals.ssl_ctx, sock);
+			if (ssl == NULL) {
+				screen_err_msg(_("SSL connection for user \"%s\" failed"),
+					acct->username);
+				close(sock);
+				return;
+			}
+
+			new_flags |= IO_ATTR_SSL;
+
+			session->transport = ssl;
+			session->sock_read = sock_read_ssl;
+			session->sock_write = sock_write_ssl;
+		} else {
+			session->transport = &sock;
+			session->sock_read = sock_read_clear;
+			session->sock_write = sock_write_clear;
+		}
+
 		pork_io_add(sock, IO_COND_READ, data, data, irc_event);
 		irc_callback_add_defaults(session);
 		irc_send_login(session);
@@ -127,6 +151,9 @@ static int irc_free(struct pork_acct *acct) {
 	free(session->prefix_types);
 	free(session->prefix_codes);
 
+	if (session->transport != NULL)
+		SSL_free(session->transport);
+
 	irc_callback_clear(session);
 
 	queue_destroy(session->inq, free);
@@ -149,11 +176,11 @@ static int irc_update(struct pork_acct *acct) {
 	struct irc_session *session = acct->data;
 	time_t time_now;
 
-	if (session == NULL)
+	if (session == NULL || !acct->connected)
 		return (-1);
 
 	time(&time_now);
-	if (session->last_update + 120 <= time_now && acct->connected) {
+	if (session->last_update + 120 <= time_now) {
 		irc_send_pong(session, acct->server);
 		session->last_update = time_now;
 	}
@@ -176,6 +203,10 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 	while ((server = strsep(&str, " ")) != NULL &&
 			session->num_servers < array_elem(session->servers))
 	{
+		if (!strncasecmp(server, "ssl://", 6)) {
+			server += 6;
+			session->server_ssl |= (1 << session->num_servers);
+		}
 		session->servers[session->num_servers++] = xstrdup(server);
 	}
 
@@ -188,7 +219,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	int ret;
 
 	if (args == NULL) {
-		screen_err_msg(_("Error: IRC: Syntax is /connect -irc <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]"));
+		screen_err_msg(_("Error: IRC: Syntax is /connect -irc <nick> [ssl://]<server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]"));
 		return (-1);
 	}
 
@@ -200,9 +231,12 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	ret = irc_connect(acct, session->servers[0], &sock);
 	if (ret == 0)
 		irc_connected(sock, 0, session);
-	else if (ret == -EINPROGRESS)
-		pork_io_add(sock, IO_COND_WRITE, session, session, irc_connected);
-	else
+	else if (ret == -EINPROGRESS) {
+		u_int32_t flags = IO_COND_WRITE;
+		if (session->server_ssl & (1 << 0))
+			flags |= IO_ATTR_SSL;
+		pork_io_add(sock, flags, session, session, irc_connected);
+	} else
 		return (-1);
 
 	return (0);
@@ -227,9 +261,12 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	ret = irc_connect(acct, session->servers[server_num], &sock);
 	if (ret == 0) {
 		irc_connected(sock, 0, session);
-	} else if (ret == -EINPROGRESS)
-		pork_io_add(sock, IO_COND_WRITE, session, session, irc_connected);
-	else
+	} else if (ret == -EINPROGRESS) {
+		u_int32_t flags = IO_COND_WRITE;
+		if (session->server_ssl & (1 << server_num))
+			flags |= IO_ATTR_SSL;
+		pork_io_add(sock, flags, session, session, irc_connected);
+	} else
 		return (-1);
 
 	return (0);

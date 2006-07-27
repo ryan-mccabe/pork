@@ -37,13 +37,13 @@
 int status_init(void) {
 	WINDOW *win;
 
-	win = newwin(STATUS_ROWS, screen.cols, screen.rows - STATUS_ROWS, 0);
+	win = newwin(STATUS_ROWS, globals.cols, globals.rows - STATUS_ROWS, 0);
 	if (win == NULL)
 		return (-1);
 
 	nodelay(win, 1);
 	set_default_win_opts(win);
-	screen.status_bar = win;
+	globals.status_bar = win;
 	return (0);
 }
 
@@ -56,7 +56,7 @@ int status_init(void) {
 
 void status_draw(struct pork_acct *acct) {
 	char buf[1024];
-	chtype status_bar[screen.cols + 1];
+	chtype status_bar[globals.cols + 1];
 	struct imwindow *win = cur_window();
 	int type;
 
@@ -68,6 +68,6 @@ void status_draw(struct pork_acct *acct) {
 	fill_format_str(type, buf, sizeof(buf), win, acct);
 	format_apply_justification(buf, status_bar, array_elem(status_bar));
 
-	mvwputstr(screen.status_bar, win->prefs, 0, 0, status_bar);
-	wnoutrefresh(screen.status_bar);
+	mvwputstr(globals.status_bar, win->prefs, 0, 0, status_bar);
+	wnoutrefresh(globals.status_bar);
 }

@@ -28,18 +28,30 @@
 #include <pork_util.h>
 #include <pork_inet.h>
 
+ssize_t sock_read_clear(void *sock, void *buf, size_t len) {
+	return (read(*(int *) sock, buf, len));
+}
+
+ssize_t sock_write_clear(void *sock, const void *buf, size_t len) {
+	return (write(*(int *) sock, buf, len));
+}
+
 /*
 ** Write to a socket, deal with interrupted and incomplete writes. Returns
 ** the number of characters written to the socket on success, -1 on failure.
 */
 
-ssize_t sock_write(int sock, const void *buf, size_t len) {
+ssize_t sock_write(	void *out,
+					const void *buf,
+					size_t len,
+					ssize_t (*writefn)(void *, const void *, size_t))
+{
 	ssize_t written = 0;
 
 	while (len > 0) {
 		ssize_t n;
 
-		n = write(sock, buf, len);
+		n = writefn(out, buf, len);
 		if (n < 0) {
 			if (errno == EINTR || errno == EAGAIN)
 				continue;
@@ -57,6 +69,40 @@ ssize_t sock_write(int sock, const void *buf, size_t len) {
 }
 
 /*
+** Returns -1 if the connection died, 0 otherwise.
+*/
+
+ssize_t sock_read(	void *in,
+					void *buf,
+					size_t len,
+					ssize_t (*readfn)(void *, void *, size_t))
+{
+	int i;
+	ssize_t ret = 0;
+
+	for (i = 0 ; i < 5 ; i++) {
+		ret = readfn(in, buf, len - 1);
+		if (ret < 0) {
+			if (errno == EINTR || errno == EAGAIN)
+				continue;
+
+			debug("read: %s", strerror(errno));
+			return (-1);
+		}
+
+		if (ret == 0) {
+			debug("read: %s", strerror(errno));
+			return (-1);
+		}
+
+		*((char *) buf + ret) = '\0';
+		return (ret);
+	}
+
+	return (-1);
+}
+
+/*
 ** printf-like function that writes to sockets.
 */
 
@@ -71,7 +117,10 @@ int sockprintf(int fd, const char *fmt, ...) {
 	ret = vasprintf(&buf, fmt, ap);
 	va_end(ap);
 
-	ret = sock_write(fd, buf, ret);
+	if (ret < 0)
+		return (-1);
+
+	ret = sock_write(&fd, buf, ret, sock_write_clear);
 	free(buf);
 
 	return (ret);
@@ -82,12 +131,16 @@ int sockprintf(int fd, const char *fmt, ...) {
 int sockprintf(int fd, const char *fmt, ...) {
 	va_list ap;
 	char buf[4096];
+	int ret;
 
 	va_start(ap, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, ap);
+	ret = vsnprintf(buf, sizeof(buf), fmt, ap);
+	if (ret < 0 || (size_t) ret >= sizeof(buf))
+		ret = -1;
 	va_end(ap);
 
-	return (sock_write(fd, buf, strlen(buf)));
+	ret = sock_write(&fd, buf, strlen(buf), sock_write_clear);
+	return (ret);
 }
 
 #endif
@@ -278,15 +331,15 @@ inline int sock_setflags(int sock, u_int32_t flags) {
 	return (ret);
 }
 
-int nb_connect(	struct sockaddr_storage *ss,
+int nb_connect(	struct sockaddr_storage *dest,
 				struct sockaddr_storage *laddr,
-				in_port_t port,
+				in_port_t dport,
 				int *dsock)
 {
 	int sock;
 	int ret = 0;
 
-	sock = socket(ss->ss_family, SOCK_STREAM, 0);
+	sock = socket(dest->ss_family, SOCK_STREAM, 0);
 	if (sock < 0) {
 		debug("socket: %s", strerror(errno));
 		return (-1);
@@ -302,9 +355,9 @@ int nb_connect(	struct sockaddr_storage *ss,
 	if (sock_setflags(sock, O_NONBLOCK) == -1)
 		goto err_out;
 
-	sin_set_port(ss, htons(port));
+	sin_set_port(dest, htons(dport));
 
-	if (connect(sock, (struct sockaddr *) ss, sin_len(ss)) != 0) {
+	if (connect(sock, (struct sockaddr *) dest, sin_len(dest)) != 0) {
 		if (errno != EINPROGRESS) {
 			debug("connect: %s", strerror(errno));
 			goto err_out;
@@ -417,5 +470,4 @@ err_out:
 	free(cur);
 	close(sock);
 	return (-1);
-
 }

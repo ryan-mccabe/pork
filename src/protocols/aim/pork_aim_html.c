@@ -311,10 +311,10 @@ char *text_to_html(const char *src) {
 
 	buf[0] = '\0';
 
-	font_face = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT);
-	font_size = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_SIZE);
-	font_bgcolor = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_BGCOLOR);
-	font_fgcolor = opt_get_str(screen.global_prefs, AIM_OPT_OUTGOING_MSG_FONT_FGCOLOR);
+	font_face = opt_get_str(globals.prefs, AIM_OPT_OUTGOING_MSG_FONT);
+	font_size = opt_get_str(globals.prefs, AIM_OPT_OUTGOING_MSG_FONT_SIZE);
+	font_bgcolor = opt_get_str(globals.prefs, AIM_OPT_OUTGOING_MSG_FONT_BGCOLOR);
+	font_fgcolor = opt_get_str(globals.prefs, AIM_OPT_OUTGOING_MSG_FONT_FGCOLOR);
 
 	ret = snprintf(buf, sizeof(buf), "<FONT LANG=\"0\"");
 	if (ret < 0 || (size_t) ret >= sizeof(buf))

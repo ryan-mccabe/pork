@@ -45,7 +45,7 @@
 #include <pork_irc_dcc.h>
 
 static void irc_dcc_send_handler_connected(	int fd,
-											u_int32_t cond __notused,
+											u_int32_t flags __notused,
 											void *data)
 {
 	struct file_transfer *xfer = data;
@@ -56,11 +56,11 @@ static void irc_dcc_send_handler_connected(	int fd,
 	transfer_recv_accepted(xfer);
 }
 
-static void irc_file_send_ready(int fd, u_int32_t cond, void *data) {
+static void irc_file_send_ready(int fd, u_int32_t flags, void *data) {
 	struct file_transfer *xfer = data;
 	struct dcc *dcc = xfer->data;
 
-	if (cond & IO_COND_READ) {
+	if (flags & IO_COND_READ) {
 		u_int32_t offset;
 
 		if (read(fd, &offset, 4) != 4) {
@@ -74,9 +74,9 @@ static void irc_file_send_ready(int fd, u_int32_t cond, void *data) {
 		}
 	}
 
-	if (cond & IO_COND_WRITE) {
+	if (flags & IO_COND_WRITE) {
 		if (xfer->bytes_sent + xfer->start_offset < xfer->file_len)
-			transfer_send_data(fd, cond, xfer);
+			transfer_send_data(fd, flags, xfer);
 
 		/*
 		** Close the connection only after they've acked everything.
@@ -90,7 +90,7 @@ static void irc_file_send_ready(int fd, u_int32_t cond, void *data) {
 		}
 	}
 
-	if (cond & IO_COND_DEAD) {
+	if (flags & IO_ATTR_DEAD) {
 		pork_io_del(xfer);
 		close(fd);
 		transfer_lost(xfer);
@@ -98,7 +98,7 @@ static void irc_file_send_ready(int fd, u_int32_t cond, void *data) {
 }
 
 static void irc_file_send_peer_connected(	int fd,
-											u_int32_t cond __notused,
+											u_int32_t flags __notused,
 											void *data)
 {
 	struct file_transfer *xfer = data;
@@ -225,7 +225,7 @@ int irc_recv_data(	struct file_transfer *xfer,
 	time(&dcc->last_active);
 	offset = htonl(xfer->bytes_sent);
 
-	if (sock_write(xfer->sock, &offset, 4) != 4) {
+	if (sock_write(xfer->sock, &offset, 4, sock_write_clear) != 4) {
 		close(xfer->sock);
 		transfer_lost(xfer);
 		return (-1);

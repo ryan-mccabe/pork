@@ -22,7 +22,7 @@ int fill_format_string(	int type,
 
 void format_apply_justification(char *buf, chtype *ch, size_t len);
 
-#define fill_format_str(type, buf, len, args...) fill_format_string((type), (buf), (len), screen.global_prefs, global_format_handler[(type) - OPT_FORMAT_OFFSET], ##args)
+#define fill_format_str(type, buf, len, args...) fill_format_string((type), (buf), (len), globals.prefs, global_format_handler[(type) - OPT_FORMAT_OFFSET], ##args)
 
 #else
 #	warning "included multiple times"

@@ -10,7 +10,7 @@
 #ifndef __PORK_SET_GLOBAL_H
 #define __PORK_SET_GLOBAL_H
 
-void init_global_prefs(struct screen *screen);
+void init_global_prefs(struct screen *globals);
 
 enum {
 	OPT_AUTOSAVE = 0,

@@ -229,13 +229,13 @@ static inline void aim_disconnected_chat(	struct pork_acct *acct,
 	chat_forced_leave(acct, chat->title, _("the server"), _("disconnected"));
 }
 
-void aim_listen_conn_event(int sock, u_int32_t cond, void *data) {
+void aim_listen_conn_event(int sock, u_int32_t flags, void *data) {
 	aim_conn_t *conn = (aim_conn_t *) data;
 	aim_session_t *session = conn->sessv;
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
 
-	if (cond == IO_COND_DEAD ||
+	if ((flags & IO_ATTR_DEAD) ||
 		aim_handlerendconnect(&priv->aim_session, conn) < 0)
 	{
 		struct file_transfer *xfer = conn->priv;
@@ -263,13 +263,13 @@ static void aim_kill_pending_chats(struct pork_acct *acct) {
 	}
 }
 
-static void aim_conn_event(int sock, u_int32_t cond, void *data) {
+static void aim_conn_event(int sock, u_int32_t flags, void *data) {
 	aim_conn_t *conn = (aim_conn_t *) data;
 	aim_session_t *session = conn->sessv;
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
 
-	if (cond == IO_COND_DEAD) {
+	if (flags & IO_ATTR_DEAD) {
 		pork_sock_err(acct, sock);
 
 		switch (conn->type) {
@@ -313,7 +313,7 @@ static void aim_conn_event(int sock, u_int32_t cond, void *data) {
 		return;
 	}
 
-	if (cond & IO_COND_READ) {
+	if (flags & IO_COND_READ) {
 		if (aim_get_command(session, conn) >= 0) {
 			aim_rxdispatch(session);
 
@@ -337,11 +337,11 @@ static void aim_conn_event(int sock, u_int32_t cond, void *data) {
 		}
 	}
 
-	if (cond & IO_COND_WRITE)
+	if (flags & IO_COND_WRITE)
 		aim_tx_flushqueue(session);
 }
 
-void aim_connected(int sock, u_int32_t cond __notused, void *data) {
+void aim_connected(int sock, u_int32_t flags __notused, void *data) {
 	aim_conn_t *conn = data;
 	aim_session_t *session = conn->sessv;
 	struct pork_acct *acct = session->aux_data;
@@ -787,7 +787,7 @@ static FAIM_CB(aim_recv_buddy_rights) {
 }
 
 static FAIM_CB(aim_recv_conn_complete) {
-	pork_io_set_cond(fr->conn, IO_COND_READ);
+	pork_io_set_flags(fr->conn, IO_COND_READ);
 
 	aim_reqpersonalinfo(session, fr->conn);
 	aim_locate_reqrights(session);
@@ -1619,7 +1619,7 @@ static FAIM_CB(aim_recv_chat_msg) {
 }
 
 static FAIM_CB(recv_chat_conn) {
-	pork_io_set_cond(fr->conn, IO_COND_READ);
+	pork_io_set_flags(fr->conn, IO_COND_READ);
 
 	aim_conn_addhandler(session, fr->conn,
 		AIM_CB_FAM_CHT, AIM_CB_CHT_ERROR, aim_recv_err_other, 0);
@@ -1640,7 +1640,7 @@ static FAIM_CB(recv_chatnav_conn) {
 	struct pork_acct *acct = session->aux_data;
 	struct aim_priv *priv = acct->data;
 
-	pork_io_set_cond(fr->conn, IO_COND_READ);
+	pork_io_set_flags(fr->conn, IO_COND_READ);
 
 	aim_conn_addhandler(session, fr->conn,
 		AIM_CB_FAM_CTN, AIM_CB_CTN_ERROR, aim_recv_err_other, 0);

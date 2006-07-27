@@ -71,7 +71,7 @@ static void pork_acct_free(struct pork_acct *acct) {
 
 	free_str_wipe(acct->passwd);
 
-	timer_del_owner(&screen.timer_list, acct);
+	timer_del_owner(&globals.timer_list, acct);
 
 	if (acct->prefs) {
 		opt_destroy(acct->prefs);
@@ -102,14 +102,14 @@ static void pork_acct_free(struct pork_acct *acct) {
 inline dlist_t *pork_acct_find(u_int32_t refnum) {
 	dlist_t *ret;
 
-	ret = dlist_find(screen.acct_list,
+	ret = dlist_find(globals.acct_list,
 			UINT_TO_POINTER(refnum), pork_acct_find_helper);
 
 	return (ret);
 }
 
 struct pork_acct *pork_acct_find_name(const char *name, int protocol) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
 	while (cur != NULL) {
 		struct pork_acct *acct = cur->data;
@@ -137,7 +137,7 @@ inline struct pork_acct *pork_acct_get_data(u_int32_t refnum) {
 }
 
 int pork_acct_add(struct pork_acct *acct) {
-	screen.acct_list = dlist_add_head(screen.acct_list, acct);
+	globals.acct_list = dlist_add_head(globals.acct_list, acct);
 	return (0);
 }
 
@@ -160,9 +160,9 @@ void pork_acct_del(dlist_t *node, char *reason) {
 	pork_signoff(acct, reason);
 	chat_leave_all(acct);
 
-	screen.acct_list = dlist_remove(screen.acct_list, node);
+	globals.acct_list = dlist_remove(globals.acct_list, node);
 
-	cur = screen.window_list;
+	cur = globals.window_list;
 	if (cur != NULL) {
 		do {
 			struct imwindow *win = cur->data;
@@ -173,16 +173,16 @@ void pork_acct_del(dlist_t *node, char *reason) {
 
 				win->owner->ref_count--;
 
-				if (win->owner == screen.null_acct)
+				if (win->owner == globals.null_acct)
 					win->owner = NULL;
 				else {
-					win->owner = screen.null_acct;
+					win->owner = globals.null_acct;
 					win->owner->ref_count++;
 				}
 			}
 
 			cur = cur->next;
-		} while (cur != screen.window_list);
+		} while (cur != globals.window_list);
 	}
 
 	/* This must always be the case. */
@@ -206,10 +206,10 @@ int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
 
 	do {
 		if (cur->next == NULL) {
-			if (cur == screen.acct_list)
+			if (cur == globals.acct_list)
 				return (-1);
 
-			cur = screen.acct_list;
+			cur = globals.acct_list;
 		} else
 			cur = cur->next;
 
@@ -221,10 +221,10 @@ int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
 }
 
 void pork_acct_print_list(void) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
 	screen_cmd_output(_("REFNUM\tUSERNAME\t\tPROTOCOL\tSERVER\t\t\t\t\t\tSTATUS"));
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
+	for (cur = globals.acct_list ; cur != NULL ; cur = cur->next) {
 		char buf[128];
 		struct pork_acct *acct = cur->data;
 		u_int32_t max_reconnect_tries = 0;
@@ -265,7 +265,7 @@ void pork_acct_print_list(void) {
 }
 
 void pork_acct_del_all(char *reason) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
 	while (cur != NULL) {
 		dlist_t *next = cur->next;
@@ -276,7 +276,7 @@ void pork_acct_del_all(char *reason) {
 }
 
 void pork_acct_update_blist_color(struct pref_val *pref, va_list ap) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
 	while (cur != NULL) {
 		struct pork_acct *acct = cur->data;
@@ -320,7 +320,7 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 }
 
 void pork_acct_update_blist_format(struct pref_val *pref, va_list ap) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
 	while (cur != NULL) {
 		struct pork_acct *acct = cur->data;
@@ -333,9 +333,9 @@ void pork_acct_update_blist_format(struct pref_val *pref, va_list ap) {
 }
 
 inline void pork_acct_update(void) {
-	dlist_t *cur = screen.acct_list;
+	dlist_t *cur = globals.acct_list;
 
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
+	for (cur = globals.acct_list ; cur != NULL ; cur = cur->next) {
 		struct pork_acct *acct = cur->data;
 		time_t time_now = time(NULL);
 
@@ -522,7 +522,7 @@ void pork_acct_reconnect_all(void) {
 	dlist_t *cur;
 	time_t now = time(NULL);
 
-	cur = screen.acct_list;
+	cur = globals.acct_list;
 	while (cur != NULL) {
 		struct pork_acct *acct = cur->data;
 		int timeout = opt_get_int(acct->prefs, ACCT_OPT_CONNECT_TIMEOUT);

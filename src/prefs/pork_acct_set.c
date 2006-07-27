@@ -146,7 +146,7 @@ int acct_init_prefs(struct pork_acct *acct) {
 	int ret;
 	char *pork_dir;
 
-	pork_dir = opt_get_str(screen.global_prefs, OPT_PORK_DIR);
+	pork_dir = opt_get_str(globals.prefs, OPT_PORK_DIR);
 	if (pork_dir == NULL)
 		pork_dir = DEFAULT_PORK_DIR;
 

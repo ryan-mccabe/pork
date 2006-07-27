@@ -29,7 +29,7 @@ struct irc_session {
 	pork_queue_t *inq;
 	pork_queue_t *outq;
 
-	char *servers[24];
+	char *servers[32];
 	char *chanmodes;
 	char *chantypes;
 	char *prefix_types;
@@ -48,6 +48,7 @@ struct irc_session {
 	u_int32_t kick_len;
 	u_int32_t topic_len;
 	u_int32_t num_servers;
+	u_int32_t server_ssl;
 
 	hash_t callbacks;
 
@@ -56,6 +57,9 @@ struct irc_session {
 	char input_buf[IRC_IN_BUFLEN];
 	struct pref_val *prefs;
 	void *data;
+	void *transport;
+	ssize_t (*sock_read)(void *, void *, size_t);
+	ssize_t (*sock_write)(void *, const void *, size_t);
 };
 
 struct irc_chan_data {
@@ -123,7 +127,7 @@ int irc_send_invite(struct irc_session *session, char *channel, char *user);
 
 char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
 int irc_chanmode_has_arg(struct irc_session *session, char mode);
-int irc_input_dispatch(struct irc_session *session);
+int irc_input_dispatch(struct irc_session *session, u_int32_t flags);
 char *irc_text_filter(char *str);
 int irc_quote(struct irc_session *session, char *str);
 

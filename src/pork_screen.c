@@ -51,7 +51,7 @@
 */
 
 static dlist_t *screen_find_refnum(u_int32_t refnum) {
-	dlist_t *cur = screen.window_list;
+	dlist_t *cur = globals.window_list;
 
 	do {
 		struct imwindow *imwindow = cur->data;
@@ -63,7 +63,7 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 			break;
 
 		cur = cur->next;
-	} while (cur != screen.window_list);
+	} while (cur != globals.window_list);
 
 	return (NULL);
 }
@@ -95,24 +95,24 @@ static void screen_window_list_add(dlist_t *new_node) {
 	** refnum.
 	*/
 
-	if (screen.window_list == NULL) {
+	if (globals.window_list == NULL) {
 		new_node->prev = new_node;
 		new_node->next = new_node;
-		screen.window_list = new_node;
+		globals.window_list = new_node;
 	} else {
-		dlist_t *cur = screen.window_list;
+		dlist_t *cur = globals.window_list;
 
 		do {
 			struct imwindow *imw = cur->data;
 
 			if (imwindow->refnum < imw->refnum) {
-				if (cur == screen.window_list)
-					screen.window_list = new_node;
+				if (cur == globals.window_list)
+					globals.window_list = new_node;
 				break;
 			}
 
 			cur = cur->next;
-		} while (cur != screen.window_list);
+		} while (cur != globals.window_list);
 
 		new_node->next = cur;
 		new_node->prev = cur->prev;
@@ -125,11 +125,11 @@ static void screen_window_list_add(dlist_t *new_node) {
 static void screen_window_list_remove(dlist_t *node) {
 	dlist_t *save = node;
 
-	if (node == screen.window_list)
-		screen.window_list = node->next;
+	if (node == globals.window_list)
+		globals.window_list = node->next;
 
-	if (node == screen.window_list)
-		screen.window_list = NULL;
+	if (node == globals.window_list)
+		globals.window_list = NULL;
 
 	save->prev->next = node->next;
 	save->next->prev = node->prev;
@@ -144,27 +144,27 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	struct imwindow *win;
 	struct pork_acct *acct;
 
-	memset(&screen, 0, sizeof(screen));
+	memset(&globals, 0, sizeof(globals));
 
-	screen.rows = rows;
-	screen.cols = cols;
+	globals.rows = rows;
+	globals.cols = cols;
 
-	init_global_prefs(&screen);
-	bind_init(&screen.binds);
+	init_global_prefs(&globals);
+	bind_init(&globals.binds);
 
 	if (status_init() == -1)
 		return (-1);
 
-	acct = pork_acct_init(opt_get_str(screen.global_prefs, OPT_TEXT_NO_NAME),
+	acct = pork_acct_init(opt_get_str(globals.prefs, OPT_TEXT_NO_NAME),
 			PROTO_NULL);
 	if (acct == NULL)
 		return (-1);
 	acct->refnum = -1UL;
 
 	pork_acct_add(acct);
-	screen.null_acct = acct;
+	globals.null_acct = acct;
 
-	pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen,
+	pork_io_add(STDIN_FILENO, IO_COND_READ, &globals, &globals,
 		keyboard_input);
 
 	rows = max(1, (int) rows - STATUS_ROWS);
@@ -172,16 +172,16 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	win = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, _("status"));
 	if (win == NULL)
 		return (-1);
-	input_init(&screen.input, cols);
+	input_init(&globals.input, cols);
 
 	opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
 	screen_add_window(win);
-	screen.status_win = win;
+	globals.status_win = win;
 	return (0);
 }
 
 void screen_destroy(void) {
-	dlist_t *cur = screen.window_list;
+	dlist_t *cur = globals.window_list;
 
 	do {
 		dlist_t *next = cur->next;
@@ -190,13 +190,13 @@ void screen_destroy(void) {
 		free(cur);
 
 		cur = next;
-	} while (cur != screen.window_list);
+	} while (cur != globals.window_list);
 
-	opt_destroy(screen.global_prefs);
-	input_destroy(&screen.input);
-	bind_destroy(&screen.binds);
-	hash_destroy(&screen.alias_hash);
-	delwin(screen.status_bar);
+	opt_destroy(globals.prefs);
+	input_destroy(&globals.input);
+	bind_destroy(&globals.binds);
+	hash_destroy(&globals.alias_hash);
+	delwin(globals.status_bar);
 	wclear(curscr);
 }
 
@@ -210,7 +210,7 @@ void screen_add_window(struct imwindow *imwindow) {
 	** If this is the first window, make it current.
 	*/
 
-	if (screen.cur_window == NULL)
+	if (globals.cur_window == NULL)
 		screen_window_swap(new_node);
 }
 
@@ -261,10 +261,10 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 
 	resize_terminal(rows, cols);
 
-	screen.rows = rows;
-	screen.cols = cols;
+	globals.rows = rows;
+	globals.cols = cols;
 
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
+	for (cur = globals.acct_list ; cur != NULL ; cur = cur->next) {
 		struct pork_acct *acct = cur->data;
 
 		if (acct->blist != NULL) {
@@ -273,7 +273,7 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 		}
 	}
 
-	cur = screen.window_list;
+	cur = globals.window_list;
 	do {
 		struct imwindow *imwindow = cur->data;
 		u_int32_t im_cols = cols;
@@ -283,7 +283,7 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 
 			if (blist_cols >= cols) {
 				imwindow->blist_visible = 0;
-				imwindow->active_binds = &screen.binds.main;
+				imwindow->active_binds = &globals.binds.main;
 			} else
 				im_cols -= blist_cols;
 		}
@@ -293,11 +293,11 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 		input_resize(imwindow->input, cols);
 
 		cur = cur->next;
-	} while (screen.window_list != cur);
+	} while (globals.window_list != cur);
 
-	ret = mvwin(screen.status_bar, max(0, (int) rows - STATUS_ROWS), 0);
+	ret = mvwin(globals.status_bar, max(0, (int) rows - STATUS_ROWS), 0);
 	if (ret == -1) {
-		delwin(screen.status_bar);
+		delwin(globals.status_bar);
 		status_init();
 	}
 }
@@ -305,13 +305,13 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 int screen_blist_width(struct blist *blist, u_int32_t new_width) {
 	dlist_t *cur;
 
-	if (new_width < 3 || new_width >= screen.cols)
+	if (new_width < 3 || new_width >= globals.cols)
 		return (-1);
 
 	if (blist == NULL)
 		return (-1);
 
-	cur = screen.window_list;
+	cur = globals.window_list;
 	do {
 		struct imwindow *imwindow = cur->data;
 
@@ -322,9 +322,9 @@ int screen_blist_width(struct blist *blist, u_int32_t new_width) {
 				imwindow->swindow.cols + blist->slist.cols - new_width);
 		}
 		cur = cur->next;
-	} while (cur != screen.window_list);
+	} while (cur != globals.window_list);
 
-	blist_resize(blist, blist->slist.rows, new_width, screen.cols);
+	blist_resize(blist, blist->slist.rows, new_width, globals.cols);
 	return (0);
 }
 
@@ -334,7 +334,7 @@ void screen_window_swap(dlist_t *new_cur) {
 	u_int32_t cur_own_input;
 	struct pork_acct *acct;
 
-	if (screen.cur_window != NULL) {
+	if (globals.cur_window != NULL) {
 		imwindow = cur_window();
 
 		last_own_input = opt_get_bool(imwindow->prefs, WIN_OPT_PRIVATE_INPUT);
@@ -342,7 +342,7 @@ void screen_window_swap(dlist_t *new_cur) {
 		imwindow->swindow.visible = 0;
 	}
 
-	screen.cur_window = new_cur;
+	globals.cur_window = new_cur;
 
 	imwindow = cur_window();
 	imwindow->swindow.visible = 1;
@@ -406,9 +406,9 @@ struct imwindow *screen_new_window(	struct pork_acct *acct,
 	struct imwindow *imwindow;
 	u_int32_t rows;
 
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
+	rows = max(1, (int) globals.rows - STATUS_ROWS);
 
-	imwindow = imwindow_new(rows, screen.cols,
+	imwindow = imwindow_new(rows, globals.cols,
 		refnum, WIN_TYPE_PRIVMSG, acct, target);
 	if (imwindow == NULL)
 		return (NULL);
@@ -427,8 +427,8 @@ struct imwindow *screen_new_chat_window(struct pork_acct *acct, char *name) {
 	struct imwindow *imwindow;
 	u_int32_t rows;
 
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
-	imwindow = imwindow_new(rows, screen.cols,
+	rows = max(1, (int) globals.rows - STATUS_ROWS);
+	imwindow = imwindow_new(rows, globals.cols,
 		refnum, WIN_TYPE_CHAT, acct, name);
 	if (imwindow == NULL)
 		return (NULL);
@@ -451,7 +451,7 @@ int screen_get_query_window(struct pork_acct *acct,
 	win = imwindow_find(acct, name);
 	if (win == NULL || win->type != WIN_TYPE_PRIVMSG) {
 		if (opt_get_bool(acct->prefs, ACCT_OPT_DUMP_MSGS_TO_STATUS))
-			win = screen.status_win;
+			win = globals.status_win;
 		else {
 			win = screen_new_window(acct, name, buddy_name(acct, name));
 			new++;
@@ -484,49 +484,49 @@ int screen_make_query_window(struct pork_acct *acct,
 }
 
 void screen_cycle_fwd(void) {
-	dlist_t *cur = screen.cur_window;
+	dlist_t *cur = globals.cur_window;
 	struct imwindow *win;
 
 	do {
 		cur = cur->next;
 		win = cur->data;
-	} while (win->skip && cur != screen.cur_window);
+	} while (win->skip && cur != globals.cur_window);
 
 	screen_window_swap(cur);
 }
 
 void screen_cycle_fwd_active(void) {
-	dlist_t *cur = screen.cur_window;
+	dlist_t *cur = globals.cur_window;
 	struct imwindow *win;
 
 	do {
 		cur = cur->next;
 		win = cur->data;
-	} while (win->skip && !win->swindow.activity && cur != screen.cur_window);
+	} while (win->skip && !win->swindow.activity && cur != globals.cur_window);
 
 	screen_window_swap(cur);
 }
 
 void screen_cycle_bak(void) {
-	dlist_t *cur = screen.cur_window;
+	dlist_t *cur = globals.cur_window;
 	struct imwindow *win;
 
 	do {
 		cur = cur->prev;
 		win = cur->data;
-	} while (win->skip && cur != screen.cur_window);
+	} while (win->skip && cur != globals.cur_window);
 
 	screen_window_swap(cur);
 }
 
 void screen_cycle_bak_active(void) {
-	dlist_t *cur = screen.cur_window;
+	dlist_t *cur = globals.cur_window;
 	struct imwindow *win;
 
 	do {
 		cur = cur->prev;
 		win = cur->data;
-	} while (win->skip && !win->swindow.activity && cur != screen.cur_window);
+	} while (win->skip && !win->swindow.activity && cur != globals.cur_window);
 
 	screen_window_swap(cur);
 }
@@ -534,12 +534,12 @@ void screen_cycle_bak_active(void) {
 void screen_bind_all_unbound(struct pork_acct *acct) {
 	dlist_t *node;
 
-	node = screen.window_list;
+	node = globals.window_list;
 
 	do {
 		struct imwindow *win = node->data;
 
-		if (win->owner == screen.null_acct) {
+		if (win->owner == globals.null_acct) {
 			imwindow_bind_acct(win, acct->refnum);
 
 			if (acct->blist != NULL && !win->blist_visible) {
@@ -549,7 +549,7 @@ void screen_bind_all_unbound(struct pork_acct *acct) {
 			}
 
 		node = node->next;
-	} while (node != screen.window_list);
+	} while (node != globals.window_list);
 }
 
 int screen_close_window(struct imwindow *imwindow) {

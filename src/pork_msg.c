@@ -118,7 +118,7 @@ int pork_recv_msg(	struct pork_acct *acct,
 		if (autoresp)
 			type = OPT_FORMAT_MSG_RECV_AUTO;
 		else {
-			if (win == screen.status_win)
+			if (win == globals.status_win)
 				type = OPT_FORMAT_MSG_RECV_STATUS;
 			else
 				type = OPT_FORMAT_MSG_RECV;
@@ -236,7 +236,7 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 				if (screen_get_query_window(acct, dest, &win) != 0)
 					screen_goto_window(win->refnum);
 
-				if (win == screen.status_win)
+				if (win == globals.status_win)
 					type = OPT_FORMAT_MSG_SEND_STATUS;
 				else
 					type = OPT_FORMAT_MSG_SEND;
@@ -277,16 +277,22 @@ int pork_set_profile(struct pork_acct *acct, char *profile) {
 	return (ret);
 }
 
-int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
-	char timebuf[32];
-
+int pork_set_idle(struct pork_acct *acct, u_int32_t seconds) {
 	if (acct->proto->set_idle_time == NULL)
 		return (-1);
 
 	if (event_generate(acct->events, EVENT_SEND_IDLE, seconds, acct->refnum))
-		return (1);
+		return (-1);
 
-	acct->proto->set_idle_time(acct, seconds);
+	return (acct->proto->set_idle_time(acct, seconds));
+}
+
+int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
+	char timebuf[32];
+
+	if (pork_set_idle(acct, seconds) == -1)
+		return (0);
+
 	time_to_str_full(seconds, timebuf, sizeof(timebuf));
 
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
@@ -332,7 +338,7 @@ int pork_recv_warn(struct pork_acct *acct, char *user, u_int16_t warn_level) {
 
 		win = imwindow_find(acct, user);
 		if (win == NULL)
-			win = screen.status_win;
+			win = globals.status_win;
 
 		ret = fill_format_str(OPT_FORMAT_WARN_RECV, buf, sizeof(buf),
 				acct->username, warn_level);
@@ -361,9 +367,9 @@ int pork_recv_warn_anon(struct pork_acct *acct, u_int16_t warn_level) {
 		if (ret < 1)
 			return (-1);
 
-		screen_print_str(screen.status_win, buf, (size_t) ret,
+		screen_print_str(globals.status_win, buf, (size_t) ret,
 			MSG_TYPE_STATUS);
-		imwindow_send_msg(screen.status_win);
+		imwindow_send_msg(globals.status_win);
 		return (0);
 	}
 
@@ -424,7 +430,7 @@ int pork_recv_action(	struct pork_acct *acct,
 
 		screen_get_query_window(acct, sender, &win);
 
-		if (win == screen.status_win)
+		if (win == globals.status_win)
 			type = OPT_FORMAT_ACTION_RECV_STATUS;
 		else
 			type = OPT_FORMAT_ACTION_RECV;
@@ -458,7 +464,7 @@ int pork_action_send(struct pork_acct *acct, char *dest, char *msg) {
 
 		screen_get_query_window(acct, dest, &win);
 
-		if (win == screen.status_win)
+		if (win == globals.status_win)
 			type = OPT_FORMAT_ACTION_SEND_STATUS;
 		else
 			type = OPT_FORMAT_ACTION_SEND;
@@ -490,7 +496,7 @@ int pork_notice_send(struct pork_acct *acct, char *dest, char *msg) {
 		int type;
 		int ret;
 
-		if (win == screen.status_win)
+		if (win == globals.status_win)
 			type = OPT_FORMAT_NOTICE_SEND_STATUS;
 		else
 			type = OPT_FORMAT_NOTICE_SEND;
@@ -516,7 +522,7 @@ int pork_recv_notice(	struct pork_acct *acct,
 
 	win = imwindow_find(acct, sender);
 	if (win == NULL) {
-		win = screen.status_win;
+		win = globals.status_win;
 		type = OPT_FORMAT_NOTICE_RECV_STATUS;
 	} else
 		type = OPT_FORMAT_NOTICE_RECV;

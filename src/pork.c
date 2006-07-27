@@ -43,7 +43,6 @@
 #include <pork_input.h>
 #include <pork_bind.h>
 #include <pork_events.h>
-#include <pork_screen.h>
 #include <pork_screen_io.h>
 #include <pork_status.h>
 #include <pork_alias.h>
@@ -54,11 +53,12 @@
 #include <pork_perl.h>
 #include <pork_timer.h>
 #include <pork_io.h>
+#include <pork_screen.h>
 #include <pork_proto.h>
 #include <pork_queue.h>
 #include <pork_missing.h>
 
-struct screen screen;
+struct screen globals;
 static void generic_signal_handler(int sig) __noreturn;
 
 /*
@@ -104,7 +104,7 @@ static void resize_display(void) {
 }
 
 static void sigwinch_handler(int sig __notused) {
-	pork_io_add_cond(&screen, IO_COND_ALWAYS);
+	pork_io_add_flag(&globals, IO_ATTR_ALWAYS);
 }
 
 static void generic_signal_handler(int sig) {
@@ -112,7 +112,7 @@ static void generic_signal_handler(int sig) {
 }
 
 void keyboard_input(int fd __notused,
-					u_int32_t cond,
+					u_int32_t flags,
 					void *data __notused)
 {
 	struct imwindow *win = cur_window();
@@ -123,13 +123,13 @@ void keyboard_input(int fd __notused,
 	** This will be the case only after the program receives SIGWINCH.
 	** The screen can't be resized from inside a signal handler..
 	*/
-	if (cond == IO_COND_ALWAYS) {
-		pork_io_del_cond(&screen, IO_COND_ALWAYS);
+	if (flags & IO_ATTR_ALWAYS) {
+		pork_io_del_flag(&globals, IO_ATTR_ALWAYS);
 		resize_display();
 		return;
 	}
 
-	key = wgetinput(screen.status_bar);
+	key = wgetinput(globals.status_bar);
 	if (key == -1)
 		return;
 
@@ -171,6 +171,7 @@ int main(int argc, char **argv) {
 
 	if (screen_init(LINES, COLS) == -1)
 		pork_exit(-1, NULL, _("Fatal: Error initializing the terminal.\n"));
+	ssl_init();
 
 	signal(SIGWINCH, sigwinch_handler);
 	signal(SIGTERM, generic_signal_handler);
@@ -178,14 +179,14 @@ int main(int argc, char **argv) {
 	signal(SIGHUP, generic_signal_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	wmove(screen.status_bar, STATUS_ROWS - 1, 0);
+	wmove(globals.status_bar, STATUS_ROWS - 1, 0);
 	win = cur_window();
 
-	bind_init(&screen.binds);
-	bind_set_handlers(&screen.binds.main, binding_run, binding_insert);
-	bind_set_handlers(&screen.binds.blist, binding_run, NULL);
+	bind_init(&globals.binds);
+	bind_set_handlers(&globals.binds.main, binding_run, binding_insert);
+	bind_set_handlers(&globals.binds.blist, binding_run, NULL);
 
-	alias_init(&screen.alias_hash);
+	alias_init(&globals.alias_hash);
 
 	screen_set_quiet(1);
 	ret = read_global_config();
@@ -194,7 +195,7 @@ int main(int argc, char **argv) {
 	if (ret != 0)
 		screen_err_msg(_("Error reading the global configuration."));
 
-	status_draw(screen.null_acct);
+	status_draw(globals.null_acct);
 	screen_draw_input();
 	screen_doupdate();
 
@@ -213,7 +214,7 @@ int main(int argc, char **argv) {
 		time(&time_now);
 		if (timer_last_run < time_now) {
 			timer_last_run = time_now;
-			timer_run(&screen.timer_list);
+			timer_run(&globals.timer_list);
 			pork_acct_reconnect_all();
 		}
 

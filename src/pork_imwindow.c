@@ -67,7 +67,7 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 	win->type = type;
 	win->target = xstrdup(nname);
 	win->name = color_quote_codes(target);
-	win->active_binds = &screen.binds.main;
+	win->active_binds = &globals.binds.main;
 	win->owner = owner;
 	win->owner->ref_count++;
 
@@ -84,7 +84,7 @@ struct imwindow *imwindow_new(	u_int32_t rows,
 		input = xmalloc(sizeof(*input));
 		input_init(input, cols);
 	} else
-		input = &screen.input;
+		input = &globals.input;
 
 	win->input = input;
 
@@ -113,7 +113,7 @@ inline void imwindow_resize(struct imwindow *win,
 int imwindow_set_priv_input(struct imwindow *win, int val) {
 	int old_val;
 
-	old_val = !(win->input == &screen.input);
+	old_val = !(win->input == &globals.input);
 	if (old_val == val)
 		return (-1);
 
@@ -133,7 +133,7 @@ int imwindow_set_priv_input(struct imwindow *win, int val) {
 
 		input_destroy(win->input);
 		free(win->input);
-		win->input = &screen.input;
+		win->input = &globals.input;
 	}
 
 	return (0);
@@ -195,10 +195,10 @@ void imwindow_blist_hide(struct imwindow *win) {
 		win->owner->blist->slist.dirty = 1;
 		new_width = win->swindow.cols + win->owner->blist->slist.cols;
 	} else
-		new_width = screen.cols;
+		new_width = globals.cols;
 
 	win->input_focus = BINDS_MAIN;
-	win->active_binds = &screen.binds.main;
+	win->active_binds = &globals.binds.main;
 
 	imwindow_resize(win, win->swindow.rows, new_width);
 }
@@ -244,15 +244,15 @@ void imwindow_switch_focus(struct imwindow *win) {
 
 	if (win->input_focus == BINDS_MAIN) {
 		win->input_focus = BINDS_BUDDY;
-		win->active_binds = &screen.binds.blist;
+		win->active_binds = &globals.binds.blist;
 	} else {
 		win->input_focus = BINDS_MAIN;
-		win->active_binds = &screen.binds.main;
+		win->active_binds = &globals.binds.main;
 	}
 }
 
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
-	dlist_t *list_start = screen.window_list;
+	dlist_t *list_start = globals.window_list;
 	dlist_t *cur = list_start;
 	char nname[NUSER_LEN];
 
@@ -277,7 +277,7 @@ struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
 struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
 											const char *target)
 {
-	dlist_t *list_start = screen.window_list;
+	dlist_t *list_start = globals.window_list;
 	dlist_t *cur = list_start;
 	char nname[NUSER_LEN];
 
@@ -300,7 +300,7 @@ struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
 }
 
 struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name) {
-	dlist_t *list_start = screen.window_list;
+	dlist_t *list_start = globals.window_list;
 	dlist_t *cur = list_start;
 
 	do {
@@ -316,7 +316,7 @@ struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name) {
 }
 
 struct imwindow *imwindow_find_refnum(u_int32_t refnum) {
-	dlist_t *cur = screen.window_list;
+	dlist_t *cur = globals.window_list;
 
 	do {
 		struct imwindow *win = cur->data;
@@ -325,7 +325,7 @@ struct imwindow *imwindow_find_refnum(u_int32_t refnum) {
 			return (win);
 
 		cur = cur->next;
-	} while (cur != screen.window_list);
+	} while (cur != globals.window_list);
 
 	return (NULL);
 }
@@ -349,7 +349,7 @@ int imwindow_bind_acct(struct imwindow *win, u_int32_t refnum) {
 	struct pork_acct *old_acct = win->owner;
 
 	if (win->type == WIN_TYPE_CHAT &&
-		win->owner != screen.null_acct)
+		win->owner != globals.null_acct)
 	{
 		return (-1);
 	}

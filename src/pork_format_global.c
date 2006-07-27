@@ -122,7 +122,7 @@ static int format_status_activity(	char opt,
 		/* Activity display */
 		case 'A':
 		case 'a': {
-			dlist_t *cur = screen.window_list;
+			dlist_t *cur = globals.window_list;
 			size_t n = 0;
 
 			do {
@@ -142,7 +142,7 @@ static int format_status_activity(	char opt,
 				}
 
 				cur = cur->next;
-			} while (cur != screen.window_list);
+			} while (cur != globals.window_list);
 
 			if (n > 0)
 				buf[n - 1] = '\0';
@@ -170,9 +170,9 @@ static int format_status_typing(char opt, char *buf, size_t len, va_list ap) {
 				char *str;
 
 				if (imwindow->typing == 1)
-					str = opt_get_str(screen.global_prefs, OPT_TEXT_TYPING_PAUSED);
+					str = opt_get_str(globals.prefs, OPT_TEXT_TYPING_PAUSED);
 				else
-					str = opt_get_str(screen.global_prefs, OPT_TEXT_TYPING);
+					str = opt_get_str(globals.prefs, OPT_TEXT_TYPING);
 
 				if (xstrncpy(buf, str, len) == -1)
 					return (-1);
@@ -306,7 +306,7 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 				(imwindow->data == NULL || !acct->connected))
 			{
 				ret = xstrncpy(buf,
-						opt_get_str(screen.global_prefs, OPT_TEXT_NO_ROOM),
+						opt_get_str(globals.prefs, OPT_TEXT_NO_ROOM),
 						len);
 			}
 			break;
@@ -913,13 +913,13 @@ static int format_blist_buddy_label(char opt, char *buf, size_t len, va_list ap)
 			char *status_text;
 
 			if (buddy->status == STATUS_ACTIVE)
-				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_ACTIVE);
+				status_text = opt_get_str(globals.prefs, OPT_TEXT_BUDDY_ACTIVE);
 			else if (buddy->status == STATUS_AWAY)
-				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_AWAY);
+				status_text = opt_get_str(globals.prefs, OPT_TEXT_BUDDY_AWAY);
 			else if (buddy->status == STATUS_IDLE)
-				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_IDLE);
+				status_text = opt_get_str(globals.prefs, OPT_TEXT_BUDDY_IDLE);
 			else if (buddy->status == STATUS_WIRELESS)
-				status_text = opt_get_str(screen.global_prefs, OPT_TEXT_BUDDY_WIRELESS);
+				status_text = opt_get_str(globals.prefs, OPT_TEXT_BUDDY_WIRELESS);
 			else
 				status_text = "%p?%x";
 
@@ -974,12 +974,12 @@ static int format_blist_group_label(char opt, char *buf, size_t len, va_list ap)
 				struct slist_cell *cell = node->data;
 
 				if (cell != NULL && cell->collapsed) {
-					expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
+					expand_str = opt_get_str(globals.prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
 				} else {
-					expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_EXPANDED);
+					expand_str = opt_get_str(globals.prefs, OPT_TEXT_BLIST_GROUP_EXPANDED);
 				}
 			} else {
-				expand_str = opt_get_str(screen.global_prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
+				expand_str = opt_get_str(globals.prefs, OPT_TEXT_BLIST_GROUP_COLLAPSED);
 			}
 
 			ret = xstrncpy(buf, expand_str, len);

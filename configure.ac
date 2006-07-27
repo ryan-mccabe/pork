@@ -74,6 +74,14 @@ else
 fi
 
 withval=""
+ssl="yes"
+AC_ARG_WITH(ssl,
+[  --with-ssl  		  Include SSL support for IRC])
+if test "$withval" = "no"; then
+	ssl="no"
+fi
+
+withval=""
 AC_ARG_WITH(efence,
 [  --with-efence=PREFIX	Use electric fence])
 if test "$withval" = "yes"; then
@@ -372,6 +380,17 @@ AC_MSG_RESULT($have_struct_addrinfo)
 
 if test "$have_struct_addrinfo" = "yes"; then
 	AC_DEFINE(HAVE_STRUCT_ADDRINFO, 1, [Define to 1 if you have struct addrinfo])
+fi
+
+if test "$ssl" = "yes"; then
+	AC_CHECK_HEADER(openssl/ssl.h,, [ssl=no])
+	if test "$ssl" = "yes"; then
+		AC_CHECK_LIB(ssl, SSL_new,, [ssl=no])
+	fi
+fi
+
+if test "$ssl" = "yes"; then
+	AC_DEFINE(SSL_SUPPORT, 1, [Define to enable SSL support for IRC])
 fi
 
 if test -n "$DEBUG_CFLAGS$DEBUG_LIBS"; then

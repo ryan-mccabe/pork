@@ -63,7 +63,7 @@ XS(PORK_timer_add) {
 	if (command == NULL)
 		XSRETURN_UNDEF;
 
-	XSRETURN_UV(timer_add(&screen.timer_list, command, cur_window()->owner, interval, times));
+	XSRETURN_UV(timer_add(&globals.timer_list, command, cur_window()->owner, interval, times));
 }
 
 XS(PORK_timer_del) {
@@ -80,7 +80,7 @@ XS(PORK_timer_del) {
 	if (command == NULL)
 		XSRETURN_IV(-1);
 
-	XSRETURN_IV(timer_del(&screen.timer_list, command));
+	XSRETURN_IV(timer_del(&globals.timer_list, command));
 }
 
 XS(PORK_timer_del_refnum) {
@@ -93,7 +93,7 @@ XS(PORK_timer_del_refnum) {
 		XSRETURN_IV(-1);
 
 	refnum = SvIV(ST(0));
-	XSRETURN_IV(timer_del_refnum(&screen.timer_list, refnum));
+	XSRETURN_IV(timer_del_refnum(&globals.timer_list, refnum));
 }
 
 XS(PORK_timer_purge) {
@@ -102,6 +102,6 @@ XS(PORK_timer_purge) {
 	(void) items;
 	(void) cv;
 
-	timer_destroy(&screen.timer_list);
+	timer_destroy(&globals.timer_list);
 	XSRETURN_IV(0);
 }
