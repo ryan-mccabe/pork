@@ -22,9 +22,11 @@ typedef struct {} SSL;
 typedef struct {} SSL_CTX;
 
 void SSL_free(SSL *);
+void SSL_CTX_free(SSL_CTX *ctx);
 
 #endif
 
+int ssl_init(void);
 SSL *ssl_connect(SSL_CTX *ctx, int sock);
 ssize_t sock_read_ssl(void *in, void *buf, size_t len);
 ssize_t sock_write_ssl(void *in, const void *buf, size_t len);

@@ -143,6 +143,7 @@ static int irc_free(struct pork_acct *acct) {
 	struct irc_session *session = acct->data;
 	u_int32_t i;
 
+	/* Wipe because there might be server passwords inside the list. */
 	for (i = 0 ; i < session->num_servers ; i++)
 		free_str_wipe(session->servers[i]);
 

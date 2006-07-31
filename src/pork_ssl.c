@@ -97,6 +97,12 @@ SSL *ssl_connect(SSL_CTX *ctx __notused, int sock __notused) {
 	return (NULL);
 }
 
+void SSL_free(SSL *ssl __notused) {
+}
+
+void SSL_CTX_free(SSL_CTX *ctx __notused) {
+}
+
 ssize_t sock_write_ssl(void *out, const void *buf, size_t len) {
 	return (-1);
 }

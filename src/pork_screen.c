@@ -198,6 +198,8 @@ void screen_destroy(void) {
 	hash_destroy(&globals.alias_hash);
 	delwin(globals.status_bar);
 	wclear(curscr);
+	if (globals.ssl_ctx != NULL)
+		SSL_CTX_free(globals.ssl_ctx);
 }
 
 void screen_add_window(struct imwindow *imwindow) {
