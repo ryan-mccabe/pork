@@ -204,8 +204,9 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 	while ((server = strsep(&str, " ")) != NULL &&
 			session->num_servers < array_elem(session->servers))
 	{
-		if (!strncasecmp(server, "ssl://", 6)) {
-			server += 6;
+		char *p = strrchr(server, '/');
+		if (p != NULL && !strcasecmp(p, "/ssl")) {
+			*p = '\0';
 			session->server_ssl |= (1 << session->num_servers);
 		}
 		session->servers[session->num_servers++] = xstrdup(server);
@@ -220,7 +221,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	int ret;
 
 	if (args == NULL) {
-		screen_err_msg(_("Error: IRC: Syntax is /connect -irc <nick> [ssl://]<server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]"));
+		screen_err_msg(_("Error: IRC: Syntax is /connect -irc <nick> <server>[:<port>[:<passwd>]][/ssl] ... <serverN>[:<port>[:<passwd>]][/ssl]"));
 		return (-1);
 	}
 
