@@ -43,6 +43,7 @@ struct irc_session {
 	u_int32_t callerid:1;
 	u_int32_t etrace:1;
 	u_int32_t safelist:1;
+	u_int32_t ssl:1;
 
 	u_int32_t nick_len;
 	u_int32_t kick_len;

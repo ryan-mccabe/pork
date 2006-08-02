@@ -62,6 +62,10 @@ static void irc_event(int sock, u_int32_t flags, void *data) {
 
 			pork_sock_err(acct, sock);
 			pork_io_del(data);
+			if (session->ssl)
+				SSL_free(session->transport);
+			session->ssl = 0;
+			session->transport = NULL;
 			pork_acct_disconnected(acct);
 		}
 	} else
@@ -100,11 +104,13 @@ static void irc_connected(int sock, u_int32_t flags, void *data) {
 
 			new_flags |= IO_ATTR_SSL;
 
+			session->ssl = 1;
 			session->transport = ssl;
 			session->sock_read = sock_read_ssl;
 			session->sock_write = sock_write_ssl;
 		} else {
-			session->transport = &sock;
+			session->ssl = 0;
+			session->transport = &session->sock;
 			session->sock_read = sock_read_clear;
 			session->sock_write = sock_write_clear;
 		}
@@ -152,7 +158,7 @@ static int irc_free(struct pork_acct *acct) {
 	free(session->prefix_types);
 	free(session->prefix_codes);
 
-	if (session->transport != NULL)
+	if (session->ssl)
 		SSL_free(session->transport);
 
 	irc_callback_clear(session);
@@ -247,6 +253,9 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 static int irc_connect_abort(struct pork_acct *acct) {
 	struct irc_session *session = acct->data;
 
+	if (session->ssl)
+		SSL_free(session->transport);
+
 	close(session->sock);
 	pork_io_del(session);
 	return (0);
@@ -261,9 +270,9 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	server_num = (acct->reconnect_tries - 1) % session->num_servers;
 
 	ret = irc_connect(acct, session->servers[server_num], &sock);
-	if (ret == 0) {
+	if (ret == 0)
 		irc_connected(sock, 0, session);
-	} else if (ret == -EINPROGRESS) {
+	else if (ret == -EINPROGRESS) {
 		u_int32_t flags = IO_COND_WRITE;
 		if (session->server_ssl & (1 << server_num))
 			flags |= IO_ATTR_SSL;

@@ -190,13 +190,13 @@ void transfer_recv_data(int fd __notused, u_int32_t flags __notused, void *data)
 
 void transfer_send_data(int fd __notused, u_int32_t flags __notused, void *data)
 {
-	int ret;
-	int sent;
+	size_t ret;
+	ssize_t sent;
 	char buf[4096];
 	struct file_transfer *xfer = data;
 
 	ret = fread(buf, 1, sizeof(buf), xfer->fp);
-	if (ret < 0) {
+	if (ret < 1) {
 		debug("fread: %s", strerror(errno));
 		transfer_lost(xfer);
 		return;
@@ -206,7 +206,7 @@ void transfer_send_data(int fd __notused, u_int32_t flags __notused, void *data)
 		gettimeofday(&xfer->time_started, NULL);
 
 	sent = sock_write(&xfer->sock, buf, ret, sock_write_clear);
-	if (sent != ret) {
+	if (if sent < 0 || (size_t) sent != ret) {
 		screen_err_msg(_("Error sending data for file %s: %s"),
 			xfer->fname_local, strerror(errno));
 		transfer_lost(xfer);

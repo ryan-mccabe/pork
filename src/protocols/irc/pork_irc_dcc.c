@@ -225,7 +225,7 @@ int irc_recv_data(	struct file_transfer *xfer,
 	time(&dcc->last_active);
 	offset = htonl(xfer->bytes_sent);
 
-	if (sock_write(xfer->sock, &offset, 4, sock_write_clear) != 4) {
+	if (sock_write(&xfer->sock, &offset, 4, sock_write_clear) != 4) {
 		close(xfer->sock);
 		transfer_lost(xfer);
 		return (-1);
