@@ -57,6 +57,7 @@
 #include <pork_proto.h>
 #include <pork_queue.h>
 #include <pork_missing.h>
+#include <pork_ssl.h>
 
 struct screen globals;
 static void generic_signal_handler(int sig) __noreturn;

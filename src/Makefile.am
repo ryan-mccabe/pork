@@ -9,9 +9,7 @@ if AIM_SUPPORT
 aim_lib = protocols/aim/libaim.a protocols/aim/libfaim/libfaim.a
 endif
 
-if COMPILE_PERL
 perl_lib = perl/libporkperl.a
-endif
 
 INCLUDES = -Imissing -Iperl -Iprefs -I.. -I.
 

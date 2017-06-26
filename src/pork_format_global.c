@@ -779,6 +779,7 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 		case 'u':
 			if (chat != NULL)
 				ret = xstrncpy(buf, chat->title_full_quoted, len);
+			break;
 
 		/* Source's userhost (if available) */
 		case 'H':

@@ -79,6 +79,8 @@ AC_ARG_WITH(ssl,
 [  --with-ssl  		  Include SSL support for IRC])
 if test "$withval" = "no"; then
 	ssl="no"
+else
+	LDFLAGS="$LDFLAGS -lcrypto"
 fi
 
 withval=""
@@ -392,6 +394,8 @@ fi
 if test "$ssl" = "yes"; then
 	AC_DEFINE(SSL_SUPPORT, 1, [Define to enable SSL support for IRC])
 fi
+
+CFLAGS="-Wextra -Wall -Wformat-security -Wno-unused -Wno-unused-parameter -D_GNU_SOURCE $CFLAGS"
 
 if test -n "$DEBUG_CFLAGS$DEBUG_LIBS"; then
 	CFLAGS="$(echo $CFLAGS | sed 's/-O[[1-9]]*/-O0/g' | sed 's/-g[[0-9]]*/-g3 -ggdb/g')"

@@ -42,6 +42,7 @@
 #include <pork_screen_io.h>
 #include <pork_io.h>
 #include <pork_status.h>
+#include <pork_ssl.h>
 
 /*
 ** Find the window having the specified refnum, and return
@@ -159,7 +160,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 			PROTO_NULL);
 	if (acct == NULL)
 		return (-1);
-	acct->refnum = -1UL;
+	acct->refnum = -1;
 
 	pork_acct_add(acct);
 	globals.null_acct = acct;
