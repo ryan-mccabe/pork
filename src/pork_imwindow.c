@@ -131,9 +131,11 @@ int imwindow_set_priv_input(struct imwindow *win, int val) {
 		** to the global input.
 		*/
 
-		input_destroy(win->input);
-		free(win->input);
-		win->input = &globals.input;
+		if (win->input != &globals.input) {
+			input_destroy(win->input);
+			free(win->input);
+			win->input = &globals.input;
+		}
 	}
 
 	return (0);

@@ -547,7 +547,7 @@ static char *get_chatname(const char *orig) {
 	char *ret;
 
 	if (orig == NULL)
-		return (xstrdup(orig));
+		return (NULL);
 
 	p = strrchr(orig, '-');
 	if (p == NULL)

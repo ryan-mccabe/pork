@@ -83,7 +83,7 @@ static void opt_updated_show_blist(struct pref_val *pref, va_list ap) {
 		u_int32_t new_val;
 
 		acct = win->owner;
-		if (acct->blist == NULL)
+		if (acct == NULL || acct->blist == NULL)
 			return;
 
 		new_val = opt_get_bool(pref, WIN_OPT_SHOW_BLIST);

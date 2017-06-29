@@ -87,6 +87,7 @@ static void irc_file_send_ready(int fd, u_int32_t flags, void *data) {
 			pork_io_del(xfer);
 			close(fd);
 			transfer_send_complete(xfer);
+			return;
 		}
 	}
 
@@ -113,6 +114,7 @@ static void irc_file_send_peer_connected(	int fd,
 	if (sock == -1) {
 		screen_err_msg(_("Error accepting connection: %s"), strerror(errno));
 		transfer_abort(xfer);
+		return;
 	}
 
 	/*

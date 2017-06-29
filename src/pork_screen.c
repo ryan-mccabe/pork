@@ -175,8 +175,8 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 		return (-1);
 	input_init(&globals.input, cols);
 
-	opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
 	screen_add_window(win);
+	opt_set(win->prefs, WIN_OPT_SHOW_BLIST, "1");
 	globals.status_win = win;
 	return (0);
 }
